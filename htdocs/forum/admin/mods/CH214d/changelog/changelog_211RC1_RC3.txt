@@ -1,0 +1,587 @@
+________________________________________________________________________________
+
+#=============================================================
+#	Change between 2.1.1 RC 1 & 2.1.1 RC 3
+#=============================================================
+Since 2005/04/03 :
+
+- install_cat/schemas/postgres_schema.sql : split default value & not null attributes from the alter tables sql (thanks to Kama)
+	this should increase the compliancy with postgresql versions less than 8.0
+
+- index.php : add the ability to use an icon for "mark all forums read"
+- memberlist.php : fix the pagination,
+- posting.php :
+	o fix the error message when hitting a new topic & calendar auth granted
+	o change the enhancement of the topic title
+- search.php :
+	o fix the topic count issue preventing the pagination to display,
+	o change the enhancement of the topic title
+- viewtopic.php :
+	o change the enhancement of the topic title
+- includes/class_config.php :
+	o remove the html usage to display a posts icon,
+	o remove default posts icon on replies,
+	o centralize the enhancement of the topic title
+- includes/class_template.php :
+	o fix a bug when using eXtreme Style,
+- includes/class_topics.php :
+	o clean html on topic title attribute when used as bubble info,
+	o add the ability to use an icon for "mark all topics read"
+- includes/sessions.php :
+	o prefer CH fix than phpBB one regarding the guest forcing,
+	o fix a typo in the "installed" pack (was ok and working, but prefer another place for the modifications)
+- includes/topic_review.php :
+	o change the enhancement of the topic title
+
+- admin/admin_icons.php : detailled the html used to display the post icons,
+- admin/admin_topics_attr.php : detect empty title name on list,
+- templates/subSilver/posting_icon_box.tpl : detailled the html used for the posts icon images,
+- templates/subSilver/admin/icons_list_body.tpl : detailled the html used for the posts icon images,
+- templates/subSilver/admin/topics_attr_list_body.tpl : move the "[]" from the php to the template,
+
+#
+#-----[ COPY ]------------------------------------------------
+#
+# see details at bottom of this document
+#
+COPY root/index.php TO index.php
+#
+#-----[ COPY ]------------------------------------------------
+#
+COPY root/admin/admin_icons.php TO admin/admin_icons.php
+COPY root/admin/admin_topics_attr.php TO admin/admin_topics_attr.php
+#
+#-----[ COPY ]------------------------------------------------
+#
+COPY root/includes/class_config.php TO includes/class_config.php
+#
+#-----[ COPY ]------------------------------------------------
+#
+COPY root/includes/class_template.php TO includes/class_template.php
+#
+#-----[ COPY ]------------------------------------------------
+#
+# see details at bottom of this document
+#
+COPY root/includes/class_topics.php TO includes/class_topics.php
+#
+#-----[ COPY ]------------------------------------------------
+#
+COPY root/templates/subSilver/posting_icon_box.tpl TO templates/subSilver/posting_icon_box.tpl
+#
+#-----[ COPY ]------------------------------------------------
+#
+COPY root/templates/subSilver/admin/icons_list_body.tpl TO templates/subSilver/admin/icons_list_body.tpl
+COPY root/templates/subSilver/admin/topics_attr_list_body.tpl TO templates/subSilver/admin/topics_attr_list_body.tpl
+#
+#-----[ OPEN ]------------------------------------------------
+#
+memberlist.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$sql = "SELECT count(*) AS total
+		FROM " . USERS_TABLE . "
+		WHERE user_id <> " . ANONYMOUS;
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+	if ( !empty($sql_join) )
+	{
+		$sql = str_replace('FROM ' . USERS_TABLE, 'FROM ' . USERS_TABLE . $sql_join, $sql);
+	}
+	if ( !empty($sql_where) )
+	{
+		$sql = str_replace('WHERE ', 'WHERE ' . $sql_where, $sql);
+	}
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+posting.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$calendar_time = intval($posting_form->fields['calendar_time']->value);
+		$calendar_stop = intval($posting_form->fields['calendar_stop']->value);
+		$calendar_time = empty($calendar_time) ? 0 : $user->cvt_user_to_sys_date($calendar_time);
+		$calendar_stop = empty($calendar_stop) ? 0 : $user->cvt_user_to_sys_date($calendar_stop);
+		if ( $calendar_time <= 0 )
+		{
+			$calendar_time = 0;
+		}
+		if ( $calendar_stop <= 0 )
+		{
+			$calendar_duration = 0;
+		}
+		else if ( empty($calendar_time) || ($calendar_time >= $calendar_stop) )
+		{
+			_error('Calendar_date_not_valid');
+		}
+		else
+		{
+			$calendar_duration = $calendar_stop - $calendar_time;
+		}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		$calendar_time = intval($posting_form->fields['calendar_time']->value);
+		$calendar_stop = intval($posting_form->fields['calendar_stop']->value);
+		$calendar_time = ($calendar_time <= 0) ? 0 : $user->cvt_user_to_sys_date($calendar_time);
+		$calendar_stop = ($calendar_stop <= 0) ? 0 : $user->cvt_user_to_sys_date($calendar_stop);
+
+		$calendar_duration = 0;
+		if ( ($calendar_stop > 0) && (($calendar_time == 0) || ($calendar_time >= $calendar_stop)) )
+		{
+			_error('Calendar_date_not_valid');
+		}
+		else if ( $calendar_time > 0 )
+		{
+			$calendar_duration = max(0, $calendar_stop - $calendar_time);
+		}
+#
+#-----[ FIND ]------------------------------------------------
+#
+		// message icon
+		$icons->topic_title('', $post_icon, ($post_data['first_post'] || ($mode == 'newtopic')) ? (($topic_type > POST_NORMAL) ? $topic_type : ($calendar_time ? POST_CALENDAR : '')) : '');
+
+		// sub title
+		$front_sub_title = new front_sub_title();
+		$front_sub_title->topic_title('', $sub_title, $sub_title_display);
+		unset($front_sub_title);
+
+		// first post of the topic, get additional information for the subject
+		if ( $post_data['first_post'] || ($mode == 'newtopic') )
+		{
+			// topic sub type
+			$topics_attr->topic_title('', $topic_sub_type);
+
+			// announce
+			$front_announce = new front_announce();
+			$front_announce->topic_title('', $post_info['topic_time'], $topic_duration);
+			unset($front_announce);
+
+			// calendar
+			$front_calendar = new front_calendar();
+			$front_calendar->topic_title('', $calendar_time, $calendar_duration);
+			unset($front_calendar);
+		}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		// build a row
+		$title_row = array_merge($post_info, array(
+			'topic_type' => $topic_type,
+			'topic_sub_type' => $topic_sub_type,
+			'topic_duration' => $topic_duration,
+			'topic_calendar_time' => $calendar_time,
+			'topic_calendar_duration' => $calendar_duration,
+			'post_icon' => $post_icon,
+			'post_sub_title' => $sub_title,
+		));
+
+		// enhance the topic title
+		$front_title = new front_title();
+		$front_title->set('', $title_row, $post_data['first_post'] || ($mode == 'newtopic'));
+#
+#-----[ OPEN ]------------------------------------------------
+#
+search.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$topics->total_topics = $total_match_count;
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		$this->total_topics = $total_match_count;
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$start = min(0, _read('start', TYPE_INT));
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		$start = max(0, _read('start', TYPE_INT));
+#
+#-----[ FIND ]------------------------------------------------
+#
+//		$tracking_topics = ( isset($HTTP_COOKIE_VARS[$board_config['cookie_name'] . '_t']) ) ? unserialize($HTTP_COOKIE_VARS[$board_config['cookie_name'] . '_t']) : array();
+//		$tracking_forums = ( isset($HTTP_COOKIE_VARS[$board_config['cookie_name'] . '_f']) ) ? unserialize($HTTP_COOKIE_VARS[$board_config['cookie_name'] . '_f']) : array();
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- add
+		// prepare title enhancement
+		$front_title = new front_title();
+#
+#-----[ FIND ]------------------------------------------------
+#
+				// message icon
+				$icons->topic_title('searchresults', $searchset[$i]['post_icon'], ($searchset[$i]['topic_first_post_id'] == $searchset[$i]['post_id']) ? (($searchset[$i]['topic_type'] > POST_NORMAL) ? $searchset[$i]['topic_type'] : ($searchset[$i]['topic_calendar_time'] ? POST_CALENDAR : '')) : '');
+
+				// sub title
+				$front_sub_title = new front_sub_title();
+				$front_sub_title->topic_title('searchresults', $searchset[$i]['post_sub_title'], intval($config->data['sub_title_length']));
+				unset($front_sub_title);
+
+				// first post of the topic, get additional information for the subject
+				if ( $searchset[$i]['topic_first_post_id'] == $searchset[$i]['post_id'] )
+				{
+					// topic sub type
+					$topics_attr->topic_title('searchresults', $searchset[$i]['topic_sub_type']);
+
+					// announce
+					$front_announce = new front_announce();
+					$front_announce->topic_title('searchresults', $searchset[$i]['topic_time'], $searchset[$i]['topic_duration']);
+					unset($front_announce);
+
+					// calendar
+					$front_calendar = new front_calendar();
+					$front_calendar->topic_title('searchresults', $searchset[$i]['topic_calendar_time'], $searchset[$i]['topic_calendar_duration']);
+					unset($front_calendar);
+				}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+				// enhance the topic title
+				$front_title->set('searchresults', $searchset[$i], $searchset[$i]['topic_first_post_id'] == $searchset[$i]['post_id'], $highlight_active);
+#
+#-----[ OPEN ]------------------------------------------------
+#
+viewtopic.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+$ranks = new ranks();
+$ranksrow = $ranks->read();
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+// prepare title enhancement
+$front_title = new front_title();
+#
+#-----[ FIND ]------------------------------------------------
+#
+	// message icon
+	$icons->topic_title('postrow', $postrow[$i]['post_icon'], ($forum_topic_data['topic_first_post_id'] == $postrow[$i]['post_id']) ? (($forum_topic_data['topic_type'] > POST_NORMAL) ? $forum_topic_data['topic_type'] : ($forum_topic_data['topic_calendar_time'] ? POST_CALENDAR : '')) : '');
+
+	// sub title
+	$front_sub_title = new front_sub_title();
+	$front_sub_title->topic_title('postrow', $postrow[$i]['post_sub_title'], intval($config->data['sub_title_length']), $highlight_match);
+	unset($front_sub_title);
+
+	// first post of the topic, get additional information for the subject
+	if ( $forum_topic_data['topic_first_post_id'] == $postrow[$i]['post_id'] )
+	{
+		// topic sub type
+		$topics_attr->topic_title('postrow', $forum_topic_data['topic_sub_type']);
+
+		// announce
+		$front_announce = new front_announce();
+		$front_announce->topic_title('postrow', $forum_topic_data['topic_time'], $forum_topic_data['topic_duration']);
+		unset($front_announce);
+
+		// calendar
+		$front_calendar = new front_calendar();
+		$front_calendar->topic_title('postrow', $forum_topic_data['topic_calendar_time'], $forum_topic_data['topic_calendar_duration']);
+		unset($front_calendar);
+	}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	// enhance the topic title
+	$front_title->set('postrow', array_merge($forum_topic_data, $postrow[$i]), $forum_topic_data['topic_first_post_id'] == $postrow[$i]['post_id'], $highlight_match);
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/sessions.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$userdata['user_id'] = ANONYMOUS;
+	return $userdata;
+}
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+	$db->sql_freeresult($result);
+#
+#-----[ FIND ]------------------------------------------------
+#
+# This FIND statement may differ depending the pack you used to install the mod
+# So replace the whole part whatever it is : use the comments for your search
+#
+					// No match; don't login, set as anonymous user
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+					$userdata = session_force_guest();
+//-- fin mod : categories hierarchy --------------------------------------------
+					$login = 0; 
+					$enable_autologin = 0; 
+					$user_id = $userdata['user_id'] = ANONYMOUS;
+				
+					$sql = 'SELECT * FROM ' . USERS_TABLE . ' WHERE user_id = ' . ANONYMOUS;
+					$result = $db->sql_query($sql);
+					$userdata = $db->sql_fetchrow($result);
+					$db->sql_freeresult($result);
+				}
+			}
+			else
+			{
+				// Autologin is not set. Don't login, set as anonymous user
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+				$userdata = session_force_guest();
+//-- fin mod : categories hierarchy --------------------------------------------
+				$login = 0;
+				$enable_autologin = 0;
+				$user_id = $userdata['user_id'] = ANONYMOUS;
+				
+				$sql = 'SELECT * FROM ' . USERS_TABLE . ' WHERE user_id = ' . ANONYMOUS;
+				$result = $db->sql_query($sql);
+				$userdata = $db->sql_fetchrow($result);
+				$db->sql_freeresult($result);
+			}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+					// No match; don't login, set as anonymous user
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+					$userdata = session_force_guest();
+//-- fin mod : categories hierarchy --------------------------------------------
+					$login = 0; 
+					$enable_autologin = 0; 
+					$user_id = $userdata['user_id'] = ANONYMOUS;
+				
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+//					$sql = 'SELECT * FROM ' . USERS_TABLE . ' WHERE user_id = ' . ANONYMOUS;
+//					$result = $db->sql_query($sql);
+//					$userdata = $db->sql_fetchrow($result);
+//					$db->sql_freeresult($result);
+//-- fin mod : categories hierarchy --------------------------------------------
+				}
+			}
+			else
+			{
+				// Autologin is not set. Don't login, set as anonymous user
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+				$userdata = session_force_guest();
+//-- fin mod : categories hierarchy --------------------------------------------
+				$login = 0;
+				$enable_autologin = 0;
+				$user_id = $userdata['user_id'] = ANONYMOUS;
+				
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+//				$sql = 'SELECT * FROM ' . USERS_TABLE . ' WHERE user_id = ' . ANONYMOUS;
+//				$result = $db->sql_query($sql);
+//				$userdata = $db->sql_fetchrow($result);
+//				$db->sql_freeresult($result);
+//-- fin mod : categories hierarchy --------------------------------------------
+			}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/topic_review.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+		if ( empty($forums) )
+		{
+			// read forums to get the specific style, used by user set
+			include_once($config->url('includes/class_forums'));
+			$forums = new forums();
+			$forums->read();
+		}
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+		// prepare title enhancement
+		$front_title = new front_title();
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+			// get icon
+			if ( !$is_inline_review )
+			{
+				// message icon
+				$icons->topic_title('postrow', $row['post_icon'], ($forum_row['topic_first_post_id'] == $row['post_id']) ? (($forum_row['topic_type'] > POST_NORMAL) ? $forum_row['topic_type'] : ($forum_row['topic_calendar_time'] ? POST_CALENDAR : '')) : '');
+
+				// sub title
+				$front_sub_title = new front_sub_title();
+				$front_sub_title->topic_title('postrow', $row['post_sub_title'], intval($config->data['sub_title_length']));
+				unset($front_sub_title);
+
+				// first post of the topic, get additional information for the subject
+				if ( $forum_row['topic_first_post_id'] == $row['post_id'] )
+				{
+					// topic sub type
+					$topics_attr->topic_title('postrow', $forum_row['topic_sub_type']);
+
+					// announce
+					$front_announce = new front_announce();
+					$front_announce->topic_title('postrow', $forum_row['topic_time'], $forum_row['topic_duration']);
+					unset($front_announce);
+
+					// calendar
+					$front_calendar = new front_calendar();
+					$front_calendar->topic_title('postrow', $forum_row['topic_calendar_time'], $forum_row['topic_calendar_duration']);
+					unset($front_calendar);
+				}
+			}
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+			// enhance the topic title
+			if ( !$is_inline_review )
+			{
+				$front_title->set('postrow', array_merge($forum_row, $row), $forum_row['topic_first_post_id'] == $row['post_id']);
+			}
+//-- fin mod : categories hierarchy --------------------------------------------
+###############################################################################
+#
+#-----[ OPEN ]------------------------------------------------
+#
+index.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.3 - 02/04/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.4 - 09/04/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+	'L_MARK_READ' => $user->lang('Mark_all_forums'),
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+	'I_MARK_READ' => $user->img('forum_mark_read'),
+#
+#-----[ OPEN ]------------------------------------------------
+#
+# Details of changes in class_topics : you can ignore this an prefer the copy in case you didn't modified it
+#
+includes/class_topics.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.10 - 02/04/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.11 - 09/04/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+	var $with_select;
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+	var $front_title;
+#
+#-----[ FIND ]------------------------------------------------
+#
+	function display($upper_box=false, $display_empty=false, $forced_title='')
+	{
+		global $template, $config, $user, $forums;
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+		// prepare title enhancement
+		$this->front_title = new front_title();
+#
+#-----[ FIND ]------------------------------------------------
+#
+					'L_MARK_READ' => $user->lang('Mark_all_topics'),
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+					'I_MARK_READ' => $user->img('topic_mark_read'),
+#
+#-----[ FIND ]------------------------------------------------
+#
+	function display_a_topic($row, $header_title='', $with_nav=false)
+	{
+		global $template, $config, $user, $forums, $icons, $topics_attr;
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+		global $images;
+#
+#-----[ FIND ]------------------------------------------------
+#
+			$s_folder_txt .= (empty($s_folder_txt) ? '&nbsp;' : "&nbsp;\n&nbsp;") . $user->lang($attr[0]['txt'][$i]);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			$s_folder_txt .= (empty($s_folder_txt) ? '&nbsp;' : "&nbsp;\n&nbsp;") . _clean_html($user->lang($attr[0]['txt'][$i]));
+#
+#-----[ FIND ]------------------------------------------------
+#
+		// topic icon
+		$icons->topic_title('topicrow.topic', $row['topic_icon'], ($row['topic_type'] == POST_NORMAL) && $row['topic_calendar_time'] ? POST_CALENDAR : $row['topic_type']);
+
+		// sub title
+		$front_sub_title = new front_sub_title();
+		$front_sub_title->topic_title('topicrow.topic', $row['topic_sub_title'], !empty($row['topic_sub_title']) && intval($config->data['sub_title_length']));
+		unset($front_sub_title);
+
+		// annonce duration
+		$front_announce = new front_announce();
+		$front_announce->topic_title('topicrow.topic', $row['topic_time'], $row['topic_duration'], !$with_nav);
+		unset($front_announce);
+
+		// calendar
+		$front_calendar = new front_calendar();
+		$front_calendar->topic_title('topicrow.topic', $row['topic_calendar_time'], $row['topic_calendar_duration']);
+		unset($front_calendar);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		// enhance the topic title
+		$row['post_icon'] = $row['topic_icon'];
+		$this->front_title->set('topicrow.topic', $row);
+#
+#-----[ FIND ]------------------------------------------------
+#
+				$template->assign_block_vars('topicrow.topic.type', array(
+					'L_TOPIC_TYPE' => $user->lang($attr[$i]['txt']),
+					'I_TOPIC_TYPE' => $user->img($attr[$i]['img']),
+				));
+				$template->set_switch('topicrow.topic.type.txt', !empty($attr[$i]['txt']) && empty($attr[$i]['img']));
+				$template->set_switch('topicrow.topic.type.img', !empty($attr[$i]['img']));
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+				$img = !empty($attr[$i]['img']) && isset($images[ $attr[$i]['img'] ]);
+				$template->assign_block_vars('topicrow.topic.type', array(
+					'L_TOPIC_TYPE' => $img ? _clean_html($user->lang($attr[$i]['txt'])) : $user->lang($attr[$i]['txt']),
+					'I_TOPIC_TYPE' => $img ? $user->img($attr[$i]['img']) : '',
+				));
+				$template->set_switch('topicrow.topic.type.txt', !empty($attr[$i]['txt']) && !$img);
+				$template->set_switch('topicrow.topic.type.img', $img);
+#
+#-----[ SAVE/CLOSE ALL FILES ]--------------------------------
+#
+# EoM
+
+________________________________________________________________________________

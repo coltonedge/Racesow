@@ -1,0 +1,27 @@
+<div id="news_content">
+<script type="text/javascript">
+    Racenet.Request.forceTarget = '#news_content';
+</script>
+<div style="height: 50px;"></div>
+<?= $this->paginatorCode = $this->paginationControl($this->paginator, 'Sliding', 'zend_paginator.phtml', array('reset' => true, 'route' => 'news', 'rel' => '#news_content')); ?>
+<div style="height: 10px;"></div>
+
+<div id="news" style="width: 810px; margin-left: auto; margin-right: auto;">
+<? foreach ($this->paginator->getIterator() as $news): ?>
+	<div class="racenet_headrow" style="">
+		<?= $this->escape($news->topic_title) ?>
+	</div>
+	<div class="racenet_row" style="margin-bottom: 15px;">
+		<span style="color: #fff; font-style: italic;"><?= date("Y-m-d H:i", $news->topic_time) ?></span><br/>
+		<br/>
+		<?= $this->Bbcode($news->getContent($news->topic_first_post_id)) ?>
+		<div style="width: 100px; border-bottom: 1px solid #737abc; height: 1px; margin: 10px 0px 5px 0px;"></div>
+		<a href="/forum/viewtopic.php?t=<?= $news->topic_id ?>"><?= $num = $news->Posts->count() - 1 ?> Comment<?= ( $num == 1 ? '' : 's' ) ?></a>
+		<br/>
+		<div class="fb-like" data-href="http://www.warsow-race.net/forum/viewtopic.php?t=<?= $news->topic_id ?>" data-send="false" data-width="450" data-show-faces="false" data-colorscheme="dark" data-font="verdana"></div>
+	</div>
+<? endforeach; ?>
+</div>
+
+<?= $this->paginatorCode ?>
+</div>

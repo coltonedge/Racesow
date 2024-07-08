@@ -1,0 +1,29 @@
+<div>
+	<? $this->rating = round($this->rating) ?>
+    <? $this->name = str_replace('#', '_', $this->name) ?>
+	<input name="rating_<?= $this->name ?>" type="radio" class="rating" value="poor"<?= $this->rating == 1 ? ' checked="true"' : '' ?><?= $this->disabled ? ' disabled="true"' : '' ?>/>
+    
+	<input name="rating_<?= $this->name ?>" type="radio" class="rating" value="poor"<?= $this->rating == 2 ? ' checked="true"' : '' ?><?= $this->disabled ? ' disabled="true"' : '' ?>/>
+	<input name="rating_<?= $this->name ?>" type="radio" class="rating" value="poor"<?= $this->rating == 3 ? ' checked="true"' : '' ?><?= $this->disabled ? ' disabled="true"' : '' ?>/>
+	<input name="rating_<?= $this->name ?>" type="radio" class="rating" value="poor"<?= $this->rating == 4 ? ' checked="true"' : '' ?><?= $this->disabled ? ' disabled="true"' : '' ?>/>
+	<input name="rating_<?= $this->name ?>" type="radio" class="rating" value="hmmm"<?= $this->rating == 5 ? ' checked="true"' : '' ?><?= $this->disabled ? ' disabled="true"' : '' ?>/>
+	<input name="rating_<?= $this->name ?>" type="radio" class="rating" value="hmmm"<?= $this->rating == 6 ? ' checked="true"' : '' ?><?= $this->disabled ? ' disabled="true"' : '' ?>/>
+	<input name="rating_<?= $this->name ?>" type="radio" class="rating" value="hmmm"<?= $this->rating == 7 ? ' checked="true"' : '' ?><?= $this->disabled ? ' disabled="true"' : '' ?>/>
+	<input name="rating_<?= $this->name ?>" type="radio" class="rating" value="hmmm"<?= $this->rating == 8 ? ' checked="true"' : '' ?><?= $this->disabled ? ' disabled="true"' : '' ?>/>
+	<input name="rating_<?= $this->name ?>" type="radio" class="rating" value="playable"<?= $this->rating == 9 ? ' checked="true"' : '' ?><?= $this->disabled ? ' disabled="true"' : '' ?>/>
+	<input name="rating_<?= $this->name ?>" type="radio" class="rating" value="playable"<?= $this->rating == 10 ? ' checked="true"' : '' ?><?= $this->disabled ? ' disabled="true"' : '' ?>/>
+	<input name="rating_<?= $this->name ?>" type="radio" class="rating" value="playable"<?= $this->rating == 11 ? ' checked="true"' : '' ?><?= $this->disabled ? ' disabled="true"' : '' ?>/>
+	<input name="rating_<?= $this->name ?>" type="radio" class="rating" value="playable"<?= $this->rating == 12 ? ' checked="true"' : '' ?><?= $this->disabled ? ' disabled="true"' : '' ?>/>
+	<input name="rating_<?= $this->name ?>" type="radio" class="rating" value="good"<?= $this->rating == 13 ? ' checked="true"' : '' ?><?= $this->disabled ? ' disabled="true"' : '' ?>/>
+	<input name="rating_<?= $this->name ?>" type="radio" class="rating" value="good"<?= $this->rating == 14 ? ' checked="true"' : '' ?><?= $this->disabled ? ' disabled="true"' : '' ?>/>
+	<input name="rating_<?= $this->name ?>" type="radio" class="rating" value="good"<?= $this->rating == 15 ? ' checked="true"' : '' ?><?= $this->disabled ? ' disabled="true"' : '' ?>/>
+	<input name="rating_<?= $this->name ?>" type="radio" class="rating" value="good"<?= $this->rating == 16 ? ' checked="true"' : '' ?><?= $this->disabled ? ' disabled="true"' : '' ?>/>
+	<input name="rating_<?= $this->name ?>" type="radio" class="rating" value="awesome"<?= $this->rating == 17 ? ' checked="true"' : '' ?><?= $this->disabled ? ' disabled="true"' : '' ?>/>
+	<input name="rating_<?= $this->name ?>" type="radio" class="rating" value="awesome"<?= $this->rating == 18 ? ' checked="true"' : '' ?><?= $this->disabled ? ' disabled="true"' : '' ?>/>
+	<input name="rating_<?= $this->name ?>" type="radio" class="rating" value="awesome"<?= $this->rating == 19 ? ' checked="true"' : '' ?><?= $this->disabled ? ' disabled="true"' : '' ?>/>
+	<input name="rating_<?= $this->name ?>" type="radio" class="rating" value="awesome"<?= $this->rating == 20 ? ' checked="true"' : '' ?><?= $this->disabled ? ' disabled="true"' : '' ?>/>
+
+	<span class="info"><?= $this->info ?></span>
+
+	<div style="clear: left;"></div>
+</div>

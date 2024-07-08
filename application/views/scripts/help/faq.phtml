@@ -1,0 +1,13 @@
+<div style="width: 810px; margin-left: auto; margin-right: auto;">
+	<div class="racenet_headrow">
+		Frequently Asked Questions
+	</div>
+	<ul class="faq">
+    <? foreach ($this->help->getFaqItems() as $item): ?>
+	    <li class="faq_item">
+            <span class="faq_question"><?= $item->question ?> <span class="icon">+</span></span>
+            <div class="faq_answer" style="<?= $item->active ? '' : 'display:none;' ?>"><?= nl2br($item->answer) ?></div>
+        </li>
+	<? endforeach; ?>
+	</ul>
+</div>

@@ -1,0 +1,403 @@
+###############################################
+##	Hack Title:		Buddylist
+##	Hack Version:	1.1.1
+##	Author:			Freakin' Booty ;-P
+##	Description:	Add and remove buddies from a list. PM or email someone right from the
+##					list, instead of searching for them through the memberlist first.
+##					See a buddy's online/offline status.
+##					This version allows you to have the buddylist on any page you want; all you need to do, is
+##					add a few lines in the page. Read "Buddylist 1.1.1 Installation Instructions (1).html" for more info.
+##
+##	Compatibility:	2.0.4 - 2.0.5
+##
+##	Installation Level: Easy
+##	Installation Time: 15 - 25 minutes
+##	Files To Edit: 10
+##		common.php
+##		privmsg.php
+##		viewtopic.php
+##		includes/constants.php
+##		includes/usercp_viewprofile.php
+##		language/lang_english/lang_main.php
+##		templates/subSilver/subSilver.cfg
+##		templates/SubSilver/privmsgs_read_body.tpl
+##		templates/SubSilver/profile_view_body.tpl
+##		templates/SubSilver/viewtopic_body.tpl
+##
+##	Included Files: 5
+##		db_update.php
+##		includes/functions_buddylist.php
+##		templates/subSilver/buddylist_body.tpl
+##		templates/subSilver/images/lang_english/icon_buddy.gif
+##		templates/subSilver/images/lang_english/icon_remove_buddy.gif
+##
+##	History:
+##		See "Buddylist 1.1.1 - version history.txt".
+##
+##	Author Notes:
+##		Please read the "Buddylist 1.1.1 Installation Instructions (1).html" as well, or you will not be able to see the buddylist!
+##
+##	Support:		http://www.phpbbhacks.com/forums
+##	Copyright:		©2003 Buddylist 1.1.1 - Freakin' Booty ;-P
+##
+###############################################
+##   You downloaded this hack from phpBBHacks.com, the #1 source for phpBB related downloads.
+##   Please visit http://www.phpbbhacks.com/forums for support.
+###############################################
+##
+###############################################
+##	This hack is released under the GPL License.
+##	This hack can be freely used, but not distributed, without permission.
+##	Intellectual Property is retained by the hack author(s) listed above.
+###############################################
+
+#
+#-----[ COPY ]--------------------------------------------
+#
+# Make sure to run this file once as an administrator and then delete it immediately
+#
+db_update.php		=> db_update.php
+
+#
+#-----[ COPY ]--------------------------------------------
+#
+includes/functions_buddylist.php			=> includes/functions_buddylist.php
+templates/subSilver/buddylist_body.tpl		=> templates/subSilver/buddylist_body.tpl
+templates/subSilver/images/lang_english/icon_buddy.gif			=> templates/subSilver/images/lang_english/icon_buddy.gif
+templates/subSilver/images/lang_english/icon_remove_buddy.gif	=> templates/subSilver/images/lang_english/icon_remove_buddy.gif
+
+#
+#-----[ OPEN ]--------------------------------------------
+#
+common.php
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+include($phpbb_root_path . 'includes/db.'.$phpEx);
+
+#
+#-----[ AFTER, ADD ]--------------------------------------
+#
+include($phpbb_root_path . 'includes/functions_buddylist.'.$phpEx);
+
+#
+#-----[ OPEN ]--------------------------------------------
+#
+privmsg.php
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+//
+// Define the box image links
+//
+
+#
+#-----[ BEFORE, ADD ]-------------------------------------
+#
+//
+// Buddylist actions
+//
+$buddy_id = ( isset($HTTP_GET_VARS['b']) ) ? intval($HTTP_GET_VARS['b']) : 0;
+$buddy_action = ( isset($HTTP_GET_VARS['buddy']) ) ? $HTTP_GET_VARS['buddy'] : '';
+if( $buddy_id && $buddy_action != '' )
+{
+	if( $buddy_action == 'add' )
+	{
+		add_buddy($userdata['user_id'], $buddy_id);
+	}
+	else if( $buddy_action == 'remove' )
+	{
+		remove_buddy($userdata['user_id'], $buddy_id);
+	}
+}
+//
+// END: Buddylist actions
+//
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+	$search = '<a href="' . $temp_url . '">' . $lang['Search_user_posts'] . '</a>';
+
+#
+#-----[ AFTER, ADD ]--------------------------------------
+#
+	if( $user_id_to == $userdata['user_id'] )
+	{
+		list($buddy_img, $buddy) = get_buddy_img($user_id_to, $user_id_from);
+	}
+	else
+	{
+		$buddy_img = '';
+		$buddy = '';
+	}
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+		'WWW' => $www,
+
+#
+#-----[ AFTER, ADD ]--------------------------------------
+#
+		'BUDDY_IMG' => $buddy_img,
+		'BUDDY' => $buddy,
+
+#
+#-----[ OPEN ]--------------------------------------------
+#
+viewtopic.php
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+//
+// Is user watching this thread?
+//
+
+#
+#-----[ BEFORE, ADD ]-------------------------------------
+#
+//
+// Buddylist actions
+//
+$buddy_id = ( isset($HTTP_GET_VARS['b']) ) ? intval($HTTP_GET_VARS['b']) : 0;
+$buddy_action = ( isset($HTTP_GET_VARS['buddy']) ) ? $HTTP_GET_VARS['buddy'] : '';
+if( $buddy_id && $buddy_action != '' )
+{
+	if( $buddy_action == 'add' )
+	{
+		add_buddy($userdata['user_id'], $buddy_id);
+	}
+	else if( $buddy_action == 'remove' )
+	{
+		remove_buddy($userdata['user_id'], $buddy_id);
+	}
+}
+//
+// END: Buddylist actions
+//
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+	$search = '<a href="' . $temp_url . '">' . $lang['Search_user_posts'] . '</a>';
+
+#
+#-----[ AFTER, ADD ]--------------------------------------
+#
+	list($buddy_img, $buddy) = get_buddy_img($userdata['user_id'], $poster_id);
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+		'YIM' => $yim,
+
+#
+#-----[ AFTER, ADD ]--------------------------------------
+#
+		'BUDDY_IMG' => $buddy_img,
+		'BUDDY' => $buddy,
+
+#
+#-----[ OPEN ]--------------------------------------------
+#
+includes/constants.php
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+define('BANLIST_TABLE', $table_prefix.'banlist');
+
+#
+#-----[ AFTER, ADD ]--------------------------------------
+#
+define('BUDDIES_TABLE', $table_prefix.'buddies');
+
+# 
+#-----[ OPEN ]--------------------------------------------
+#
+includes/usercp_viewprofile.php
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+$profiledata = get_userdata(intval($HTTP_GET_VARS[POST_USERS_URL]));
+
+#
+#-----[ AFTER, ADD ]--------------------------------------
+#
+//
+// Buddylist actions
+//
+$buddy_id = ( isset($HTTP_GET_VARS['b']) ) ? intval($HTTP_GET_VARS['b']) : 0;
+$buddy_action = ( isset($HTTP_GET_VARS['buddy']) ) ? $HTTP_GET_VARS['buddy'] : '';
+if( $buddy_id && $buddy_action != '' )
+{
+	if( $buddy_action == 'add' )
+	{
+		add_buddy($userdata['user_id'], $buddy_id);
+	}
+	else if( $buddy_action == 'remove' )
+	{
+		remove_buddy($userdata['user_id'], $buddy_id);
+	}
+}
+//
+// END: Buddylist actions
+//
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+$search = '<a href="' . $temp_url . '">' . $lang['Search_user_posts'] . '</a>';
+
+#
+#-----[ AFTER, ADD ]--------------------------------------
+#
+list($buddy_img, $buddy) = get_buddy_img($userdata['user_id'], $profiledata['user_id']);
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+	'WWW' => $www,
+
+#
+#-----[ AFTER, ADD ]--------------------------------------
+#
+	'BUDDY_IMG' => $buddy_img,
+	'BUDDY' => $buddy,
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+	'L_WEBSITE' => $lang['Website'],
+
+#
+#-----[ AFTER, ADD ]--------------------------------------
+#
+	'L_BUDDY' => $lang['Buddy'],
+
+# 
+#-----[ OPEN ]--------------------------------------------
+#
+# make sure to copy/edit this for every language installed
+#
+language/lang_english/lang_main.php
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+//
+// That's all Folks!
+// -------------------------------------------------
+
+#
+#-----[ BEFORE, ADD ]-------------------------------------
+#
+//
+// Buddy list
+//
+$lang['Buddylist'] = 'Buddylist';
+$lang['Buddy'] = 'Buddy';
+$lang['Add_buddy'] = 'Add to your buddylist';
+$lang['Remove_buddy'] = 'Remove from your buddylist';
+$lang['Buddy_added'] = 'The user has been added to your buddylist';
+$lang['Buddy_removed'] = 'The user has been removed from your buddylist';
+$lang['Click_return_page'] = 'Click %sHere%s to return to the page';
+$lang['Confirm_remove_buddy'] = 'Are you sure you want to remove this buddy from your list?';
+
+$lang['Online'] = 'Online';
+$lang['Offline'] = 'Offline';
+$lang['Buddies_online'] = 'Online buddies';
+$lang['Buddies_offline'] = 'Offline buddies';
+$lang['No_buddies'] = 'You currently have no buddies in your list';
+$lang['No_buddies_online'] = 'You currently have no buddies online';
+$lang['No_buddies_offline'] = 'You currently have no buddies offline';
+
+# 
+#-----[ OPEN ]--------------------------------------------
+#
+# make sure to copy/edit this file for every template installed
+#
+templates/subSilver/privmsgs_read_body.tpl
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+{PROFILE_IMG}
+
+#
+#-----[ AFTER, ADD ]--------------------------------------
+#
+ {BUDDY_IMG}
+
+# 
+#-----[ OPEN ]-------------------------------------------- 
+#
+# make sure to copy/edit this file for every template installed
+#
+templates/subSilver/profile_view_body.tpl
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+<noscript>{ICQ_IMG}</noscript></td>
+		</tr>
+
+#
+#-----[ AFTER, ADD ]--------------------------------------
+#
+		<tr> 
+		  <td valign="middle" nowrap="nowrap" align="right"><span class="gen">{L_BUDDY}:</span></td>
+		  <td class="row1" valign="middle">{BUDDY_IMG}</td>
+		</tr>
+
+# 
+#-----[ OPEN ]--------------------------------------------
+#
+# make sure to copy/edit this file for every template installed
+#
+templates/subSilver/subSilver.cfg
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+$images['icon_email'] = "$current_template_images/{LANG}/icon_email.gif";
+
+#
+#-----[ AFTER, ADD ]--------------------------------------
+#
+//
+// Buddylist 
+//
+$images['icon_buddy'] = "$current_template_images/{LANG}/icon_buddy.gif";
+$images['icon_buddy_remove'] = "$current_template_images/{LANG}/icon_buddy_remove.gif";
+
+# 
+#-----[ OPEN ]--------------------------------------------
+#
+# make sure to copy/edit this file for every template installed
+#
+templates/subSilver/viewtopic_body.tpl
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+{postrow.PROFILE_IMG}
+
+#
+#-----[ AFTER, ADD ]--------------------------------------
+#
+ {postrow.BUDDY_IMG}
+
+#
+# READ
+#
+Buddylist 1.1.0 Installation instructions (1).html
+
+#
+#-----[ SAVE & CLOSE ALL FILES ]--------------------------
+#

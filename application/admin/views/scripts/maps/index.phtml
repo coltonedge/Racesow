@@ -1,0 +1,114 @@
+<div style="margin-left: auto; margin-right: auto; width: 850px;">
+   
+    <table class="racenet" border="0">
+        <thead>
+            <td colspan="9">
+                <div style="float: left;">
+                    Maps
+                </div>
+                <form action="/admin/maps/index/" method="get" onsubmit="return Racenet.Request.load(this);" style="float: right; margin-bottom: 1px;">
+                            
+	                <span style="margin-top: 7px; margin-right: 5px; font-weight: normal; font-family: verdana; font-size: 12px;">
+	                    <input value="1" rel="<?= $this->url(array('snew' => null, 'senabled' => null, 'sdisabled' => null)) ?>" <?= $this->snew ? 'checked="true" ' : '' ?>type="checkbox" name="snew" id="status_new"/><label for="status_new" style="color: #0f0;">new</label>
+	                    <input value="1" rel="<?= $this->url(array('snew' => null, 'senabled' => null, 'sdisabled' => null)) ?>" <?= $this->senabled ? 'checked="true" ' : '' ?>type="checkbox" name="senabled" id="status_enabled"/><label for="status_enabled">enabled</label>
+	                    <input value="1" rel="<?= $this->url(array('snew' => null, 'senabled' => null, 'sdisabled' => null)) ?>" <?= $this->sdisabled ? 'checked="true" ' : '' ?>type="checkbox" name="sdisabled" id="status_disabled"/><label for="status_disabled" style="color: #f00;">disabled</label>
+	                    <input value="1" rel="<?= $this->url(array('trace' => null, 'tfs' => null)) ?>" <?= $this->trace ? 'checked="true" ' : '' ?>type="checkbox" name="trace" id="type_race"/><label for="type_race">race</label>
+	                    <input value="1" rel="<?= $this->url(array('trace' => null, 'tfs' => null)) ?>" <?= $this->tfs ? 'checked="true" ' : '' ?>type="checkbox" name="tfs" id="type_fs"/><label for="type_fs">freestyle</label>
+	                </span>
+                    <? /* if ($this->search): ?>
+		                <? if ($this->matchedItems): ?>
+		                    <span style="font-size: 12px; font-family: Arial; font-style: normal;">showing player<?= $this->matchedItems != 1 ? 's' : '' ?> from <?= $this->showFrom ?> to <?= $this->showTo ?> of <?= $this->matchedItems ?> matches for </span>
+		                <? elseif (!$this->filter): ?>
+		                    <span style="font-size: 12px; font-family: Arial; font-style: normal; color: red;">no map matches </span>
+		                <? endif; ?>
+		            <? endif; */ ?>
+		            <input name="filter" class="search" type="text" value="<?= $this->search ? $this->search : ($this->filter ? $this->filter : '') ?>" />
+		            <!--
+		            <input title="show all players and highlight matches" type="submit" onclick="return Racenet.Request.search(this, '<?= $this->url(array("search" => ":value", "filter" => null,"skip" => "0", "page" => null)) ?>', 'map');" name="highlight" value="highlight" />
+		             -->
+		            <input title="show only players matching your search" type="submit" onclick="" value="search" />
+		            <!--
+		            <input title="jump to previous matches" type="button" class="history" onclick="return racenet_request($(this).attr('rel'), '#inner_tube');" rel="<?= $this->url(array("skip" => $this->skip-1)) ?>" value="&lt;" <?= ($this->skip < 1 || !$this->search ? 'disabled="disabled"' : '') ?>/>
+		            <input title="jump to following matches" type="button" class="history" onclick="return racenet_request($(this).attr('rel'), '#inner_tube');" rel="<?= $this->url(array("skip" => $this->skip+1)) ?>" value="&gt;" <?= ($this->page >= $this->lastMatchedPage || !$this->search ? 'disabled="disabled"' : '') ?> />
+		            -->
+		            <input title="clear the current search or highlight" type="button" class="history" onclick="return Racenet.Request.search(this, $(this).attr('rel'), '');" rel="<?= $this->url(array("skip" => null, "hl" => null, "search" => null, "filter" => null, "page" => $this->page)) ?>" value="clear" <?= (!$this->filter && !$this->search ? 'disabled="disabled"' : '') ?> />
+		        </form>
+
+		        <div style="clear: both;"></div>
+            </td>
+        </thead>
+    
+    
+	    <? $counter = 0 ?>
+	    <? if( $this->paginator ): ?>
+		    <tr>
+		       <td colspan="9">
+		        <?  
+		            // removes search from in paginator links
+		            if (isset($this->search)) {
+		            	require_once 'Racenet/View/Helper/Url.php';
+		                Racenet_View_Helper_Url::setOptions(array(
+		                    "search" => null,
+		                    "skip" => null
+		                ));
+		            }
+		            
+		            echo $this->paginatorCode = $this->paginationControl($this->paginator, 'Sliding', 'zend_paginator.phtml', array("highlight" => $this->highlight, "disabled" => !empty($this->search) ? false: false));
+		
+		            // restore original paginator links
+		            Racenet_View_Helper_Url::clearOptions();
+		        ?>
+		        </td>
+		    </tr>
+		    
+	        <tr class="racenet_semihead rankedmaps_click">
+	            <td style="width: 45px; text-align: right;">
+	                Pos.
+	            </td>
+	            <td style="width: 310px;<?= $this->order == 'name' ? ' color: '. ($this->dir == 'ASC' ? '#00ff00' : '#ff0000') : '' ?>">            
+	                Map
+	                <a class="history" onClick="return racenet_request(maptype_filter_url(this));" href="<?= $this->url(array("order" => "name", "dir" => "ASC", "page" => null)); ?>" title="up"><img src="/gfx/icons/ico_up.gif" border="0" align="absmiddle"></a><a class="history" onClick="return racenet_request(maptype_filter_url(this));" href="<?= $this->url(array("order" => "name", "dir" => "DESC", "page" => null)); ?>" title="down"><img src="/gfx/icons/ico_down.gif" border="0" align="absmiddle"></a>
+	            </td>
+	            <td style="width: 100px; text-align: left;<?= $this->order == 'races' ? ' color: '. ($this->dir == 'ASC' ? '#00ff00' : '#ff0000') : '' ?>">
+	                Races
+	                <a class="history" onClick="return racenet_request(maptype_filter_url(this));" href="<?= $this->url(array("order" => "races", "dir" => "ASC", "page" => null)); ?>" title="up"><img src="/gfx/icons/ico_up.gif" border="0" align="absmiddle"></a><a class="history" onClick="return racenet_request(maptype_filter_url(this));" href="<?= $this->url(array("order" => "races", "dir" => "DESC", "page" => null)); ?>" title="down"><img src="/gfx/icons/ico_down.gif" border="0" align="absmiddle"></a>
+	            </td>
+	            <td style="width: 100px; text-align: left;<?= $this->order == 'playtime' ? ' color: '. ($this->dir == 'ASC' ? '#00ff00' : '#ff0000') : '' ?>">
+	                Playtime
+	                <a class="history" onClick="return racenet_request(maptype_filter_url(this));" href="<?= $this->url(array("order" => "playtime", "dir" => "ASC", "page" => null)); ?>" title="up"><img src="/gfx/icons/ico_up.gif" border="0" align="absmiddle"></a><a class="history" onClick="return racenet_request(maptype_filter_url(this));" href="<?= $this->url(array("order" => "playtime", "dir" => "DESC", "page" => null)); ?>" title="down"><img src="/gfx/icons/ico_down.gif" border="0" align="absmiddle"></a>
+	            </td>
+	            <td style="width: 60px; text-align: right;<?= $this->order == 'downloads' ? ' color: '. ($this->dir == 'ASC' ? '#00ff00' : '#ff0000') : '' ?>">
+	                DL.
+	                <a class="history" onClick="return racenet_request(maptype_filter_url(this));" href="<?= $this->url(array("order" => "downloads", "dir" => "ASC", "page" => null)); ?>" title="up"><img src="/gfx/icons/ico_up.gif" border="0" align="absmiddle"></a><a class="history" onClick="return racenet_request(maptype_filter_url(this));" href="<?= $this->url(array("order" => "downloads", "dir" => "DESC", "page" => null)); ?>" title="down"><img src="/gfx/icons/ico_down.gif" border="0" align="absmiddle"></a>
+	            </td>
+	            <td style="text-align: right; width: 100px;">            
+	                Type
+	            </td>
+	            <td style="text-align: center; width: 90px;">            
+	                Status
+	            </td>
+	            <td style="width: 50px">            
+	                &nbsp;
+	            </td>
+	        </tr> 
+        <? if (count($this->paginator->getIterator())): ?>
+            <?= $this->partialLoop('/maps/map.phtml', $this->paginator->getIterator()) ?>
+        <? else: ?>
+            <tr style="color: #f00; margin: 10px;">
+                <td colspan=9">
+                    No map matched your search
+                </td>
+            </tr>
+        <? endif; ?>
+        <tr>
+            <td colspan="9">
+                <?= $this->paginatorCode ?>
+            </td>
+        </tr>
+    <? else: ?>
+    <tr>
+        <td colspan="9">No maps are available</td>
+    </tr>      
+    <? endif; ?>
+    </table>
+</div>

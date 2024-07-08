@@ -1,0 +1,43 @@
+This will walk you through understanding the uploads section of the template,
+since it can appear vague to a new mod installer.
+
+Let us step through an example:
+-------------------------------------------------------------------------------
+#-----[ UPLOAD ]------------------------------------------ 
+#   If you are having trouble understanding this section, read
+#   the goodies/understanding_upload.txt file.
+#
+copy install/*.* to install/
+copy admin/*.* to admin/
+copy test.php to /
+copy templates/subSilver/admin/*.* to templates/subSilver/admin/
+copy language/lang_english/*.* to language/lang_english/
+copy includes/*.* to includes/
+-------------------------------------------------------------------------------
+
+You will see lots of dir/*.* to dir/ above.  It actually means that inside
+the directory structure of the hack you are installing, you will find, for example
+the install directory.  Inside this directory will be several files, which all needs
+to be uploaded to your site.  If it does not already exist, you would need to
+create the install sub-directory on your site, such as phpBB2/install.  You would
+upload all the files inside the local install directory to the one on your site.
+
+If you see a single / as the upload location, it simply means your main phpBB
+directory.  Such as phpBB2/.
+
+Some areas will be using the default names, such as templates and languages.  Here
+you should substitute your directory if you use something different.  For example,
+say you use a template scheme called copperX.  You would instead of the line
+templates/subSilver/admin/*.* to templates/subSilver/admin/ assume it is meant
+templates/subSilver/admin/*.* to templates/copperX/admin/ instead.
+
+Languages are different, as my hacks most likely will not include any other than
+English unless someone has contributed them to me.  You can of course use the
+default English text for all languages on your site until you can translate them
+yourself or find one that is translated.  To do so, for the line
+language/lang_english/*.* to language/lang_english/ you would assume for each
+language/lang_english/*.* to language/lang_german/,
+language/lang_english/*.* to language/lang_french/, and so forth.  If there is
+an included language other than english, it will exist under the same
+structure like language/lang_german/*.* locally.
+

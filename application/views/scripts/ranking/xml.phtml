@@ -1,0 +1,23 @@
+<ranking>
+<order<?= ($this->ranking->order != $this->ranking->defaultOrder ? ' default="'. $this->ranking->defaultOrder .'"' : '') ?>><?= $this->ranking->order ?></order>
+<direction<?= ($this->ranking->dir != $this->ranking->defaultDir ? ' default="'. $this->ranking->defaultDir .'"' : '') ?>><?= $this->ranking->dir ?></direction>
+<? foreach ($this->ranking->paginator->getIterator() as $player): ?>
+<player position="<?= $player->position ?>">
+<id><?= $this->Cdata($player->id) ?></id>
+<name><?= $this->Cdata($player->name) ?></name>
+<simplified><?= $this->Cdata($player->simplified) ?></simplified>
+<points diff="<?= $player->diff_points ?>"><?= $player->points ?></points>
+<races><?= $this->Cdata($player->races) ?></races>
+<maps><?= $this->Cdata($player->maps) ?></maps>
+<playtime><?= $this->Cdata($player->playtime) ?></playtime>
+<awards points=""><? if(isset($player->awards)) foreach ($player->awards as $award): ?>
+<award>
+<type><?= $this->Cdata($award->type) ?></type>
+<date><?= $this->Cdata($award->date) ?></date>
+<value><?= $this->Cdata($award->value) ?></value>
+<info><?= $this->Cdata($award->info) ?></info>
+</award>
+<? endforeach; ?></awards>
+</player>
+<? endforeach; ?>
+</ranking>

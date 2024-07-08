@@ -1,0 +1,41 @@
+<table class="racenet" style="margin:auto">
+<? foreach( $this->races as $race ): ?>
+	<tr>
+		<td style="font-size: 14px; text-align: right;">
+			&nbsp;
+		</td>
+		<td style="font-size: 14px;">           
+			&nbsp;
+		</td>
+		<td style="font-size: 14px; color: <?= $race->prejumped == 'true' ? 'red' : 'green' ?>;">
+			<?= $this->Racetime($race->time, Racenet_Filter_Racetime::FORMAT_INGAME, true) ?>
+		</td>
+		<td style="text-align: center; color: #fff; font-weight: bold;">
+			&nbsp;
+		</td>
+		<td style="font-size: 14px;">         
+			&nbsp;
+		</td>
+		<td style="font-size: 14px;">         
+			&nbsp;
+		</td>
+		<td style="font-size: 14px;">         
+			&nbsp;
+		</td>
+		<td style="font-size: 14px;">         
+			&nbsp;
+		</td>
+		<td>
+			<span style="font-size: 10px;"><?= $race->created ?></span>
+		</td>
+		<td>
+			&nbsp;
+		</td>
+		<td style="text-align: center;">
+			&nbsp;
+		</td>
+	</tr>
+<? endforeach; ?>
+</table>
+
+

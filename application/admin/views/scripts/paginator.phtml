@@ -1,0 +1,43 @@
+<div class="racenet_pager">
+	<? if( $this->pager->showFirstLast() ): ?>
+		<? if( !$this->pager->firstVisible() ): ?>
+			<a href="<?= $this->pager->buildLink( 1 ) ?>" class="history" onclick="return racenet_request(this);" title="first page">&lt;&lt;</a>
+		<? else: ?>
+			&lt;&lt;
+		<? endif; ?>
+	<? endif; ?>
+	
+	<? if( $this->pager->showPrevNext() ): ?>
+		<? if( $this->pager->prevAvailable() ): ?>
+			<a href="<?= $this->pager->buildLink( $this->pager->getPrevPage() ) ?>" class="history" onclick="return racenet_request(this);" title="previous page">&lt;</a>
+		<? else: ?>
+			&lt;
+		<? endif ?>
+	<? endif; ?>
+	
+	<? foreach( $this->pager->getLinks() as $link ): ?>
+		<? if( $this->pager->getActivePage() != $link->page ): ?>
+			<a href="<?= $link->url ?>" class="history" onclick="return racenet_request(this);" title="page <?= $link->page ?>">
+		<? endif; ?>
+		<?= $link->name ?>
+		<? if( $this->pager->getActivePage() != $link->page ): ?>
+			</a>
+		<? endif; ?>
+	<? endforeach; ?>
+	
+	<? if( $this->pager->showPrevNext() ): ?>
+		<? if( $this->pager->nextAvailable() ): ?>
+			<a href="<?= $this->pager->buildLink( $this->pager->getNextPage() ) ?>" class="history" onclick="return racenet_request(this);" title="next page">&gt;</a>
+		<? else: ?>
+			&gt;
+		<? endif ?>
+	<? endif; ?>
+	
+	<? if( $this->pager->showFirstLast() ): ?>
+		<? if( !$this->pager->lastVisible() ): ?>
+			<a href="<?= $this->pager->buildLink( $this->pager->getNumPages() ) ?>" class="history" onclick="return racenet_request(this);" title="last page">&gt;&gt;</a>
+		<? else: ?>
+			&gt;&gt;
+		<? endif; ?>
+	<? endif; ?>
+</div>

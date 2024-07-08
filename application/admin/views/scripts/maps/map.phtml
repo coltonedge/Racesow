@@ -1,0 +1,61 @@
+<tr class="racenet_row rankedmaps_click" <?= $this->isHighlighted ? 'style="background-color: #302843;"' : '' ?> <?= empty($this->file) ? 'title="please reupload the pk3"' : '' ?>>
+    <td style="font-size: 12px; text-align: right;">
+        <?= $this->position ?>.
+    </td>
+    <td>            
+        <a class="wmtt" rel="<?= $this->image ?>" href="/maps/details/id/<?= $this->id ?>/">
+            <!--
+            <?= $this->status == 'disabled' ? '<span style="color: #f00;">' : '' ?>
+            <?= $this->status == 'new' ? '<span style="color: #0f0;">' : '' ?>
+            -->
+            <span class="mapname" rel="<?= $this->id ?>"><?= $this->name ?></span>
+            <!--
+            <?= $this->status == 'disabled' || $this->status == 'new' ? '</span>' : '' ?>
+            -->
+        </a>
+		
+		<? if ($this->status == 'new' && empty($this->file)): ?>
+		<span style="font-size: 10px;">(please reupload the pk3)</span>
+		<? endif ?>
+		
+        <!--span style="font-size: 10px;"><?= ($this->freestyle == "true" ? "freestyle" : "race") ?></span-->
+    </td>
+    <td style="text-align: left;">
+        <?= $this->races ? $this->races : '<span class="info">none</span>' ?>
+    </td>
+    <td style="text-align: left;">
+        <?= $this->playtime ? $this->playtime : '<span class="info">none</span>' ?>
+    </td>
+    <td style="text-align: right;">
+        <?= (integer)$this->downloads ?>
+        <? if (!empty($this->file)): ?>
+            <? if ($this->status == 'new'): ?>
+                <a href="/upload/maps/<?= urlencode( $this->file ) ?>"><img align="absmiddle" src="/gfx/icons/ico_floppy.gif" border="0" /></a>         
+            <? else: ?>
+             <a href="javascript:void(0);" onClick="download_map( <?= $this->id ?>, 'http://downloads.warsow-race.net/maps/<?= urlencode( $this->file ) ?>' );"><img align="absmiddle" src="/gfx/icons/ico_floppy.gif" border="0" /></a>
+            <? endif; ?>
+        <? else: ?>
+        <img src="/gfx/icons/ico_nofile.gif" alt="x" title="Download is currently not available" />
+        <? endif; ?>
+    </td>
+    <td style="text-align: right;">
+       <select class="map_admin type" rel="<?= $this->id ?>" alt="<?= $this->freestyle ?>" style="width: 70px; font-size: 11px;">
+           <option value="false"<?= $this->freestyle == 'false' ? 'selected="selected"' : '' ?>>race</option>
+           <? if (!$this->races): ?>
+               <option value="true"<?= $this->freestyle == 'true' ? 'selected="selected"' : '' ?>>freestyle</option>
+           <? endif; ?>
+       </select>
+    </td>
+    <td style="text-align: center;">
+       <select class="map_admin status" rel="<?= $this->id ?>" alt="<?= $this->status ?>" style="width: 70px; font-size: 11px;">
+           <? if ($this->status == 'new'): ?>
+               <option disabled="disabled" value="new" selected="selected">new</option>
+           <? endif; ?>
+           <option value="enabled"<?= $this->status == 'enabled' ? 'selected="selected"' : '' ?>>enabled</option>
+           <option value="disabled"<?= $this->status == 'disabled' ? 'selected="selected"' : '' ?>>disabled</option>
+       </select>
+    </td>
+    <td>
+       <input class="map_admin" type="button" value="save" rel="<?= $this->id ?>" disabled="disabled" style="font-size: 11px;" />
+    </td>
+</tr>

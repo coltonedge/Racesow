@@ -1,0 +1,118 @@
+<br/>
+
+<div style="width: 850px; margin-left: auto; margin-right: auto;">
+    
+    <div class="racenet_headrow">
+        |
+        <?= ( !empty( $this->player->firstname ) ? $this->player->firstname .' ' : '' ) ?>
+        <?= new Racenet_IngameColors($this->player->name) ?>
+        <?= ( !empty( $this->player->lastname ) ? ' '. $this->player->lastname : '' ) ?>
+        |
+        <a class="headrow_link" href="<?= $this->url(array('controller' => 'player', 'action' => 'index', 'id' => $this->player->id), null, true) ?>">profile</a>
+        |
+        <a class="headrow_link" href="<?= $this->url(array('controller' => 'player', 'action' => 'maps', 'id' => $this->player->id), null, true) ?>>">played maps</a>
+    </div>
+    
+    <div style="float: left; margin-top: 10px; font-weight: normal; font-family: verdana; line-height: 20px; margin-right: 20px;">
+        <?= $this->ranking->totalItemCount ?> <?= $this->computionTime ?> Maps
+    </div>
+    
+    <div style="float: right; margin-top: 10px;">
+
+		<form action="<? $this->ranking->getFormAction($this) ?>" method="get" onsubmit="return Racenet.Request.load(this);" style="float: right; margin-bottom: 1px;">
+		    
+		    <input type="hidden" name="player" value="maps" /><?/* controller player, action maps. notaion for Racenet.Request.serializeForm */?> 
+		    <input type="hidden" name="id" value="<?=$this->player->id ?>" />
+		    <input type="hidden" name="page" value="<?= $this->ranking->page ?>" />
+		    <input type="hidden" name="order" value="<?= $this->ranking->order ?>" />
+		    <input type="hidden" name="dir" value="<?= $this->ranking->dir ?>" />
+		    <input type="hidden" name="filter" value="<?= $this->ranking->filter ?>" />
+		    <input type="hidden" name="highlight" value="<?= $this->ranking->highlight ?>" />
+		
+		    <div style="margin-top: 0px; margin-right: 5px; float: left; font-weight: normal; font-family: verdana; font-size: 12px;">
+		        <input name="types[]" value="fs" <?= $this->ranking->types->fs ? 'checked="true" ' : '' ?>type="checkbox" id="type_fs"/><label style="vertical-align: 1px;" for="type_fs">freestyle</label>
+		        <input name="types[]" value="race" <?= $this->ranking->types->race ? 'checked="true" ' : '' ?>type="checkbox" id="type_race"/><label style="vertical-align: 1px;" for="type_race">race</label>
+		    </div>
+		    
+		    <div style="margin-top: 2px; margin-right: 5px; float: left; font-weight: normal; font-family: verdana; font-size: 12px;">
+		        <input name="weapons[]" value="rl" class="gfxCheckbox" style="display: none;" <?= $this->ranking->weapons->rl ? 'checked="true" ' : '' ?>type="checkbox" id="weap_rl"/><label for="weap_rl"><img width="16" height="16" src="/gfx/icons/weapon_rocketlauncher_small.gif" rel="/gfx/icons/weapon_rocketlauncher_small_disabled.gif" title="activate to show only maps with rocketlauncher" alt="rl" style="vertical-align: -1px;" /></label>
+		        <input name="weapons[]" value="pg" class="gfxCheckbox" style="display: none;" <?= $this->ranking->weapons->pg ? 'checked="true" ' : '' ?>type="checkbox" id="weap_pg"/><label for="weap_pg"><img width="16" height="16" src="/gfx/icons/weapon_plasmagun_small.gif" rel="/gfx/icons/weapon_plasmagun_small_disabled.gif" title="activate to show only maps with  plasmagun" alt="pg" style="vertical-align: -1px;" /></label>
+		        <input name="weapons[]" value="gl" class="gfxCheckbox" style="display: none;" <?= $this->ranking->weapons->gl ? 'checked="true" ' : '' ?>type="checkbox" id="weap_gl"/><label for="weap_gl"><img width="16" height="16" src="/gfx/icons/weapon_grenadelauncher_small.gif" rel="/gfx/icons/weapon_grenadelauncher_small_disabled.gif" title="activate to show only maps with grenadelauncher" alt="gl" style="vertical-align: -1px;" /></label>
+		        <input name="weapons[]" value="lg" class="gfxCheckbox" style="display: none;" <?= $this->ranking->weapons->lg ? 'checked="true" ' : '' ?>type="checkbox" id="weap_lg"/><label for="weap_lg"><img width="16" height="16" src="/gfx/icons/weapon_lightning_small.gif" rel="/gfx/icons/weapon_lightning_small_disabled.gif" title="activate to show only maps with lasergun" alt="rl" style="vertical-align: -1px;" /></label>
+		        <input name="weapons[]" value="rg" class="gfxCheckbox" style="display: none;" <?= $this->ranking->weapons->rg ? 'checked="true" ' : '' ?>type="checkbox" id="weap_rg"/><label for="weap_rg"><img width="16" height="16" src="/gfx/icons/weapon_shotgun_small.gif" rel="/gfx/icons/weapon_shotgun_small_disabled.gif" title="activate to show only maps with riotgun" alt="rg" style="vertical-align: -1px;" /></label>
+		        <input name="weapons[]" value="eb" class="gfxCheckbox" style="display: none;" <?= $this->ranking->weapons->eb ? 'checked="true" ' : '' ?>type="checkbox" id="weap_eb"/><label for="weap_eb"><img width="16" height="16" src="/gfx/icons/weapon_railgun_small.gif" rel="/gfx/icons/weapon_railgun_small_disabled.gif" title="activate to show only maps with electrobolt" alt="eb" style="vertical-align: -1px;" /></label>
+		    </div>
+		    
+		    <div style="float: left;">
+		        <? if ($this->ranking->message): ?>
+		            <span style="font-size: 12px; font-family: Arial; font-style: normal; color: red;"><?= $this->ranking->message ?></span>
+		        <? endif; ?>
+		        <input name="search" class="noserialize" type="text" value="<?= $this->ranking->getSearchPreset() ?>" rel="<?= $this->ranking->getSearchPreset(true) ?>" onfocus="if(this.value == $(this).attr('rel')) this.value = '';" onblur="if(this.value=='') this.value = $(this).attr('rel');" />
+		        <input title="show only maps matching your search" type="submit" onclick="var $form = $(this).parents('form'); if ($('input[name=search]', $form).val() == $('input[name=search]', $form).attr('rel')) return; $('input[name=page]', $form).val(''); $('input[name=highlight]', $form).val(''); $('input[name=filter]', $form).val($('input[name=search]', $form).val());" class="ajaxsearch" value="filter" />
+		        <input title="show all maps and highlight matches" type="submit" onclick="var $form = $(this).parents('form'); if ($('input[name=search]', $form).val() == $('input[name=search]', $form).attr('rel')) return; $('input[name=page]', $form).val(''); $('input[name=filter]', $form).val(''); $('input[name=highlight]', $form).val($('input[name=search]', $form).val());" class="ajaxsearch" value="highlight" />
+		        <input title="previous results for your search on page <?= $this->ranking->prevMatchedPage ?>" type="submit" onclick="$('input[name=page]', $(this).parents('form')).val(<?= $this->ranking->prevMatchedPage ?>);" value="<?= $this->ranking->prevMatchedPage ?>&lt;" <?= !$this->ranking->prevMatchedPage ? 'disabled="disabled" ' : '' ?>/>
+		        <input title="following results for your search on page <?= $this->ranking->nextMatchedPage ?>" type="submit" onclick="$('input[name=page]', $(this).parents('form')).val(<?= $this->ranking->nextMatchedPage ?>);" value="&gt; <?= $this->ranking->nextMatchedPage ?>" <?= !$this->ranking->nextMatchedPage ? 'disabled="disabled" ' : '' ?>/>
+		        <input title="clear the search and show the full list" type="submit"  onclick="var $form = $(this).parents('form'); $('input[name=filter]', $form).val(''); $('input[name=highlight]', $form).val(''); var $input = $('input[name=search]', $form); $input.val($input.attr('rel'))" value="clear" <?= (!$this->ranking->filter && !$this->ranking->highlight ? 'disabled="disabled"' : '') ?> />
+		    </div>
+		
+		    <div style="clear: both;"></div>
+		</form> 
+    
+    </div>
+    <div style="clear: both;"></div>
+
+    <table class="racenet" border="0">
+        <? $counter = 0 ?>
+        <? if($this->ranking->paginator): ?>
+            <tr>
+               <td colspan="7">
+                    <?= $paginatorCode = $this->paginationControl($this->ranking->paginator, 'Sliding', 'zend_paginator.phtml', array("highlight" => $this->highlight, "disabled" => !empty($this->search) ? false: false)) ?>
+                </td>
+            </tr>
+            
+            <? $order = $this->ranking->order ?>
+            <? $dir = $this->ranking->dir ?>
+            
+            <tr class="racenet_semihead rankedmaps_click">
+                <td style="width: 65px; text-align: left;">
+                    <a onclick="return Racenet.Request.load(this);" style="color: <?= $order == 'points' ? ($dir == 'ASC' ? '#00ff00' : '#ff0000') : '#fff' ?>" href="<?= $this->url(array('page' => null, 'order' => 'points', 'dir' => ($order == 'points' ? ($dir == 'ASC' ? 'desc' : 'asc') : null))) ?>">Points</a>
+                    <a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("order" => "points", "dir" => "ASC", "page" => null)); ?>" title="up"><img src="/gfx/icons/ico_up.gif" border="0" align="absmiddle"></a><a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("order" => "points", "dir" => "DESC", "page" => null)); ?>" title="down"><img src="/gfx/icons/ico_down.gif" border="0" align="absmiddle"></a>
+                </td>
+                <td style="width: 220px;">            
+                    <a onclick="return Racenet.Request.load(this);" style="color: <?= $order == 'name' ? ($dir == 'ASC' ? '#00ff00' : '#ff0000') : '#fff' ?>" href="<?= $this->url(array('page' => null, 'order' => 'name', 'dir' => ($order == 'name' ? ($dir == 'ASC' ? 'desc' : 'asc') : null))) ?>">Name</a>
+                    <a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("order" => "name", "dir" => "ASC", "page" => null)); ?>" title="up"><img src="/gfx/icons/ico_up.gif" border="0" align="absmiddle"></a><a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("order" => "name", "dir" => "DESC", "page" => null)); ?>" title="down"><img src="/gfx/icons/ico_down.gif" border="0" align="absmiddle"></a>
+                </td>
+                <td style="width: 100px; text-align: left;">
+                    <a onclick="return Racenet.Request.load(this);" style="color: <?= $order == 'time' ? ($dir == 'ASC' ? '#00ff00' : '#ff0000') : '#fff' ?>" href="<?= $this->url(array('page' => null, 'order' => 'time', 'dir' => ($order == 'time' ? ($dir == 'ASC' ? 'desc' : 'asc') : null))) ?>">Record</a>
+                    <a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("order" => "time", "dir" => "ASC", "page" => null)); ?>" title="up"><img src="/gfx/icons/ico_up.gif" border="0" align="absmiddle"></a><a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("order" => "time", "dir" => "ASC", "page" => null)); ?>" title="down"><img src="/gfx/icons/ico_down.gif" border="0" align="absmiddle"></a>
+                </td>
+                <td style="width: 80px; text-align: left;">
+                    <a onclick="return Racenet.Request.load(this);" style="color: <?= $order == 'races' ? ($dir == 'ASC' ? '#00ff00' : '#ff0000') : '#fff' ?>" href="<?= $this->url(array('page' => null, 'order' => 'races', 'dir' => ($order == 'races' ? ($dir == 'ASC' ? 'desc' : 'asc') : null))) ?>">Races</a>
+                    <a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("order" => "races", "dir" => "ASC", "page" => null)); ?>" title="up"><img src="/gfx/icons/ico_up.gif" border="0" align="absmiddle"></a><a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("order" => "races", "dir" => "DESC", "page" => null)); ?>" title="down"><img src="/gfx/icons/ico_down.gif" border="0" align="absmiddle"></a>
+                </td>
+                <td style="width: 80px; text-align: left;">
+                    <a onclick="return Racenet.Request.load(this);" style="color: <?= $order == 'tries' ? ($dir == 'ASC' ? '#00ff00' : '#ff0000') : '#fff' ?>" href="<?= $this->url(array('page' => null, 'order' => 'tries', 'dir' => ($order == 'tries' ? ($dir == 'ASC' ? 'desc' : 'asc') : null))) ?>">Tries</a>
+                    <a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("order" => "tries", "dir" => "ASC", "page" => null)); ?>" title="up"><img src="/gfx/icons/ico_up.gif" border="0" align="absmiddle"></a><a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("order" => "tries", "dir" => "DESC", "page" => null)); ?>" title="down"><img src="/gfx/icons/ico_down.gif" border="0" align="absmiddle"></a>
+                </td>
+                <td style="width: 120px; text-align: left;">
+                    <a onclick="return Racenet.Request.load(this);" style="color: <?= $order == 'playtime' ? ($dir == 'ASC' ? '#00ff00' : '#ff0000') : '#fff' ?>" href="<?= $this->url(array('page' => null, 'order' => 'playtime', 'dir' => ($order == 'playtime' ? ($dir == 'ASC' ? 'desc' : 'asc') : null))) ?>">Playtime</a>
+                    <a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("order" => "playtime", "dir" => "ASC", "page" => null)); ?>" title="up"><img src="/gfx/icons/ico_up.gif" border="0" align="absmiddle"></a><a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("order" => "playtime", "dir" => "DESC", "page" => null)); ?>" title="down"><img src="/gfx/icons/ico_down.gif" border="0" align="absmiddle"></a>
+                </td>
+                <td style="width: 120px; text-align: left;">
+                    <a onclick="return Racenet.Request.load(this);" style="color: <?= $order == 'created' ? ($dir == 'ASC' ? '#00ff00' : '#ff0000') : '#fff' ?>" href="<?= $this->url(array('page' => null, 'order' => 'created', 'dir' => ($order == 'created' ? ($dir == 'ASC' ? 'desc' : 'asc') : null))) ?>">Date of record</a>
+                    <a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("order" => "created", "dir" => "ASC", "page" => null)); ?>" title="up"><img src="/gfx/icons/ico_up.gif" border="0" align="absmiddle"></a><a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("order" => "created", "dir" => "DESC", "page" => null)); ?>" title="down"><img src="/gfx/icons/ico_down.gif" border="0" align="absmiddle"></a>
+                </td>
+            </tr>
+            <?= $this->partialLoop('/player/map.phtml', $this->ranking->paginator->getIterator()) ?>
+            <tr>
+                <td colspan="7">
+                    <?= $paginatorCode ?>
+                </td>
+            </tr>
+        <? else: ?>
+            <tr>
+                <td colspan="7">No maps are available</td>
+            </tr>      
+        <? endif; ?>
+    </table>
+</div>

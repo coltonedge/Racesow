@@ -1,0 +1,1446 @@
+#=============================================================
+#	Changes between 2.1.1 RC 6 & 2.1.2
+#=============================================================
+#	Since 2005/08/21 :
+#	- enhance compliancy with php 5.0.5,
+#	- add a security fix regarding cookies,
+#	- fix the posting when no post icons are available,
+#	- ensure you can't post into a link or a category forum whatever auths are,
+#	- remove topic calendar version from config table if topic calendar is no more present,
+#	- remove "empty message" in posting when canceling the form,
+#	- fix small glitches,
+# ________________________________________________________________________________
+#
+# Modified files :
+# ---------------
+#	common.php
+#	posting.php
+#	search.php
+#
+#	admin/admin_groups.php
+#	admin/admin_icons.php
+#	admin/admin_topics_attr.php
+#
+#	includes/class_config.php
+#	includes/class_cp.php
+#	includes/class_form.php
+#	includes/class_forums.php
+#	includes/class_run_stats.php
+#	includes/class_stats.php
+#	includes/class_topics.php
+#	includes/class_user.php
+#	includes/functions_post.php
+#	includes/functions_search.php
+#	includes/page_header.php
+#
+#	language/lang_english/lang_CH_install.php
+#	language/lang_english/lang_extend_cat_hierarchy.php
+#
+#	templates/ptifo/admin/topics_attr_list_body.tpl
+#	templates/ptifo/index_body.tpl
+#	templates/ptifo/posting_bbcode.tpl
+#	templates/ptifo/posting_body.tpl
+#	templates/ptifo/topics_row_box.tpl
+#
+#	templates/subSilver/admin/topics_attr_list_body.tpl
+#	templates/subSilver/index_body.tpl
+#	templates/subSilver/posting_bbcode.tpl
+#	templates/subSilver/posting_body.tpl
+#	templates/subSilver/topics_row_box.tpl
+#	templates/subSilver/viewtopic_body.tpl
+#
+# ________________________________________________________________________________
+#
+#
+#
+#-----[ COPY ]------------------------------------------------
+#
+COPY root/install_cat/*.* TO install_cat/*.*
+COPY root/templates/ptifo/images/common/ft_close.gif TO templates/ptifo/images/common/ft_close.gif
+COPY root/templates/ptifo/images/common/ft_open.gif TO templates/ptifo/images/common/ft_open.gif
+#
+#-----[ OPEN ]------------------------------------------------
+#
+common.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+if( $board_config['board_disable'] && !defined("IN_ADMIN") && !defined("IN_LOGIN") )
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+*/
+//-- add
+if( $config->data['board_disable'] && !defined('IN_ADMIN') && !defined('IN_LOGIN') && !defined('IN_INSTALL') )
+//-- fin mod : categories hierarchy ---------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+posting.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+if ( $mode == 'newtopic' )
+{
+	$post_info['forum_id'] = intval($forum_id);
+}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+if ( $mode == 'newtopic' )
+{
+	$post_info['forum_id'] = intval($forum_id);
+	if ( empty($forum_id) || !isset($forums->data[ intval($forum_id) ]) || ($forums->data[ intval($forum_id) ]['forum_type'] != POST_FORUM_URL) )
+	{
+		message_die(GENERAL_MESSAGE, $lang['Move_to_forum_error']);
+	}
+}
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy --------------------------------------------------------------------
+//-- modify
+// here we added
+//	, $post_icon, $topic_duration, $calendar_time, $calendar_duration, $sub_title, $topic_sub_type
+//-- modify
+				submit_post($mode, $post_data, $return_message, $return_meta, $forum_id, $topic_id, $post_id, $poll_id, $topic_type, $bbcode_on, $html_on, $smilies_on, $attach_sig, $bbcode_uid, str_replace("\'", "''", $username), str_replace("\'", "''", $subject), str_replace("\'", "''", $message), str_replace("\'", "''", $poll_title), $poll_options, $poll_length, $post_icon, $topic_duration, $calendar_time, $calendar_duration, $sub_title, $topic_sub_type);
+//-- fin mod : categories hierarchy ----------------------------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy --------------------------------------------------------------------
+//-- delete
+/*
+				submit_post($mode, $post_data, $return_message, $return_meta, $forum_id, $topic_id, $post_id, $poll_id, $topic_type, $bbcode_on, $html_on, $smilies_on, $attach_sig, $bbcode_uid, str_replace("\'", "''", $username), str_replace("\'", "''", $subject), str_replace("\'", "''", $message), str_replace("\'", "''", $poll_title), $poll_options, $poll_length);
+*/
+//-- add
+				$input_data = array(
+					'topic_type' => $topic_type,
+					'bbcode_on' => $bbcode_on,
+					'html_on' => $html_on,
+					'smilies_on' => $smilies_on,
+					'attach_sig' => $attach_sig,
+					'bbcode_uid' => $bbcode_uid,
+					'post_username' => str_replace("\'", "''", $username),
+					'post_subject' => str_replace("\'", "''", $subject),
+					'post_message' => str_replace("\'", "''", $message),
+					'poll_title' => str_replace("\'", "''", $poll_title),
+					'poll_options' => $poll_options,
+					'poll_length' => $poll_length,
+					'post_icon' => $post_icon,
+					'topic_duration' => $topic_duration,
+					'calendar_time' => $calendar_time,
+					'calendar_duration' => $calendar_duration,
+					'sub_title' => $sub_title,
+					'topic_sub_type' => $topic_sub_type,
+				);
+				submit_post($mode, $post_data, $return_message, $return_meta, $forum_id, $topic_id, $post_id, $poll_id, $input_data);
+				unset($input_data);
+//-- fin mod : categories hierarchy ----------------------------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+search.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$this->total_topics = $total_match_count;
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+		$this->forum_id = 0;
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/admin_groups.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$group_status = intval($group_row['group_status']);
+		$group_row['group_name'] = ($group_status >= GROUP_SYSTEM) ? $user->lang($group_row['group_name']) : $group_row['group_name'];
+		$group_row['group_description'] = ($group_status >= GROUP_SYSTEM) ? $user->lang($group_row['group_description']) : $group_row['group_description'];
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		$group_status = intval($group_row['group_status']);
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/admin_icons.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.5 - 21/08/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.6 - 19/10/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+	function display()
+	{
+		global $db, $template, $config, $user, $icons;
+		global $list_auths, $list_types;
+		global $lang;
+
+		$template->assign_vars(array(
+			'L_SAMPLE' => $user->lang('Icons_box'),
+			'L_ICONS' => $user->lang('Message_icon'),
+			'L_AUTHS' => $user->lang('Permissions'),
+			'L_TYPES' => $user->lang('Icons_types'),
+			'L_STATS' => $user->lang('Icons_usage'),
+			'L_ACTION' => $user->lang('Action'),
+
+			'L_MOVE_UP' => $user->lang('Move_up'),
+			'I_MOVE_UP' => $user->img('cmd_up_arrow'),
+			'L_MOVE_DOWN' => $user->lang('Move_down'),
+			'I_MOVE_DOWN' => $user->img('cmd_down_arrow'),
+			'I_EDIT' => $user->img($this->dsp ? 'cmd_mini_edit' : 'cmd_edit'),
+			'L_EDIT' => $user->lang('Edit'),
+			'I_DELETE' => $user->img($this->dsp ? 'cmd_mini_delete' : 'cmd_delete'),
+			'L_DELETE' => $user->lang('Delete'),
+
+			'L_EMPTY' => $user->lang('No_icons_create'),
+		));
+
+		// let's display the list
+		$count_data = count($this->data);
+		$template->set_switch('empty', $count_data == 0);
+
+		// nothing to display : by :)
+		if ( $count_data == 0 )
+		{
+			return;
+		}
+
+		// display the sample box
+		parent::display();
+
+		// get usage
+		$sql = 'SELECT post_icon, COUNT(post_id) AS total_posts
+					FROM ' . POSTS_TABLE . '
+					GROUP BY post_icon';
+		$result = $db->sql_query($sql, false, __LINE__, __FILE__);
+		$stats = array();
+		$total_posts = 0;
+		while ( $row = $db->sql_fetchrow($result) )
+		{
+			$stats[ $row['post_icon'] ] = $row['total_posts'];
+			$total_posts += $row['total_posts'];
+		}
+
+		// display details
+		foreach ( $this->data as $icon_id => $icon )
+		{
+			$template->assign_block_vars('row', array(
+				'I_ICON' => $user->img($icon['icon_url']),
+				'L_ICON' => $user->lang($icon['icon_name']),
+				'LANG_KEY' => $icon['icon_name'],
+				'L_AUTH' => empty($icon['icon_auth']) ? '' : $user->lang($list_auths[ $icon['icon_auth'] ]),
+				'COUNT' => intval($stats[$icon_id]),
+				'PER_CENT' => empty($total_posts) ? 0 : round(intval($stats[$icon_id]) * 100 / $total_posts),
+
+				'U_MOVE_UP' => $config->url($this->requester, array('mode' => 'moveup', 'icon' => $icon_id), true),
+				'U_MOVE_DOWN' => $config->url($this->requester, array('mode' => 'movedw', 'icon' => $icon_id), true),
+				'U_EDIT' => $config->url($this->requester, array('mode' => 'edit', 'icon' => $icon_id), true),
+				'U_DELETE' => $config->url($this->requester, array('mode' => 'delete', 'icon' => $icon_id), true),
+			));
+			$template->set_switch('row.lang_key', isset($lang[ $icon['icon_name'] ]));
+			$count_types = count($icon['icon_types']);
+			for ( $i = 0; $i < $count_types; $i++ )
+			{
+				$template->assign_block_vars('row.type', array(
+					'L_TYPE' => $user->lang($list_types[intval($icon['icon_types'][$i])]),
+				));
+			}
+		}
+		display_buttons(array(
+			'create' => array('txt' => 'Create_new', 'img' => 'cmd_create', 'key' => 'cmd_create', 'url' => $this->requester, 'parms' => array('mode' => 'create')),
+		));
+		$template->set_filenames(array('body' => 'admin/icons_list_body.tpl'));
+	}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	function display()
+	{
+		global $db, $template, $config, $user, $icons;
+		global $list_auths, $list_types;
+		global $lang;
+
+		$template->assign_vars(array(
+			'L_SAMPLE' => $user->lang('Icons_box'),
+			'L_ICONS' => $user->lang('Message_icon'),
+			'L_AUTHS' => $user->lang('Permissions'),
+			'L_TYPES' => $user->lang('Icons_types'),
+			'L_STATS' => $user->lang('Icons_usage'),
+			'L_ACTION' => $user->lang('Action'),
+
+			'L_MOVE_UP' => $user->lang('Move_up'),
+			'I_MOVE_UP' => $user->img('cmd_up_arrow'),
+			'L_MOVE_DOWN' => $user->lang('Move_down'),
+			'I_MOVE_DOWN' => $user->img('cmd_down_arrow'),
+			'I_EDIT' => $user->img($this->dsp ? 'cmd_mini_edit' : 'cmd_edit'),
+			'L_EDIT' => $user->lang('Edit'),
+			'I_DELETE' => $user->img($this->dsp ? 'cmd_mini_delete' : 'cmd_delete'),
+			'L_DELETE' => $user->lang('Delete'),
+
+			'L_EMPTY' => $user->lang('No_icons_create'),
+		));
+
+		// let's display the list
+		$count_data = count($this->data);
+		$template->set_switch('empty', $count_data == 0);
+		if ( $count_data > 0 )
+		{
+			// display the sample box
+			parent::display();
+
+			// get usage
+			$sql = 'SELECT post_icon, COUNT(post_id) AS total_posts
+						FROM ' . POSTS_TABLE . '
+						GROUP BY post_icon';
+			$result = $db->sql_query($sql, false, __LINE__, __FILE__);
+			$stats = array();
+			$total_posts = 0;
+			while ( $row = $db->sql_fetchrow($result) )
+			{
+				$stats[ $row['post_icon'] ] = $row['total_posts'];
+				$total_posts += $row['total_posts'];
+			}
+
+			// display details
+			foreach ( $this->data as $icon_id => $icon )
+			{
+				$template->assign_block_vars('row', array(
+					'I_ICON' => $user->img($icon['icon_url']),
+					'L_ICON' => $user->lang($icon['icon_name']),
+					'LANG_KEY' => $icon['icon_name'],
+					'L_AUTH' => empty($icon['icon_auth']) ? '' : $user->lang($list_auths[ $icon['icon_auth'] ]),
+					'COUNT' => intval($stats[$icon_id]),
+					'PER_CENT' => empty($total_posts) ? 0 : round(intval($stats[$icon_id]) * 100 / $total_posts),
+
+					'U_MOVE_UP' => $config->url($this->requester, array('mode' => 'moveup', 'icon' => $icon_id), true),
+					'U_MOVE_DOWN' => $config->url($this->requester, array('mode' => 'movedw', 'icon' => $icon_id), true),
+					'U_EDIT' => $config->url($this->requester, array('mode' => 'edit', 'icon' => $icon_id), true),
+					'U_DELETE' => $config->url($this->requester, array('mode' => 'delete', 'icon' => $icon_id), true),
+				));
+				$template->set_switch('row.lang_key', isset($lang[ $icon['icon_name'] ]));
+				$count_types = count($icon['icon_types']);
+				for ( $i = 0; $i < $count_types; $i++ )
+				{
+					$template->assign_block_vars('row.type', array(
+						'L_TYPE' => $user->lang($list_types[intval($icon['icon_types'][$i])]),
+					));
+				}
+			}
+		}
+		display_buttons(array(
+			'create' => array('txt' => 'Create_new', 'img' => 'cmd_create', 'key' => 'cmd_create', 'url' => $this->requester, 'parms' => array('mode' => 'create')),
+		));
+		$template->set_filenames(array('body' => 'admin/icons_list_body.tpl'));
+	}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/admin_topics_attr.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.3 - 21/08/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.4 - 19/10/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+	function display()
+	{
+		global $template, $config, $user, $images;
+		global $main_types, $main_fields, $main_conds;
+
+		$template->assign_vars(array(
+			'L_NAME' => $user->lang('Topics_attr_name'),
+			'L_FOLDER' => $user->lang('Topics_attr_folder'),
+			'L_FRONT' => $user->lang('Topics_attr_title'),
+			'L_ACTION' => $user->lang('Action'),
+
+			'L_MOVE_UP' => $user->lang('Move_up'),
+			'I_MOVE_UP' => $user->img('cmd_up_arrow'),
+			'L_MOVE_DOWN' => $user->lang('Move_down'),
+			'I_MOVE_DOWN' => $user->img('cmd_down_arrow'),
+			'I_EDIT' => $user->img($this->dsp ? 'cmd_mini_edit' : 'cmd_edit'),
+			'L_EDIT' => $user->lang('Edit'),
+			'I_DELETE' => $user->img($this->dsp ? 'cmd_mini_delete' : 'cmd_delete'),
+			'L_DELETE' => $user->lang('Delete'),
+		));
+
+		// main types
+		$count_main_types = count($main_types);
+
+		// display details
+		foreach ( $this->data as $attr_id => $data )
+		{
+			$timg = !empty($data['attr_timg']) && isset($images[ $data['attr_timg'] ]);
+			$template->assign_block_vars('row', array(
+				'U_NAME' => $config->url($this->requester, array('mode' => 'edit', 'attr' => $attr_id), true),
+				'L_NAME' => $user->lang($data['attr_name']),
+				'L_AUTH' => empty($data['attr_auth']) ? '' : $user->lang($data['attr_auth']),
+				'L_COND' => empty($data['attr_field']) ? '' : $user->lang($main_fields[ $data['attr_field'] ]) . (empty($data['attr_cond']) ? '' : ' ' . $user->lang($main_conds[ $data['attr_cond'] ]) . ' ' . intval($data['attr_value'])),
+				'L_FNAME' => $user->lang($data['attr_fname']),
+				'L_TNAME' => empty($data['attr_tname']) ? '' : $user->lang($data['attr_tname']),
+				'I_TAG' => $timg ? $user->img($data['attr_timg']) : '',
+				'L_TAG' => $data['attr_timg'],
+
+				'U_MOVE_UP' => $config->url($this->requester, array('mode' => 'moveup', 'attr' => $attr_id), true),
+				'U_MOVE_DOWN' => $config->url($this->requester, array('mode' => 'movedw', 'attr' => $attr_id), true),
+				'U_EDIT' => $config->url($this->requester, array('mode' => 'edit', 'attr' => $attr_id), true),
+				'U_DELETE' => $config->url($this->requester, array('mode' => 'delete', 'attr' => $attr_id), true),
+			));
+			$template->set_switch('row.cond', !empty($data['attr_field']));
+			$template->set_switch('row.auth', !empty($data['attr_auth']));
+			$template->set_switch('row.fname', !empty($data['attr_fname']));
+			$template->set_switch('row.timg', $timg);
+			$template->set_switch('row.ttxt', !empty($data['attr_tname']));
+			$template->set_switch('row.tname', !empty($data['attr_tname']));
+			if ( !empty($data['attr_fimg']) )
+			{
+				for ( $i = 0; $i < $count_main_types; $i++ )
+				{
+					$template->assign_block_vars('row.sub', array(
+						'I_FOLDER' => isset($images[ $data['attr_fimg'] . $main_types[$i] ]) ? $user->img($data['attr_fimg'] . $main_types[$i]) : '',
+						'L_FOLDER' => $data['attr_fimg'] . $main_types[$i],
+					));
+					$template->set_switch('row.sub.img', isset($images[ $data['attr_fimg'] . $main_types[$i] ]));
+				}
+			}
+			$template->set_switch('row.command', !$data['attr_added']);
+		}
+		display_buttons(array(
+			'create' => array('txt' => 'Create_new', 'img' => 'cmd_create', 'key' => 'cmd_create', 'url' => $this->requester, 'parms' => array('mode' => 'create')),
+		));
+		$template->set_filenames(array('body' => 'admin/topics_attr_list_body.tpl'));
+	}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	function display()
+	{
+		global $template, $config, $user, $images;
+		global $main_types, $main_fields, $main_conds;
+
+		$template->assign_vars(array(
+			'L_NAME' => $user->lang('Topics_attr_name'),
+			'L_FOLDER' => $user->lang('Topics_attr_folder'),
+			'L_FRONT' => $user->lang('Topics_attr_title'),
+			'L_ACTION' => $user->lang('Action'),
+			'L_EMPTY' => $user->lang('Create_new'),
+
+			'L_MOVE_UP' => $user->lang('Move_up'),
+			'I_MOVE_UP' => $user->img('cmd_up_arrow'),
+			'L_MOVE_DOWN' => $user->lang('Move_down'),
+			'I_MOVE_DOWN' => $user->img('cmd_down_arrow'),
+			'I_EDIT' => $user->img($this->dsp ? 'cmd_mini_edit' : 'cmd_edit'),
+			'L_EDIT' => $user->lang('Edit'),
+			'I_DELETE' => $user->img($this->dsp ? 'cmd_mini_delete' : 'cmd_delete'),
+			'L_DELETE' => $user->lang('Delete'),
+		));
+
+		// main types
+		$count_main_types = count($main_types);
+
+		// display details
+		$template->set_switch('empty', empty($this->data));
+		if ( !empty($this->data) )
+		{
+			foreach ( $this->data as $attr_id => $data )
+			{
+				$timg = !empty($data['attr_timg']) && isset($images[ $data['attr_timg'] ]);
+				$template->assign_block_vars('row', array(
+					'U_NAME' => $config->url($this->requester, array('mode' => 'edit', 'attr' => $attr_id), true),
+					'L_NAME' => $user->lang($data['attr_name']),
+					'L_AUTH' => empty($data['attr_auth']) ? '' : $user->lang($data['attr_auth']),
+					'L_COND' => empty($data['attr_field']) ? '' : $user->lang($main_fields[ $data['attr_field'] ]) . (empty($data['attr_cond']) ? '' : ' ' . $user->lang($main_conds[ $data['attr_cond'] ]) . ' ' . intval($data['attr_value'])),
+					'L_FNAME' => $user->lang($data['attr_fname']),
+					'L_TNAME' => empty($data['attr_tname']) ? '' : $user->lang($data['attr_tname']),
+					'I_TAG' => $timg ? $user->img($data['attr_timg']) : '',
+					'L_TAG' => $data['attr_timg'],
+
+					'U_MOVE_UP' => $config->url($this->requester, array('mode' => 'moveup', 'attr' => $attr_id), true),
+					'U_MOVE_DOWN' => $config->url($this->requester, array('mode' => 'movedw', 'attr' => $attr_id), true),
+					'U_EDIT' => $config->url($this->requester, array('mode' => 'edit', 'attr' => $attr_id), true),
+					'U_DELETE' => $config->url($this->requester, array('mode' => 'delete', 'attr' => $attr_id), true),
+				));
+				$template->set_switch('row.cond', !empty($data['attr_field']));
+				$template->set_switch('row.auth', !empty($data['attr_auth']));
+				$template->set_switch('row.fname', !empty($data['attr_fname']));
+				$template->set_switch('row.timg', $timg);
+				$template->set_switch('row.ttxt', !empty($data['attr_tname']));
+				$template->set_switch('row.tname', !empty($data['attr_tname']));
+				if ( !empty($data['attr_fimg']) )
+				{
+					for ( $i = 0; $i < $count_main_types; $i++ )
+					{
+						$template->assign_block_vars('row.sub', array(
+							'I_FOLDER' => isset($images[ $data['attr_fimg'] . $main_types[$i] ]) ? $user->img($data['attr_fimg'] . $main_types[$i]) : '',
+							'L_FOLDER' => $data['attr_fimg'] . $main_types[$i],
+						));
+						$template->set_switch('row.sub.img', isset($images[ $data['attr_fimg'] . $main_types[$i] ]));
+					}
+				}
+				$template->set_switch('row.command', !$data['attr_added']);
+			}
+		}
+		display_buttons(array(
+			'create' => array('txt' => 'Create_new', 'img' => 'cmd_create', 'key' => 'cmd_create', 'url' => $this->requester, 'parms' => array('mode' => 'create')),
+		));
+		$template->set_filenames(array('body' => 'admin/topics_attr_list_body.tpl'));
+	}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_config.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.21 - 18/09/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.22 - 19/10/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+define('CH_CURRENT_VERSION', '2.1.1RC6');
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+define('CH_CURRENT_VERSION', '2.1.2');
+#
+#-----[ FIND ]------------------------------------------------
+#
+	function display($box='ICON_BOX', $icon_id=0)
+	{
+		global $template, $user;
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+		if ( empty($this->allowed) )
+		{
+			return false;
+		}
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$this->data[$last] = array(
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		$this->data[] = array(
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_cp.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.10 - 21/08/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.11 - 23/10/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+					if ( !empty($patch_data) && (!isset($keys[$file]) || ($patch_date > $this->data[ $keys[$file] ]['patch_date'])) )
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+					if ( (!empty($patch_data) || !empty($patch_auths)) && (!isset($keys[$file]) || ($patch_date > $this->data[ $keys[$file] ]['patch_date'])) )
+#
+#-----[ FIND ]------------------------------------------------
+#
+			if ( !empty($patch['options']) )
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			if ( !empty($patch['options']) || !empty($patch['auths']) )
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_form.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.11 - 21/08/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.12 - 23/10/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+			if ( !preg_match('#^(mailto\:|(news|(ht|f)tp(s?))\:\/\/)[a-z0-9\-]+\.([a-z0-9\-]+\.)?[a-z]+#i', $this->value) )
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			if ( !preg_match('#^(mailto\:|(news|(ht|f)tp(s?))\:\/\/)[a-z0-9\-_]+\.([a-z0-9\-_]+\.)?[a-z]+#i', $this->value) )
+#
+#-----[ FIND ]------------------------------------------------
+#
+			if ( ($this->value != '#') && !preg_match('#^[a-z0-9\-\.\/]+\.([a-z0-9\-]+\.)?[a-z]+#i', $this->value) )
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			if ( ($this->value != '#') && !preg_match('#^[a-z0-9\-\.\/_]+\.([a-z0-9\-_]+\.)?[a-z]+#i', $this->value) )
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_forums.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.11 - 21/08/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.12 - 19/10/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+	function get_jumpbox()
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	function get_jumpbox($with_select=false, $forum_id=0)
+#
+#-----[ FIND ]------------------------------------------------
+#
+				$options .= '<option value="' . (($cur_id >= 0) ? $cur_id : -1) . '">';
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+				$selected = $with_select && ($cur_id == $forum_id) ? ' selected="selected"' : '';
+				$options .= '<option value="' . (($cur_id >= 0) ? $cur_id : -1) . '"' . $selected . '>';
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_run_stats.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.1 - 21/05/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.2 - 05/10/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+				if ( in_array(SQL_LAYER, array('mysql', 'mysql4', 'postgresql')) && !preg_match('/^(UPDATE|INSERT|DELETE|SHOW)/i', $trc_sql[$i]['sql']) )
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+				if ( in_array(SQL_LAYER, array('mysql', 'mysql4', 'postgresql')) && !preg_match('/^(UPDATE|INSERT|DELETE|SHOW|TRUNCATE)/i', $trc_sql[$i]['sql']) )
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_stats.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.9 - 21/08/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.10 - 19/10/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+class stats
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+class user_stats extends user
+{
+	function get_pool_fields()
+	{
+		return array_keys(array_flip(parent::get_pool_fields()) + array_flip(array(
+			'u.user_allow_viewonline',
+			'u.user_level',
+			'u.user_session_time',
+			'u.user_session_logged',
+		)));
+	}
+}
+
+#
+#-----[ FIND ]------------------------------------------------
+#
+		// build the main request to read registered users
+		$sql_where = empty($forum_id) ? 'user_session_time >= ' . ($now - $selected_timerange) : 'user_session_time >= ' . ($now - $online_timerange) . ' AND user_session_page = ' . intval($forum_id);
+		$sql = 'SELECT user_id, username, user_allow_viewonline, user_level, user_session_time, user_session_logged
+					FROM ' . USERS_TABLE . '
+					WHERE user_id <> ' . ANONYMOUS . '
+						AND ' . $sql_where . '
+					ORDER BY username';
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		// get user fields
+		$user_stats = new user_stats();
+		$user_fields = $user_stats->get_pool_fields();
+		unset($user_stats);
+
+		// build the main request to read registered users
+		$sql_where = empty($forum_id) ? 'u.user_session_time >= ' . ($now - $selected_timerange) : 'u.user_session_time >= ' . ($now - $online_timerange) . ' AND u.user_session_page = ' . intval($forum_id);
+		$sql = 'SELECT u.user_id, ' . implode(', ', $user_fields) . '
+					FROM ' . USERS_TABLE . ' u
+					WHERE u.user_id <> ' . ANONYMOUS . '
+						AND ' . $sql_where . '
+					ORDER BY username';
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_topics.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.13 - 21/08/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.14 - 19/10/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+	var $topic_ids;
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+	var $user_fields;
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$this->total_announces = 0;
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+		$this->user_fields = array();
+#
+#-----[ FIND ]------------------------------------------------
+#
+			if ( !empty($fork_ids) )
+			{
+				$sub_where[] = 'f.forum_order BETWEEN ' . implode(' AND ', $fork_ids);
+				$sql_join .= ', ' . FORUMS_TABLE . ' f';
+				$sql_where = 'f.forum_id = t.forum_id AND ' . $sql_where;
+			}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			$sql_join = '';
+			if ( !empty($fork_ids) )
+			{
+				$sub_where[] = 'f.forum_order BETWEEN ' . implode(' AND ', $fork_ids);
+				$sql_join = ', ' . FORUMS_TABLE . ' f';
+				$sql_where = 'f.forum_id = t.forum_id AND ' . $sql_where;
+			}
+#
+#-----[ FIND ]------------------------------------------------
+#
+				$sql_fields .= ', u.username';
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+				$this->user_fields = $user->get_pool_fields();
+				$sql_fields .= ', ' . implode(', ', $this->user_fields);
+#
+#-----[ FIND ]------------------------------------------------
+#
+			if ( !empty($row['username']) )
+			{
+				$user->pool[ $row['topic_poster'] ] = array('username' => $row['username']);
+			}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			if ( !empty($this->user_fields) )
+			{
+				$user->pool[ $row['topic_poster'] ] = array();
+				$count_user_fields = count($this->user_fields);
+				for ( $i = 0; $i < $count_user_fields; $i++ )
+				{
+					$user->pool[ $row['topic_poster'] ][ $this->user_fields[$i] ] = $row[ $this->user_fields[$i] ];
+				}
+			}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_user.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.13 - 21/08/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.15 - 19/10/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+	function read_pool(&$user_ids)
+	{
+		global $db;
+
+		if ( !empty($user_ids) )
+		{
+			$sql = 'SELECT user_id, username
+						FROM ' . USERS_TABLE . '
+						WHERE user_id IN(' . implode(', ', array_keys($user_ids)) . ')';
+			$result = $db->sql_query($sql, false, __LINE__, __FILE__);
+			while ( $row = $db->sql_fetchrow($result) )
+			{
+				$user_id = intval($row['user_id']);
+				unset($row['user_id']);
+				$this->pool[$user_id] = $row;
+			}
+			$db->sql_freeresult($result);
+		}
+		$user_ids = array();
+	}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	function get_pool_fields()
+	{
+		return array(
+			'u.username',
+		);
+	}
+
+	function read_pool(&$user_ids)
+	{
+		global $db;
+
+		if ( !empty($user_ids) )
+		{
+			$sql = 'SELECT u.user_id, ' . implode(', ', $this->get_pool_fields()) . '
+						FROM ' . USERS_TABLE . ' u
+						WHERE u.user_id IN(' . implode(', ', array_keys($user_ids)) . ')';
+			$result = $db->sql_query($sql, false, __LINE__, __FILE__);
+			while ( $row = $db->sql_fetchrow($result) )
+			{
+				$user_id = intval($row['user_id']);
+				unset($row['user_id']);
+				$this->pool[$user_id] = $row;
+			}
+			$db->sql_freeresult($result);
+		}
+		$user_ids = array();
+	}
+#
+#-----[ FIND ]------------------------------------------------
+#
+	function dst_in_action($date)
+	{
+		static $years;
+
+		$year = date('Y', $date);
+		$month = date('m', $date);
+		$day = date('d', $date);
+		$hour = date('Hms', $date);
+		if ( ($month == 04) || ($month == 10) )
+		{
+			// April
+			if ( $month == 04 )
+			{
+				if ( isset($years[$year]) && isset($years[$year]['f']) )
+				{
+					$first_sunday = $years[$year]['f'];
+				}
+				else
+				{
+					$first_sunday = 1;
+					while ( date('w', mktime(2, 0, 0, $month, $first_sunday, $year)) != 0 )
+					{
+						$first_sunday++;
+					}
+					$years[$year]['f'] = $first_sunday;
+				}
+				return ($day == $first_sunday) ? ($hour >= 020000) : ($day > $first_sunday);
+			}
+
+			// October
+			else
+			{
+				if ( isset($years[$year]) && isset($years[$year]['t']) )
+				{
+					$last_sunday = $years[$year]['t'];
+				}
+				else
+				{
+					$last_sunday = 1;
+					while ( date('w', mktime(2, 0, 0, $month, $last_sunday, $year)) != 0 )
+					{
+						$last_sunday--;
+					}
+					$years[$year]['t'] = $last_sunday;
+				}
+				return ($day == $last_sunday) ? ($hour < 020000) : ($day < $last_sunday);
+			}
+		}
+		else
+		{
+			return ($month > 04) && ($month < 10);
+		}
+	}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	function dst_in_action($date)
+	{
+		static $years;
+
+		$year = date('Y', $date);
+		$month = date('m', $date);
+		$day = date('d', $date);
+		$hour = date('His', $date);
+		if ( ($month == 04) || ($month == 10) )
+		{
+			// April
+			if ( $month == 04 )
+			{
+				if ( isset($years[$year]) && isset($years[$year]['f']) )
+				{
+					$first_sunday = $years[$year]['f'];
+				}
+				else
+				{
+					$day_of_week = date('w', mktime(2, 0, 0, $month, 1, $year));
+					$first_sunday = ($day_of_week == 0) ? 1 : 8 - $day_of_week;
+					$years[$year]['f'] = $first_sunday;
+				}
+				return ($day == $first_sunday) ? ($hour >= 020000) : ($day > $first_sunday);
+			}
+
+			// October
+			else
+			{
+				if ( isset($years[$year]) && isset($years[$year]['t']) )
+				{
+					$last_sunday = $years[$year]['t'];
+				}
+				else
+				{
+					$last_sunday = 31 - date('w', mktime(2, 0, 0, $month, 31, $year));
+					$years[$year]['t'] = $last_sunday;
+				}
+				return ($day == $last_sunday) ? ($hour < 020000) : ($day < $last_sunday);
+			}
+		}
+		else
+		{
+			return ($month > 04) && ($month < 10);
+		}
+	}
+#
+#-----[ FIND ]------------------------------------------------
+#
+		// get user timezone & dst
+		$time_zone = intval(doubleval($this->data['user_timezone']) * 3600);
+		$dst = $this->data['user_dst'] && $this->dst_in_action($time + $time_zone) ? 1 : 0;
+		$time_zone += $dst * 3600;
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		// get user timezone & dst
+		$time_zone = intval(doubleval($this->data['user_timezone']) * 3600);
+		$dst = $this->data['user_dst'] && $this->dst_in_action($time) ? 1 : 0;
+		$time_zone += $dst * 3600;
+#
+#-----[ FIND ]------------------------------------------------
+#
+			if ( $floor )
+			{
+				foreach( $unreads as $topic_id => $topic_time )
+				{
+					$unreads[$topic_id] += $floor;
+				}
+			}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			foreach( $unreads as $topic_id => $topic_time )
+			{
+				if ( intval($topic_id) > 0 )
+				{
+					$unreads[ intval($topic_id) ] = intval($topic_time) + $floor;
+				}
+				else
+				{
+					unset($unreads[$topic_id]);
+				}
+			}
+#
+#-----[ FIND ]------------------------------------------------
+#
+		if ( $this->data['session_logged_in'] || $keep_unread )
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		if ( $this->data['session_logged_in'] || $keep_unreads )
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/functions_post.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+// here we added
+//	, $post_icon=0, $topic_duration=0, $calendar_time=0, $calendar_duration=0, $sub_title='', $topic_sub_type=0
+//-- modify
+function submit_post($mode, &$post_data, &$message, &$meta, &$forum_id, &$topic_id, &$post_id, &$poll_id, &$topic_type, &$bbcode_on, &$html_on, &$smilies_on, &$attach_sig, &$bbcode_uid, &$post_username, &$post_subject, &$post_message, &$poll_title, &$poll_options, &$poll_length, $post_icon=0, $topic_duration=0, $calendar_time=0, $calendar_duration=0, $sub_title='', $topic_sub_type=0)
+//-- fin mod : categories hierarchy --------------------------------------------
+{
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+function submit_post($mode, &$post_data, &$message, &$meta, &$forum_id, &$topic_id, &$post_id, &$poll_id, &$topic_type, &$bbcode_on, &$html_on, &$smilies_on, &$attach_sig, &$bbcode_uid, &$post_username, &$post_subject, &$post_message, &$poll_title, &$poll_options, &$poll_length)
+{
+*/
+//-- add
+function submit_post($mode, &$post_data, &$message, &$meta, &$forum_id, &$topic_id, &$post_id, &$poll_id, &$input_data)
+{
+	$awaited_input_data = array(
+		'topic_type' => 0,
+		'bbcode_on' => 0,
+		'html_on' => 0,
+		'smilies_on' => 0,
+		'attach_sig' => 0,
+		'bbcode_uid' => '',
+		'post_username' => '',
+		'post_subject' => '',
+		'post_message' => '',
+		'poll_title' => '',
+		'poll_options' => array(),
+		'poll_length' => 0,
+		'post_icon' => 0,
+		'topic_duration' => 0,
+		'calendar_time' => 0,
+		'calendar_duration' => 0,
+		'sub_title' => '',
+		'topic_sub_type' => 0,
+	);
+	foreach ( $awaited_input_data as $var => $dft )
+	{
+		$$var = isset($input_data[$var]) ? $input_data[$var] : $dft;
+	}
+
+	// reclaim some memory
+	$input_data = array();
+	unset($awaited_input_data);
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/functions_search.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+function clean_words($mode, &$entry, &$stopword_list, &$synonym_list)
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+function clean_words($mode, &$entry, &$stopword_list, &$synonym_list)
+*/
+//-- add
+function clean_words($mode, $entry, &$stopword_list, &$synonym_list)
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+function split_words(&$entry, $mode = 'post')
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+function split_words(&$entry, $mode = 'post')
+*/
+//-- add
+function split_words($entry, $mode = 'post')
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/page_header.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+// calendar if present
+if ( !empty($config->data['mod_topic_calendar_CH']) && !defined('IN_CALENDAR') )
+{
+	include_once($config->url('includes/class_calendar'));
+	$calendar = new calendar();
+	$calendar->display('CALENDAR_BOX');
+	unset($calendar);
+}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+// calendar if present
+if ( !empty($config->data['mod_topic_calendar_CH']) && !defined('IN_CALENDAR') )
+{
+	@include_once($config->url('includes/class_calendar'));
+	if ( class_exists('calendar') )
+	{
+		$calendar = new calendar();
+		$calendar->display('CALENDAR_BOX');
+		unset($calendar);
+	}
+	else
+	{
+		$sql = 'DELETE FROM ' . CONFIG_TABLE . '
+			WHERE config_name = \'mod_topic_calendar_CH\'';
+		$db->sql_query($sql, false, __LINE__, __FILE__);
+		$config->read(true);
+	}
+}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+language/lang_english/lang_CH_install.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+	'CH_orphean_groups_deleted' => '%d orphean individual groups have been deleted.',
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	'CH_orphean_groups_deleted' => '%d orphan individual groups have been deleted.',
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this is a partial search : the full line is longer
+#
+	'Script_title' =>
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+2.1.1
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+%s
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this is a partial search : the full line is longer
+#
+	'CH_welcome' =>
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+2.1.1
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+%s
+#
+#-----[ OPEN ]------------------------------------------------
+#
+language/lang_english/lang_extend_cat_hierarchy.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+$lang['Topic_duration_special'] = 'Choose "Never displayed" to never show this announcement elsewhere than in its own forum, <br />choose "Always displayed" to display it forever.';
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+$lang['Topic_duration_special'] = 'Choose "Never displayed" to never show this announcement elsewhere than in its own forum. <br />Choose "Always displayed" to display it forever.';
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/ptifo/admin/topics_attr_list_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+<!-- END row -->
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+<!-- BEGIN empty -->
+<tr>
+	<td colspan="4" align="center" height="35" class="row1"><span class="gen">{L_EMPTY}
+	</span></td>
+</tr>
+<!-- END empty -->
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/ptifo/index_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this is a partial search : the full line is longer
+#
+		<a href="{indexrow.forum.U_LAST_POST}" class="gensmall" title="{L_LAST_POST}">
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+<a href="{indexrow.forum.U_LAST_POST}"
+#
+#----------[ IN-LINE BEFORE, ADD ]----------------------------
+#
+&nbsp;
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/ptifo/posting_bbcode.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+	formErrors = false;
+
+<!-- BEGIN switch_standalone -->
+	if (document.post.message.value.length < 2) {
+		formErrors = "{L_EMPTY_MESSAGE}";
+	}
+<!-- END switch_standalone -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	formErrors = false;
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/ptifo/posting_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+				  <td colspan="{S_SMILIES_COLSPAN}"><span  class="nav"><a href="{U_MORE_SMILIES}" onclick="window.open('{U_MORE_SMILIES}', '_phpbbsmilies', 'HEIGHT=300,resizable=yes,scrollbars=yes,WIDTH=250');return false;" target="_phpbbsmilies" class="nav">{L_MORE_SMILIES}</a></span></td>
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+<span  class="nav">
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+<span class="topictitle">
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+class="nav"
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+class="topictitle"
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/ptifo/topics_row_box.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this is a partial search : the full line is longer
+#
+<!-- END last_post_userlink -->&nbsp;
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+<!-- END last_post_userlink -->&nbsp;
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+<!-- END last_post_userlink -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this is a partial search : the full line is longer
+#
+<!-- BEGIN last_post_link --><a href="{topicrow.U_LAST_POST}"
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+<!-- BEGIN last_post_link -->
+#
+#----------[ IN-LINE AFTER, ADD ]-----------------------------
+#
+&nbsp;
+#
+#
+#
+#
+#-------------------------------------------------------------
+#
+# subSilver part : you can skip this if you don't use subSilver
+# modifications are the same than the ones for ptifo, except viewtopic_body.tpl and overall_header.tpl
+#
+#-------------------------------------------------------------
+#
+#-----[ COPY ]------------------------------------------------
+#
+COPY root/templates/subSilver/images/*.* TO templates/subSilver/images/*.*
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/admin/topics_attr_list_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+<!-- END row -->
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+<!-- BEGIN empty -->
+<tr>
+	<td colspan="4" align="center" height="35" class="row1"><span class="gen">{L_EMPTY}
+	</span></td>
+</tr>
+<!-- END empty -->
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/index_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this is a partial search : the full line is longer
+#
+		<a href="{indexrow.forum.U_LAST_POST}" class="gensmall" title="{L_LAST_POST}">
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+<a href="{indexrow.forum.U_LAST_POST}"
+#
+#----------[ IN-LINE BEFORE, ADD ]----------------------------
+#
+&nbsp;
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/overall_header.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this is a partial search : the full line is longer
+#
+<a href="{U_PREFERENCES}" class="mainmenu"><img src="templates/subSilver/images/icon_mini_profile.gif"
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+icon_mini_profile.gif
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+icon_mini_preferences.gif
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/posting_bbcode.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+	formErrors = false;
+
+<!-- BEGIN switch_standalone -->
+	if (document.post.message.value.length < 2) {
+		formErrors = "{L_EMPTY_MESSAGE}";
+	}
+<!-- END switch_standalone -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	formErrors = false;
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/posting_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+				  <td colspan="{S_SMILIES_COLSPAN}"><span  class="nav"><a href="{U_MORE_SMILIES}" onclick="window.open('{U_MORE_SMILIES}', '_phpbbsmilies', 'HEIGHT=300,resizable=yes,scrollbars=yes,WIDTH=250');return false;" target="_phpbbsmilies" class="nav">{L_MORE_SMILIES}</a></span></td>
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+<span  class="nav">
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+<span class="topictitle">
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+class="nav"
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+class="topictitle"
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/topics_row_box.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this is a partial search : the full line is longer
+#
+<!-- END last_post_userlink -->&nbsp;
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+<!-- END last_post_userlink -->&nbsp;
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+<!-- END last_post_userlink -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this is a partial search : the full line is longer
+#
+<!-- BEGIN last_post_link --><a href="{topicrow.U_LAST_POST}"
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+<!-- BEGIN last_post_link -->
+#
+#----------[ IN-LINE AFTER, ADD ]-----------------------------
+#
+&nbsp;
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/viewtopic_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+		<td class="spaceRow" colspan="2" height="1"><img src="{I_SPACER}" alt="" width="1" height="1" />
+		</td>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		<td class="spaceRow" colspan="2" height="1"><img src="{I_SPACER}" alt="" width="1" height="1" /></td>
+#
+#-----[ SAVE/CLOSE ALL FILES ]--------------------------------
+#
+# EoM

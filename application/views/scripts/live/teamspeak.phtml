@@ -1,0 +1,28 @@
+<table class="players" cellspacing="0" cellpadding="0" width="100%">
+	<tr class="head title">
+		<td>Teamspeak</td>
+	</tr>
+	<tr>
+		<td style="border-bottom: 0px;">
+			<div class="clean" style="overflow: hidden;">
+			<div id="tsload"><center><img src="'. PATH_ICONS .'loading.gif"/></center></div>
+				<div id="dummy" style="height: 300px;">loading Teamspeak...</div>
+				<div id="ts2" style="display: none; overflow: hidden;">
+					<script type="text/javascript">
+					<!--
+						$.get( "/tools/teamspeak.php", function( data ) {
+							$("#tsload").remove();
+							$("#dummy").remove();
+							$("#ts2").append( data ).show()
+							$( 'img:last', $("div.tsv") ).remove();
+							$( 'img:last', $("div.tsv") ).remove();
+						});
+					//-->
+					</script>
+				</div>
+				<div id="ts2x" style="display:none;">
+				</div>
+			</div>
+		</td>
+	</tr>
+</table>

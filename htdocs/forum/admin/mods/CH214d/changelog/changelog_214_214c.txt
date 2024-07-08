@@ -1,0 +1,3882 @@
+##############################################################
+##
+## Upgrade path from 2.1.4 (phpBB 2.0.19) to 2.1.4c (phpBB 2.0.20)
+##
+##############################################################
+#
+#-----[ DIY INSTRUCTIONS ]------------------------------------
+#
+run install/update_to_latest.php coming with phpBB 2.0.20
+#
+#-----[ COPY ]------------------------------------------------
+#
+# Use the files coming with the "installed" pack, especially for the _sav_* ones
+#
+COPY root/install_cat/*.* TO install_cat/*.*
+COPY root/_sav_index.php TO _sav_index.php
+COPY root/admin/_sav_admin_forums.php TO admin/_sav_admin_forums.php
+COPY root/templates/subSilver/admin/confirm_body.tpl TO templates/subSilver/admin/confirm_body.tpl
+COPY root/templates/ptifo/admin/confirm_body.tpl TO templates/ptifo/admin/confirm_body.tpl
+#
+#-----[ OPEN ]------------------------------------------------
+#
+common.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: common.php,v 1.74.2.22 2005/12/30 09:51:01 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: common.php,v 1.74.2.23 2006/02/26 17:34:50 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+$nav_links = array();
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+$dss_seeded = false;
+#
+#-----[ OPEN ]------------------------------------------------
+#
+login.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: login.php,v 1.47.2.21 2005/12/29 11:51:13 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: login.php,v 1.47.2.23 2006/01/13 20:10:02 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+				// Check to see if user is allowed to login again... if his tries are exceeded
+				if ($row['user_last_login_try'] && $board_config['login_reset_time'] && $board_config['max_login_attempts'] && 
+					$row['user_last_login_try'] >= (time() - ($board_config['login_reset_time'] * 60)) && $row['user_login_tries'] >= $board_config['max_login_attempts'])
+				{
+					message_die(GENERAL_MESSAGE, sprintf($lang['Login_attempts_exceeded'], $board_config['max_login_attempts'], $board_config['login_reset_time']));
+				}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+				// Check to see if user is allowed to login again... if his tries are exceeded
+				if ($row['user_last_login_try'] && $board_config['login_reset_time'] && $board_config['max_login_attempts'] && 
+					$row['user_last_login_try'] >= (time() - ($board_config['login_reset_time'] * 60)) && $row['user_login_tries'] >= $board_config['max_login_attempts'] && $userdata['user_level'] != ADMIN)
+				{
+					message_die(GENERAL_MESSAGE, sprintf($lang['Login_attempts_exceeded'], $board_config['max_login_attempts'], $board_config['login_reset_time']));
+				}
+#
+#-----[ FIND ]------------------------------------------------
+#
+				else
+				{
+					// Save login tries and last login
+					if ($row['user_id'] != ANONYMOUS)
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+				// Only store a failed login attempt for an active user - inactive users can't login even with a correct password
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+				elseif( $row['user_active'] )
+				{
+					// Save login tries and last login
+					if ($row['user_id'] != ANONYMOUS)
+*/
+//-- add
+				else
+				{
+					// Save login tries and last login
+					if ( ($row['user_id'] != ANONYMOUS) && intval($row['user_active']) )
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+memberlist.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: memberlist.php,v 1.36.2.11 2005/09/14 18:14:30 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: memberlist.php,v 1.36.2.12 2006/02/07 20:42:51 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$search_img = '<a href="' . $temp_url . '"><img src="' . $images['icon_search'] . '" alt="' . $lang['Search_user_posts'] . '" title="' . $lang['Search_user_posts'] . '" border="0" /></a>';
+		$search = '<a href="' . $temp_url . '">' . $lang['Search_user_posts'] . '</a>';
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		$search_img = '<a href="' . $temp_url . '"><img src="' . $images['icon_search'] . '" alt="' . sprintf($lang['Search_user_posts'], $username) . '" title="' . sprintf($lang['Search_user_posts'], $username) . '" border="0" /></a>';
+		$search = '<a href="' . $temp_url . '">' . sprintf($lang['Search_user_posts'], $username) . '</a>';
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+// here we added
+//	" . $selection . "
+//-- modify
+		$pagination = generate_pagination("memberlist.$phpEx?mode=$mode" . $selection . "&amp;order=$sort_order", $total_members, $board_config['topics_per_page'], $start). '&nbsp;';
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+		$pagination = generate_pagination("memberlist.$phpEx?mode=$mode&amp;order=$sort_order", $total_members, $board_config['topics_per_page'], $start). '&nbsp;';
+*/
+//-- add
+		$pagination = generate_pagination("memberlist.$phpEx?mode=$mode" . $selection . "&amp;order=$sort_order", $total_members, $board_config['topics_per_page'], $start). '&nbsp;';
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+modcp.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: modcp.php,v 1.71.2.27 2005/09/14 18:14:30 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: modcp.php,v 1.71.2.28 2006/01/20 19:50:27 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+	case 'delete':
+		if (!$is_auth['auth_delete'])
+		{
+			message_die(GENERAL_MESSAGE, sprintf($lang['Sorry_auth_delete'], $is_auth['auth_delete_type']));
+		}
+
+		$page_title = $lang['Mod_CP'];
+		include($phpbb_root_path . 'includes/page_header.'.$phpEx);
+
+		if ( $confirm )
+		{
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+  			if ( empty($HTTP_POST_VARS['topic_id_list']) && empty($topic_id) )
+			{
+				message_die(GENERAL_MESSAGE, $lang['None_selected']);
+			}
+#
+#-----[ FIND ]------------------------------------------------
+#
+			$topic_id_sql = '';
+			while ($row = $db->sql_fetchrow($result))
+			{
+				$topic_id_sql .= (($topic_id_sql != '') ? ', ' : '') . intval($row['topic_id']);
+			}
+			$db->sql_freeresult($result);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+			if ( $topic_id_sql == '')
+			{
+				message_die(GENERAL_MESSAGE, $lang['None_selected']);
+			}
+#
+#-----[ FIND ]------------------------------------------------
+#
+			$post_id_sql = '';
+			while ($row = $db->sql_fetchrow($result))
+			{
+				$post_id_sql .= (($post_id_sql != '') ? ', ' : '') . intval($row['post_id']);
+			}
+			$db->sql_freeresult($result);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+			if ($post_id_sql == '')
+			{
+				message_die(GENERAL_MESSAGE, $lang['None_selected']);
+			}
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$ip_this_post = ( $rdns_ip_num == $ip_this_post ) ? gethostbyaddr($ip_this_post) : $ip_this_post;
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		$ip_this_post = ( $rdns_ip_num == $ip_this_post ) ? htmlspecialchars(gethostbyaddr($ip_this_post)) : $ip_this_post;
+#
+#-----[ FIND ]------------------------------------------------
+#
+				$ip = ( $rdns_ip_num == $row['poster_ip'] || $rdns_ip_num == 'all') ? gethostbyaddr($ip) : $ip;
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+				$ip = ( $rdns_ip_num == $row['poster_ip'] || $rdns_ip_num == 'all') ? htmlspecialchars(gethostbyaddr($ip)) : $ip;
+#
+#-----[ OPEN ]------------------------------------------------
+#
+posting.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: posting.php,v 1.159.2.27 2005/10/30 15:17:13 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: posting.php,v 1.159.2.28 2006/01/28 14:56:51 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy --------------------------------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- fin mod : categories hierarchy ----------------------------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+				$poll_options[$option_id] = htmlspecialchars(trim(stripslashes($option_text)));
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+				$poll_options[intval($option_id)] = htmlspecialchars(trim(stripslashes($option_text)));
+#
+#-----[ OPEN ]------------------------------------------------
+#
+privmsg.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: privmsg.php,v 1.96.2.44 2005/12/22 12:54:56 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: privmsg.php,v 1.96.2.48 2006/03/18 12:33:06 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$privmsg_subject = trim(strip_tags($HTTP_POST_VARS['subject']));
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		$privmsg_subject = trim(htmlspecialchars($HTTP_POST_VARS['subject']));
+#
+#-----[ FIND ]------------------------------------------------
+#
+		if ( !$db->sql_query($sql, END_TRANSACTION) )
+		{
+			message_die(GENERAL_ERROR, "Could not insert/update private message sent text.", "", __LINE__, __FILE__, $sql_info);
+		}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		if ( !$db->sql_query($sql, END_TRANSACTION) )
+		{
+			message_die(GENERAL_ERROR, "Could not insert/update private message sent text.", "", __LINE__, __FILE__, $sql);
+		}
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$privmsg_subject = ( isset($HTTP_POST_VARS['subject']) ) ? trim(strip_tags(stripslashes($HTTP_POST_VARS['subject']))) : '';
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		$privmsg_subject = ( isset($HTTP_POST_VARS['subject']) ) ? trim(htmlspecialchars(stripslashes($HTTP_POST_VARS['subject']))) : '';
+#
+#-----[ FIND ]------------------------------------------------
+#
+			$privmsg_subject = ( ( !preg_match('/^Re:/', $privmsg['privmsgs_subject']) ) ? 'Re: ' : '' ) . $privmsg['privmsgs_subject'];
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			$orig_word = $replacement_word = array();
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+			obtain_word_list($orig_word, $replace_word);
+*/
+//-- add
+			obtain_word_list($orig_word, $replacement_word);
+//-- fin mod : categories hierarchy --------------------------------------------
+
+			$privmsg_subject = ( ( !preg_match('/^Re:/', $privmsg['privmsgs_subject']) ) ? 'Re: ' : '' ) . $privmsg['privmsgs_subject'];
+			$privmsg_subject = preg_replace($orig_word, $replacement_word, $privmsg_subject);
+#
+#-----[ FIND ]------------------------------------------------
+#
+				$privmsg_message = preg_replace('#</textarea>#si', '&lt;/textarea&gt;', $privmsg_message);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+				$privmsg_message = preg_replace($orig_word, $replacement_word, $privmsg_message);
+#
+#-----[ FIND ]------------------------------------------------
+#
+	generate_smilies('inline', PAGE_PRIVMSGS);
+
+	$privmsg_subject = preg_replace($html_entities_match, $html_entities_replace, $privmsg_subject);
+	$privmsg_subject = str_replace('"', '&quot;', $privmsg_subject);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	generate_smilies('inline', PAGE_PRIVMSGS);
+#
+#-----[ OPEN ]------------------------------------------------
+#
+profile.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: profile.php,v 1.193.2.5 2004/11/18 17:49:37 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: profile.php,v 1.193.2.6 2006/02/26 17:34:50 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+function gen_rand_string($hash)
+{
+	$chars = array( 'a', 'A', 'b', 'B', 'c', 'C', 'd', 'D', 'e', 'E', 'f', 'F', 'g', 'G', 'h', 'H', 'i', 'I', 'j', 'J',  'k', 'K', 'l', 'L', 'm', 'M', 'n', 'N', 'o', 'O', 'p', 'P', 'q', 'Q', 'r', 'R', 's', 'S', 't', 'T',  'u', 'U', 'v', 'V', 'w', 'W', 'x', 'X', 'y', 'Y', 'z', 'Z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0');
+	
+	$max_chars = count($chars) - 1;
+	srand( (double) microtime()*1000000);
+	
+	$rand_str = '';
+	for($i = 0; $i < 8; $i++)
+	{
+		$rand_str = ( $i == 0 ) ? $chars[rand(0, $max_chars)] : $rand_str . $chars[rand(0, $max_chars)];
+	}
+
+	return ( $hash ) ? md5($rand_str) : $rand_str;
+}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+function gen_rand_string($hash)
+{
+	$rand_str = dss_rand();
+
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+	return ( $hash ) ? md5($rand_str) : substr($rand_str, 8);
+*/
+//-- add
+	// fix a typo
+	return ( $hash ) ? md5($rand_str) : substr($rand_str, 0, 8);
+//-- fin mod : categories hierarchy --------------------------------------------
+}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+search.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: search.php,v 1.72.2.17 2005/09/14 18:14:30 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: search.php,v 1.72.2.19 2006/02/05 15:59:48 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$limiter = 5000;
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+	$current_time = time();
+#
+#-----[ FIND ]------------------------------------------------
+#
+	//
+	// Cycle through options ...
+	//
+	if ( $search_id == 'newposts' || $search_id == 'egosearch' || $search_id == 'unanswered' || $search_keywords != '' || $search_author != '' )
+	{
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+		//
+		// Flood control
+		//
+		$where_sql = ($userdata['user_id'] == ANONYMOUS) ? "se.session_ip = '$user_ip'" : 'se.session_user_id = ' . $userdata['user_id'];
+		$sql = 'SELECT MAX(sr.search_time) AS last_search_time
+			FROM ' . SEARCH_TABLE . ' sr, ' . SESSIONS_TABLE . " se
+			WHERE sr.session_id = se.session_id
+				AND $where_sql";
+		if ($result = $db->sql_query($sql))
+		{
+			if ($row = $db->sql_fetchrow($result))
+			{
+				if (intval($row['last_search_time']) > 0 && ($current_time - intval($row['last_search_time'])) < intval($board_config['search_flood_interval']))
+				{
+					message_die(GENERAL_MESSAGE, $lang['Search_Flood_Error']);
+				}
+			}
+		}
+#
+#-----[ FIND ]------------------------------------------------
+#
+				if (preg_match('#^[\*%]+$#', trim($search_author)) || preg_match('#^[^\*]{1,2}$#', str_replace(array('*', '%'), '', trim($search_author))))
+				{
+					$search_author = '';
+				}
+
+				$search_author = str_replace('*', '%', trim($search_author));
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+				$search_author = str_replace('*', '%', trim($search_author));
+
+				if( ( strpos($search_author, '%') !== false ) && ( strlen(str_replace('%', '', $search_author)) < 3 ) )
+				{
+					$search_author = '';
+				}
+#
+#-----[ FIND ]------------------------------------------------
+#
+		if ( $search_author != '' )
+		{
+			if (preg_match('#^[\*%]+$#', trim($search_author)) || preg_match('#^[^\*]{1,2}$#', str_replace(array('*', '%'), '', trim($search_author))))
+			{
+				$search_author = '';
+			}
+
+			$search_author = str_replace('*', '%', trim(str_replace("\'", "''", $search_author)));
+		}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		if ( $search_author != '' )
+		{
+			$search_author = str_replace('*', '%', trim($search_author));
+
+			if( ( strpos($search_author, '%') !== false ) && ( strlen(str_replace('%', '', $search_author)) < 3 ) )
+			{
+				$search_author = '';
+			}
+		}
+#
+#-----[ FIND ]------------------------------------------------
+#
+		//
+		// Finish building query (for all combinations)
+		// and run it ...
+		//
+		$sql = "SELECT session_id 
+			FROM " . SESSIONS_TABLE;
+		if ( $result = $db->sql_query($sql) )
+		{
+			$delete_search_ids = array();
+			while( $row = $db->sql_fetchrow($result) )
+			{
+				$delete_search_ids[] = "'" . $row['session_id'] . "'";
+			}
+
+			if ( count($delete_search_ids) )
+			{
+				$sql = "DELETE FROM " . SEARCH_TABLE . " 
+					WHERE session_id NOT IN (" . implode(", ", $delete_search_ids) . ")";
+				if ( !$result = $db->sql_query($sql) )
+				{
+					message_die(GENERAL_ERROR, 'Could not delete old search id sessions', '', __LINE__, __FILE__, $sql);
+				}
+			}
+		}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		//
+		// Delete old data from the search result table
+		//
+		$sql = 'DELETE FROM ' . SEARCH_TABLE . '
+			WHERE search_time < ' . ($current_time - (int) $board_config['session_length']);
+		if ( !$result = $db->sql_query($sql) )
+		{
+			message_die(GENERAL_ERROR, 'Could not delete old search id sessions', '', __LINE__, __FILE__, $sql);
+		}
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$sql = "UPDATE " . SEARCH_TABLE . " 
+			SET search_id = $search_id, search_array = '" . str_replace("\'", "''", $result_array) . "'
+			WHERE session_id = '" . $userdata['session_id'] . "'";
+		if ( !($result = $db->sql_query($sql)) || !$db->sql_affectedrows() )
+		{
+			$sql = "INSERT INTO " . SEARCH_TABLE . " (search_id, session_id, search_array) 
+				VALUES($search_id, '" . $userdata['session_id'] . "', '" . str_replace("\'", "''", $result_array) . "')";
+			if ( !($result = $db->sql_query($sql)) )
+			{
+				message_die(GENERAL_ERROR, 'Could not insert search results', '', __LINE__, __FILE__, $sql);
+			}
+		}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		$sql = "UPDATE " . SEARCH_TABLE . " 
+			SET search_id = $search_id, search_time = $current_time, search_array = '" . str_replace("\'", "''", $result_array) . "'
+			WHERE session_id = '" . $userdata['session_id'] . "'";
+		if ( !($result = $db->sql_query($sql)) || !$db->sql_affectedrows() )
+		{
+			$sql = "INSERT INTO " . SEARCH_TABLE . " (search_id, session_id, search_time, search_array) 
+				VALUES($search_id, '" . $userdata['session_id'] . "', $current_time, '" . str_replace("\'", "''", $result_array) . "')";
+			if ( !($result = $db->sql_query($sql)) )
+			{
+				message_die(GENERAL_ERROR, 'Could not insert search results', '', __LINE__, __FILE__, $sql);
+			}
+		}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/admin_board.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: admin_board.php,v 1.51.2.13 2005/12/29 11:51:11 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: admin_board.php,v 1.51.2.15 2006/02/10 22:19:01 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+		if ($config_name == 'cookie_name')
+		{
+			$cookie_name = str_replace('.', '_', $new['cookie_name']);
+		}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		if ($config_name == 'cookie_name')
+		{
+			$new['cookie_name'] = str_replace('.', '_', $new['cookie_name']);
+		}
+
+		// Attempt to prevent a common mistake with this value,
+		// http:// is the protocol and not part of the server name
+		if ($config_name == 'server_name')
+		{
+			$new['server_name'] = str_replace('http://', '', $new['server_name']);
+		}
+#
+#-----[ FIND ]------------------------------------------------
+#
+	"L_FLOOD_INTERVAL_EXPLAIN" => $lang['Flood_Interval_explain'],
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+	"L_SEARCH_FLOOD_INTERVAL" => $lang['Search_Flood_Interval'],
+	"L_SEARCH_FLOOD_INTERVAL_EXPLAIN" => $lang['Search_Flood_Interval_explain'], 
+#
+#-----[ FIND ]------------------------------------------------
+#
+	"FLOOD_INTERVAL" => $new['flood_interval'],
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+	"SEARCH_FLOOD_INTERVAL" => $new['search_flood_interval'],
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/admin_caches.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+	function init()
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	function init($mode='')
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/admin_db_utilities.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+*     $Id: admin_db_utilities.php,v 1.42.2.12 2005/11/05 21:18:12 grahamje Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+*     $Id: admin_db_utilities.php,v 1.42.2.14 2006/02/10 20:35:40 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+		unset($schema_vals);
+		unset($schema_fields);
+		unset($schema_insert);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		$schema_vals = '';
+		$schema_fields = '';
+		$schema_insert = '';
+#
+#-----[ FIND ]------------------------------------------------
+#
+				if ($empty($strVal))
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+				if (empty($strVal))
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/admin_groups.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: admin_groups.php,v 1.25.2.9 2004/03/25 15:57:20 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: admin_groups.php,v 1.25.2.13 2006/03/09 19:42:41 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$sql = "SELECT user_id, username
+		FROM " . USERS_TABLE . "
+		WHERE user_id <> " . ANONYMOUS . "
+		ORDER BY username";
+	if ( !($result = $db->sql_query($sql)) )
+	{
+		message_die(GENERAL_ERROR, 'Could not obtain user info for moderator list', '', __LINE__, __FILE__, $sql);
+	}
+
+	while ( $row = $db->sql_fetchrow($result) )
+	{
+		if ( $row['user_id'] == $group_info['group_moderator'] ) 
+		{
+			$group_moderator = $row['username'];
+		}
+	}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	if ($group_info['group_moderator'] != '')
+	{
+		$sql = "SELECT user_id, username
+			FROM " . USERS_TABLE . "
+			WHERE user_id = " . $group_info['group_moderator'];
+		if ( !($result = $db->sql_query($sql)) )
+		{
+			message_die(GENERAL_ERROR, 'Could not obtain user info for moderator list', '', __LINE__, __FILE__, $sql);
+		}
+
+		if ( !($row = $db->sql_fetchrow($result)) )
+		{
+			message_die(GENERAL_ERROR, 'Could not obtain user info for moderator list', '', __LINE__, __FILE__, $sql);
+		}
+
+		$group_moderator = $row['username'];
+	}
+	else
+	{
+		$group_moderator = '';
+	}
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$group_name = isset($HTTP_POST_VARS['group_name']) ? trim($HTTP_POST_VARS['group_name']) : '';
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		$group_name = isset($HTTP_POST_VARS['group_name']) ? htmlspecialchars(trim($HTTP_POST_VARS['group_name'])) : '';
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/admin_ranks.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: admin_ranks.php,v 1.13.2.5 2005/12/18 13:57:50 grahamje Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: admin_ranks.php,v 1.13.2.7 2006/01/23 19:47:19 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+define('IN_PHPBB', 1);
+
+if( !empty($setmodules) )
+{
+	$file = basename(__FILE__);
+	$module['Users']['Ranks'] = $file;
+	return;
+}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+if( !empty($setmodules) )
+{
+	$file = basename(__FILE__);
+	$module['Users']['Ranks'] = $file;
+	return;
+}
+
+define('IN_PHPBB', 1);
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$mode = ($HTTP_GET_VARS['mode']) ? $HTTP_GET_VARS['mode'] : $HTTP_POST_VARS['mode'];
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	$mode = (isset($HTTP_GET_VARS['mode'])) ? $HTTP_GET_VARS['mode'] : $HTTP_POST_VARS['mode'];
+#
+#-----[ FIND ]------------------------------------------------
+#
+	else
+	{
+		$mode = "";
+	}
+}
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+// Restrict mode input to valid options
+$mode = ( in_array($mode, array('add', 'edit', 'save', 'delete')) ) ? $mode : '';
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+if ( _button('cancel') )
+{
+	$mode = '';
+}
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+		if( $rank_id )
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		$confirm = isset($HTTP_POST_VARS['confirm']);
+		
+		if( $rank_id && $confirm )
+#
+#-----[ FIND ]------------------------------------------------
+#
+		else
+		{
+			message_die(GENERAL_MESSAGE, $lang['Must_select_rank']);
+		}
+	}
+	else
+	{
+		//
+		// They didn't feel like giving us any information. Oh, too bad, we'll just display the
+		// list then...
+		//
+		$template->set_filenames(array(
+			"body" => "admin/ranks_list_body.tpl")
+		);
+		
+		$sql = "SELECT * FROM " . RANKS_TABLE . "
+			ORDER BY rank_min, rank_title";
+		if( !$result = $db->sql_query($sql) )
+		{
+			message_die(GENERAL_ERROR, "Couldn't obtain ranks data", "", __LINE__, __FILE__, $sql);
+		}
+		
+		$rank_rows = $db->sql_fetchrowset($result);
+		$rank_count = count($rank_rows);
+		
+		$template->assign_vars(array(
+			"L_RANKS_TITLE" => $lang['Ranks_title'],
+			"L_RANKS_TEXT" => $lang['Ranks_explain'],
+			"L_RANK" => $lang['Rank_title'],
+			"L_RANK_MINIMUM" => $lang['Rank_minimum'],
+			"L_SPECIAL_RANK" => $lang['Special_rank'],
+			"L_EDIT" => $lang['Edit'],
+			"L_DELETE" => $lang['Delete'],
+			"L_ADD_RANK" => $lang['Add_new_rank'],
+			"L_ACTION" => $lang['Action'],
+			
+			"S_RANKS_ACTION" => append_sid("admin_ranks.$phpEx"))
+		);
+		
+		for( $i = 0; $i < $rank_count; $i++)
+		{
+			$rank = $rank_rows[$i]['rank_title'];
+			$special_rank = $rank_rows[$i]['rank_special'];
+			$rank_id = $rank_rows[$i]['rank_id'];
+			$rank_min = $rank_rows[$i]['rank_min'];
+
+			if($special_rank)
+			{
+				$rank_min = $rank_max = "-";
+			}
+			
+			$row_color = ( !($i % 2) ) ? $theme['td_color1'] : $theme['td_color2'];
+			$row_class = ( !($i % 2) ) ? $theme['td_class1'] : $theme['td_class2'];
+	
+			$template->assign_block_vars("ranks", array(
+				"ROW_COLOR" => "#" . $row_color,
+				"ROW_CLASS" => $row_class,
+				"RANK" => $rank,
+				"RANK_MIN" => $rank_min,
+
+				"SPECIAL_RANK" => ( $special_rank == 1 ) ? $lang['Yes'] : $lang['No'],
+
+				"U_RANK_EDIT" => append_sid("admin_ranks.$phpEx?mode=edit&amp;id=$rank_id"),
+				"U_RANK_DELETE" => append_sid("admin_ranks.$phpEx?mode=delete&amp;id=$rank_id"))
+			);
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+			$template->set_switch('ranks.light', !($i % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+		}
+	}
+}
+else
+{
+	//
+	// Show the default page
+	//
+	$template->set_filenames(array(
+		"body" => "admin/ranks_list_body.tpl")
+	);
+	
+	$sql = "SELECT * FROM " . RANKS_TABLE . "
+		ORDER BY rank_min ASC, rank_special ASC";
+	if( !$result = $db->sql_query($sql) )
+	{
+		message_die(GENERAL_ERROR, "Couldn't obtain ranks data", "", __LINE__, __FILE__, $sql);
+	}
+	$rank_count = $db->sql_numrows($result);
+
+	$rank_rows = $db->sql_fetchrowset($result);
+	
+	$template->assign_vars(array(
+		"L_RANKS_TITLE" => $lang['Ranks_title'],
+		"L_RANKS_TEXT" => $lang['Ranks_explain'],
+		"L_RANK" => $lang['Rank_title'],
+		"L_RANK_MINIMUM" => $lang['Rank_minimum'],
+		"L_SPECIAL_RANK" => $lang['Rank_special'],
+		"L_EDIT" => $lang['Edit'],
+		"L_DELETE" => $lang['Delete'],
+		"L_ADD_RANK" => $lang['Add_new_rank'],
+		"L_ACTION" => $lang['Action'],
+		
+		"S_RANKS_ACTION" => append_sid("admin_ranks.$phpEx"))
+	);
+	
+	for($i = 0; $i < $rank_count; $i++)
+	{
+		$rank = $rank_rows[$i]['rank_title'];
+		$special_rank = $rank_rows[$i]['rank_special'];
+		$rank_id = $rank_rows[$i]['rank_id'];
+		$rank_min = $rank_rows[$i]['rank_min'];
+		
+		if( $special_rank == 1 )
+		{
+			$rank_min = $rank_max = "-";
+		}
+
+		$row_color = ( !($i % 2) ) ? $theme['td_color1'] : $theme['td_color2'];
+		$row_class = ( !($i % 2) ) ? $theme['td_class1'] : $theme['td_class2'];
+
+		$rank_is_special = ( $special_rank ) ? $lang['Yes'] : $lang['No'];
+		
+		$template->assign_block_vars("ranks", array(
+			"ROW_COLOR" => "#" . $row_color,
+			"ROW_CLASS" => $row_class,
+			"RANK" => $rank,
+			"SPECIAL_RANK" => $rank_is_special,
+			"RANK_MIN" => $rank_min,
+
+			"U_RANK_EDIT" => append_sid("admin_ranks.$phpEx?mode=edit&amp;id=$rank_id"),
+			"U_RANK_DELETE" => append_sid("admin_ranks.$phpEx?mode=delete&amp;id=$rank_id"))
+		);
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+		$template->set_switch('ranks.light', !($i % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+	}
+}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		elseif( $rank_id && !$confirm)
+		{
+			// Present the confirmation screen to the user
+			$template->set_filenames(array(
+				'body' => 'admin/confirm_body.tpl')
+			);
+
+			$hidden_fields = '<input type="hidden" name="mode" value="delete" /><input type="hidden" name="id" value="' . $rank_id . '" />';
+
+			$template->assign_vars(array(
+				'MESSAGE_TITLE' => $lang['Confirm'],
+				'MESSAGE_TEXT' => $lang['Confirm_delete_rank'],
+
+				'L_YES' => $lang['Yes'],
+				'L_NO' => $lang['No'],
+
+				'S_CONFIRM_ACTION' => append_sid("admin_ranks.$phpEx"),
+				'S_HIDDEN_FIELDS' => $hidden_fields)
+			);
+		}
+		else
+		{
+			message_die(GENERAL_MESSAGE, $lang['Must_select_rank']);
+		}
+	}
+
+	$template->pparse("body");
+
+	include('./page_footer_admin.'.$phpEx);
+}
+
+//
+// Show the default page
+//
+$template->set_filenames(array(
+	"body" => "admin/ranks_list_body.tpl")
+);
+
+$sql = "SELECT * FROM " . RANKS_TABLE . "
+	ORDER BY rank_min ASC, rank_special ASC";
+if( !$result = $db->sql_query($sql) )
+{
+	message_die(GENERAL_ERROR, "Couldn't obtain ranks data", "", __LINE__, __FILE__, $sql);
+}
+$rank_count = $db->sql_numrows($result);
+
+$rank_rows = $db->sql_fetchrowset($result);
+
+$template->assign_vars(array(
+	"L_RANKS_TITLE" => $lang['Ranks_title'],
+	"L_RANKS_TEXT" => $lang['Ranks_explain'],
+	"L_RANK" => $lang['Rank_title'],
+	"L_RANK_MINIMUM" => $lang['Rank_minimum'],
+	"L_SPECIAL_RANK" => $lang['Rank_special'],
+	"L_EDIT" => $lang['Edit'],
+	"L_DELETE" => $lang['Delete'],
+	"L_ADD_RANK" => $lang['Add_new_rank'],
+	"L_ACTION" => $lang['Action'],
+	
+	"S_RANKS_ACTION" => append_sid("admin_ranks.$phpEx"))
+);
+
+for($i = 0; $i < $rank_count; $i++)
+{
+	$rank = $rank_rows[$i]['rank_title'];
+	$special_rank = $rank_rows[$i]['rank_special'];
+	$rank_id = $rank_rows[$i]['rank_id'];
+	$rank_min = $rank_rows[$i]['rank_min'];
+	
+	if( $special_rank == 1 )
+	{
+		$rank_min = $rank_max = "-";
+	}
+
+	$row_color = ( !($i % 2) ) ? $theme['td_color1'] : $theme['td_color2'];
+	$row_class = ( !($i % 2) ) ? $theme['td_class1'] : $theme['td_class2'];
+
+	$rank_is_special = ( $special_rank ) ? $lang['Yes'] : $lang['No'];
+	
+	$template->assign_block_vars("ranks", array(
+		"ROW_COLOR" => "#" . $row_color,
+		"ROW_CLASS" => $row_class,
+		"RANK" => $rank,
+		"SPECIAL_RANK" => $rank_is_special,
+		"RANK_MIN" => $rank_min,
+
+		"U_RANK_EDIT" => append_sid("admin_ranks.$phpEx?mode=edit&amp;id=$rank_id"),
+		"U_RANK_DELETE" => append_sid("admin_ranks.$phpEx?mode=delete&amp;id=$rank_id"))
+	);
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+	$template->set_switch('ranks.light', !($i % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/admin_smilies.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+*     $Id: admin_smilies.php,v 1.22.2.16 2005/10/30 15:17:13 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+*     $Id: admin_smilies.php,v 1.22.2.17 2006/01/28 12:46:53 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+else
+{
+	$mode = "";
+}
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+if ( _button('cancel') )
+{
+	$mode = '';
+}
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+			$sql = "DELETE FROM " . SMILIES_TABLE . "
+				WHERE smilies_id = " . $smiley_id;
+			$result = $db->sql_query($sql);
+			if( !$result )
+			{
+				message_die(GENERAL_ERROR, "Couldn't delete smiley", "", __LINE__, __FILE__, $sql);
+			}
+
+			$message = $lang['smiley_del_success'] . "<br /><br />" . sprintf($lang['Click_return_smileadmin'], "<a href=\"" . append_sid("admin_smilies.$phpEx") . "\">", "</a>") . "<br /><br />" . sprintf($lang['Click_return_admin_index'], "<a href=\"" . append_sid("index.$phpEx?pane=right") . "\">", "</a>");
+
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+			$smilies = new smilies();
+			$smilies->read(true);
+//-- fin mod : categories hierarchy --------------------------------------------
+
+			message_die(GENERAL_MESSAGE, $message);
+			break;
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			$confirm = isset($HTTP_POST_VARS['confirm']);
+
+			if( $confirm )
+			{
+				$sql = "DELETE FROM " . SMILIES_TABLE . "
+					WHERE smilies_id = " . $smiley_id;
+				$result = $db->sql_query($sql);
+				if( !$result )
+				{
+					message_die(GENERAL_ERROR, "Couldn't delete smiley", "", __LINE__, __FILE__, $sql);
+				}
+
+				$message = $lang['smiley_del_success'] . "<br /><br />" . sprintf($lang['Click_return_smileadmin'], "<a href=\"" . append_sid("admin_smilies.$phpEx") . "\">", "</a>") . "<br /><br />" . sprintf($lang['Click_return_admin_index'], "<a href=\"" . append_sid("index.$phpEx?pane=right") . "\">", "</a>");
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+				$smilies = new smilies();
+				$smilies->read(true);
+//-- fin mod : categories hierarchy --------------------------------------------
+
+				message_die(GENERAL_MESSAGE, $message);
+			}
+			else
+			{
+				// Present the confirmation screen to the user
+				$template->set_filenames(array(
+					'body' => 'admin/confirm_body.tpl')
+				);
+
+				$hidden_fields = '<input type="hidden" name="mode" value="delete" /><input type="hidden" name="id" value="' . $smiley_id . '" />';
+
+				$template->assign_vars(array(
+					'MESSAGE_TITLE' => $lang['Confirm'],
+					'MESSAGE_TEXT' => $lang['Confirm_delete_smiley'],
+
+					'L_YES' => $lang['Yes'],
+					'L_NO' => $lang['No'],
+
+					'S_CONFIRM_ACTION' => append_sid("admin_smilies.$phpEx"),
+					'S_HIDDEN_FIELDS' => $hidden_fields)
+				);
+				$template->pparse('body');
+			}
+			break;
+#
+#-----[ FIND ]------------------------------------------------
+#
+			$smile_code = ( isset($HTTP_POST_VARS['smile_code']) ) ? trim($HTTP_POST_VARS['smile_code']) : trim($HTTP_GET_VARS['smile_code']);
+			$smile_url = ( isset($HTTP_POST_VARS['smile_url']) ) ? trim($HTTP_POST_VARS['smile_url']) : trim($HTTP_GET_VARS['smile_url']);
+			$smile_url = phpbb_ltrim(basename($smile_url), "'");
+			$smile_emotion = ( isset($HTTP_POST_VARS['smile_emotion']) ) ? trim($HTTP_POST_VARS['smile_emotion']) : trim($HTTP_GET_VARS['smile_emotion']);
+			$smile_id = ( isset($HTTP_POST_VARS['smile_id']) ) ? intval($HTTP_POST_VARS['smile_id']) : intval($HTTP_GET_VARS['smile_id']);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			$smile_code = ( isset($HTTP_POST_VARS['smile_code']) ) ? trim($HTTP_POST_VARS['smile_code']) : '';
+			$smile_url = ( isset($HTTP_POST_VARS['smile_url']) ) ? trim($HTTP_POST_VARS['smile_url']) : '';
+			$smile_url = phpbb_ltrim(basename($smile_url), "'");
+			$smile_emotion = ( isset($HTTP_POST_VARS['smile_emotion']) ) ? htmlspecialchars(trim($HTTP_POST_VARS['smile_emotion'])) : '';
+			$smile_id = ( isset($HTTP_POST_VARS['smile_id']) ) ? intval($HTTP_POST_VARS['smile_id']) : 0;
+			$smile_code = trim($smile_code);
+			$smile_url = trim($smile_url);
+#
+#-----[ FIND ]------------------------------------------------
+#
+			$smile_code = ( isset($HTTP_POST_VARS['smile_code']) ) ? $HTTP_POST_VARS['smile_code'] : $HTTP_GET_VARS['smile_code'];
+			$smile_url = ( isset($HTTP_POST_VARS['smile_url']) ) ? $HTTP_POST_VARS['smile_url'] : $HTTP_GET_VARS['smile_url'];
+			$smile_url = phpbb_ltrim(basename($smile_url), "'");
+			$smile_emotion = ( isset($HTTP_POST_VARS['smile_emotion']) ) ? $HTTP_POST_VARS['smile_emotion'] : $HTTP_GET_VARS['smile_emotion'];
+			$smile_code = trim($smile_code);
+			$smile_url = trim($smile_url);
+			$smile_emotion = trim($smile_emotion);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			$smile_code = ( isset($HTTP_POST_VARS['smile_code']) ) ? $HTTP_POST_VARS['smile_code'] : '';
+			$smile_url = ( isset($HTTP_POST_VARS['smile_url']) ) ? $HTTP_POST_VARS['smile_url'] : '';
+			$smile_url = phpbb_ltrim(basename($smile_url), "'");
+			$smile_emotion = ( isset($HTTP_POST_VARS['smile_emotion']) ) ? htmlspecialchars(trim($HTTP_POST_VARS['smile_emotion'])) : '';
+			$smile_code = trim($smile_code);
+			$smile_url = trim($smile_url);
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/admin_users.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: admin_users.php,v 1.57.2.31 2005/12/20 20:42:28 grahamje Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: admin_users.php,v 1.57.2.35 2006/03/26 14:43:24 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+		$user_style = ( $HTTP_POST_VARS['style'] ) ? intval( $HTTP_POST_VARS['style'] ) : $board_config['default_style'];
+*/
+//-- add
+		$user_style = _read('style', TYPE_INT, $config->data['default_style']);
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		$user_style = ( isset( $HTTP_POST_VARS['style'] ) ) ? intval( $HTTP_POST_VARS['style'] ) : $board_config['default_style'];
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$user_timezone = ( isset( $HTTP_POST_VARS['timezone']) ) ? doubleval( $HTTP_POST_VARS['timezone'] ) : $board_config['board_timezone'];
+		$user_template = ( $HTTP_POST_VARS['template'] ) ? $HTTP_POST_VARS['template'] : $board_config['board_template'];
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		$user_timezone = ( isset( $HTTP_POST_VARS['timezone']) ) ? doubleval( $HTTP_POST_VARS['timezone'] ) : $board_config['board_timezone'];
+#
+#-----[ FIND ]------------------------------------------------
+#
+						message_die(GENERAL_ERROR, 'Error removing user session', '', __LINE__, __FILE__, $sql);
+					}
+				}
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+				// We remove all stored login keys since the password has been updated
+				// and change the current one (if applicable)
+				if ( !empty($passwd_sql) )
+				{
+					session_reset_keys($user_id, $user_ip);
+				}
+#
+#-----[ FIND ]------------------------------------------------
+#
+			else
+			{
+				$error = TRUE;
+				$error_msg .= ( ( isset($error_msg) ) ? '<br />' : '' ) . $lang['Admin_user_fail'];
+			}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			else
+			{
+				message_die(GENERAL_ERROR, 'Admin_user_fail', '', __LINE__, __FILE__, $sql);
+			}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/admin_words.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: admin_words.php,v 1.10.2.4 2005/12/18 13:57:51 grahamje Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: admin_words.php,v 1.10.2.5 2006/01/23 21:24:40 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+define('IN_PHPBB', 1);
+
+if( !empty($setmodules) )
+{
+	$file = basename(__FILE__);
+	$module['General']['Word_Censor'] = $file;
+	return;
+}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+if( !empty($setmodules) )
+{
+	$file = basename(__FILE__);
+	$module['General']['Word_Censor'] = $file;
+	return;
+}
+
+define('IN_PHPBB', 1);
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$mode = ($HTTP_GET_VARS['mode']) ? $HTTP_GET_VARS['mode'] : $HTTP_POST_VARS['mode'];
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	$mode = (isset($HTTP_GET_VARS['mode'])) ? $HTTP_GET_VARS['mode'] : $HTTP_POST_VARS['mode'];
+#
+#-----[ FIND ]------------------------------------------------
+#
+	else
+	{
+		$mode = "";
+	}
+}
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+// Restrict mode input to valid options
+$mode = ( in_array($mode, array('add', 'edit', 'save', 'delete')) ) ? $mode : '';
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+if ( _button('cancel') )
+{
+	$mode = '';
+}
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$s_hidden_fields = '';
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+		$word_info = array('word' => '', 'replacement' => '');
+#
+#-----[ FIND ]------------------------------------------------
+#
+		if( $word_id )
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		$confirm = isset($HTTP_POST_VARS['confirm']);
+
+		if( $word_id && $confirm )
+#
+#-----[ FIND ]------------------------------------------------
+#
+			message_die(GENERAL_MESSAGE, $message);
+		}
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+		elseif( $word_id && !$confirm)
+		{
+			// Present the confirmation screen to the user
+			$template->set_filenames(array(
+				'body' => 'admin/confirm_body.tpl')
+			);
+
+			$hidden_fields = '<input type="hidden" name="mode" value="delete" /><input type="hidden" name="id" value="' . $word_id . '" />';
+
+			$template->assign_vars(array(
+				'MESSAGE_TITLE' => $lang['Confirm'],
+				'MESSAGE_TEXT' => $lang['Confirm_delete_word'],
+
+				'L_YES' => $lang['Yes'],
+				'L_NO' => $lang['No'],
+
+				'S_CONFIRM_ACTION' => append_sid("admin_words.$phpEx"),
+				'S_HIDDEN_FIELDS' => $hidden_fields)
+			);
+		}
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$word_rows = $db->sql_fetchrowset($result);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+	$db->sql_freeresult($result);
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/index.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+						$mod_version = implode('.', $available);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+						$mod_version = implode('.', array_splice($available, 0, 3));
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/page_header_admin.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: page_header_admin.php,v 1.12.2.6 2005/03/26 14:15:59 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: page_header_admin.php,v 1.12.2.7 2006/01/29 21:19:02 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+// set the in_admin switch
+$template->set_switch('in_admin', defined('IN_ADMIN'));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+// Work around for "current" Apache 2 + PHP module which seems to not
+// cope with private cache control setting
+if (!empty($HTTP_SERVER_VARS['SERVER_SOFTWARE']) && strstr($HTTP_SERVER_VARS['SERVER_SOFTWARE'], 'Apache/2'))
+{
+	header ('Cache-Control: no-cache, pre-check=0, post-check=0');
+}
+else
+{
+	header ('Cache-Control: private, pre-check=0, post-check=0, max-age=0');
+}
+header ('Expires: 0');
+header ('Pragma: no-cache');
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/pagestart.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: pagestart.php,v 1.1.2.9 2005/06/26 14:39:30 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: pagestart.php,v 1.1.2.10 2006/01/22 17:11:09 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$url = str_replace(preg_replace('#^\/?(.*?)\/?$#', '\1', trim($board_config['server_name'])), '', $HTTP_SERVER_VARS['REQUEST_URI']);
+	$url = str_replace(preg_replace('#^\/?(.*?)\/?$#', '\1', trim($board_config['script_path'])), '', $url);
+	$url = str_replace('//', '/', $url);
+	$url = preg_replace('/sid=([^&]*)(&?)/i', '', $url);
+	$url = preg_replace('/\?$/', '', $url);
+	$url .= ((strpos($url, '?')) ? '&' : '?') . 'sid=' . $userdata['session_id'];
+
+	redirect("index.$phpEx?sid=" . $userdata['session_id']);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	redirect("index.$phpEx?sid=" . $userdata['session_id']);
+#
+#-----[ OPEN ]------------------------------------------------
+#
+db/mssql.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: mssql.php,v 1.22.2.2 2002/12/21 18:31:53 psotfx Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: mssql.php,v 1.22.2.4 2006/03/09 19:57:37 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+				$row[$key] = stripslashes($value);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+				$row[$key] = ($value === ' ') ? '' : stripslashes($value);
+#
+#-----[ FIND ]------------------------------------------------
+#
+					$rowset[$i][$key] = stripslashes($value);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+					$rowset[$i][$key] = ($value === ' ') ? '' : stripslashes($value);
+#
+#-----[ FIND ]------------------------------------------------
+#
+					$result = stripslashes($this->row[$query_id][$field]);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+					$result = ($this->row[$query_id][$field] === ' ') ? '' : stripslashes($this->row[$query_id][$field]);
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/auth.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: auth.php,v 1.37.2.5 2004/03/01 16:49:03 psotfx Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: auth.php,v 1.37.2.7 2006/03/06 17:28:51 grahamje Exp $                                                           
+#
+#-----[ FIND ]------------------------------------------------
+#
+				$value = $f_access[$k][$key];
+				$f_forum_id = $f_access[$k]['forum_id'];
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+				$u_access[$f_forum_id] = isset($u_access[$f_forum_id]) ? $u_access[$f_forum_id] : array();
+#
+#-----[ FIND ]------------------------------------------------
+#
+		for($k = 0; $k < count($f_access); $k++)
+		{
+			$f_forum_id = $f_access[$k]['forum_id'];
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+			$u_access[$f_forum_id] = isset($u_access[$f_forum_id]) ? $u_access[$f_forum_id] : array();
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/bbcode.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: bbcode.php,v 1.36.2.39 2005/12/29 15:12:20 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: bbcode.php,v 1.36.2.41 2006/02/26 17:34:50 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+	// [img]image_url_here[/img] code..
+	// This one gets first-passed..
+	$patterns[] = "#\[img:$uid\]([^?].*?)\[/img:$uid\]#i";
+	$replacements[] = $bbcode_tpl['img'];
+
+	// matches a [url]xxxx://www.phpbb.com[/url] code..
+	$patterns[] = "#\[url\]([\w]+?://([\w\#$%&~/.\-;:=,?@\]+]|\[(?!url=))*?)\[/url\]#is";
+	$replacements[] = $bbcode_tpl['url1'];
+
+	// [url]www.phpbb.com[/url] code.. (no xxxx:// prefix).
+	$patterns[] = "#\[url\]((www|ftp)\.([\w\#$%&~/.\-;:=,?@\]+]|\[(?!url=))*?)\[/url\]#is";
+	$replacements[] = $bbcode_tpl['url2'];
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	// [img]image_url_here[/img] code..
+	// This one gets first-passed..
+	$patterns[] = "#\[img:$uid\]([^?](?:[^\[]+|\[(?!url))*?)\[/img:$uid\]#i";
+	$replacements[] = $bbcode_tpl['img'];
+
+	// matches a [url]xxxx://www.phpbb.com[/url] code..
+	$patterns[] = "#\[url\]([\w]+?://([\w\#$%&~/.\-;:=,?@\]+]+|\[(?!url=))*?)\[/url\]#is";
+	$replacements[] = $bbcode_tpl['url1'];
+
+	// [url]www.phpbb.com[/url] code.. (no xxxx:// prefix).
+	$patterns[] = "#\[url\]((www|ftp)\.([\w\#$%&~/.\-;:=,?@\]+]+|\[(?!url=))*?)\[/url\]#is";
+	$replacements[] = $bbcode_tpl['url2'];
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$uid = md5(mt_rand());
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	$uid = dss_rand();
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_config.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+define('CH_CURRENT_VERSION', '2.1.4');
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+define('CH_CURRENT_VERSION', '2.1.4c');
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_cp.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+			$list_timezone[ sprintf('%01.2f', $offset) ] = sprintf($lang['UTC'], $offset < 0 ? '-' : '+', floatval(abs($offset)));
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			$list_timezone[ sprintf('%01.2f', $offset) ] = sprintf($lang['UTC'], $offset < 0 ? '-' : '+', doubleval(abs($offset)));
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_db.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.10 - 21/08/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.11 - 08/04/2006
+#
+#-----[ FIND ]------------------------------------------------
+#
+		@chmod($filename, 0666);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		@chmod($config->url($this->cache_path . $this->cache_file), 0666);
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_topics.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.15 - 31/10/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.16 - 08/04/2006
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$board_announces = true;
+		switch ( $board_box )
+		{
+			case BOARD_GLOBAL_ANNOUNCES:
+				$parent_announces = $child_announces = false;
+				break;
+			case BOARD_PARENT_ANNOUNCES:
+				$parent_announces = true;
+				$child_announces = false;
+				break;
+			case BOARD_CHILD_ANNOUNCES:
+				$parent_announces = false;
+				$child_announces = true;
+				break;
+			case BOARD_BRANCH_ANNOUNCES:
+				$parent_announces = true;
+				$child_announces = true;
+				break;
+			default:
+				$board_announces = $parent_announces = $child_announces = false;
+				$only_own_global |= ($forums->data[$this->forum_id]['forum_type'] != POST_FORUM_URL);
+				break;
+		}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		if ( $only_own_global )
+		{
+			$board_box = 0;
+		}
+		switch ( $board_box )
+		{
+			case BOARD_GLOBAL_ANNOUNCES:
+				$board_announces = true;
+				$parent_announces = $child_announces = false;
+				break;
+			case BOARD_PARENT_ANNOUNCES:
+				$board_announces = $parent_announces = true;
+				$child_announces = false;
+				break;
+			case BOARD_CHILD_ANNOUNCES:
+				$board_announces = $child_announces = true;
+				$parent_announces = false;
+				break;
+			case BOARD_BRANCH_ANNOUNCES:
+				$board_announces = $parent_announces = $child_announces = true;
+				break;
+			default:
+				$board_announces = $parent_announces = $child_announces = false;
+				break;
+		}
+#
+#-----[ FIND ]------------------------------------------------
+#
+		// read external topics
+		$this->data_ext = array();
+		if ( !$only_own_global )
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		// read external topics
+		$this->data_ext = array();
+		if ( $board_box )
+#
+#-----[ FIND ]------------------------------------------------
+#
+			$sql_where .= ') AND (t.topic_duration = 0 OR t.topic_duration  > ' . time() . ') AND (t.forum_id <> ' . intval($this->forum_id) . ')';
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			$sql_where .= ') AND (t.topic_duration = 0 OR t.topic_duration  > ' . time() . ')' . ($this->forum_id ? ' AND (t.forum_id <> ' . intval($this->forum_id) . ')' : '');
+#
+#-----[ FIND ]------------------------------------------------
+#
+			while ( $row = $db->sql_fetchrow($result) )
+			{
+				if ( empty($fork_ids) || $user->auth(POST_FORUM_URL, 'auth_read', $row['forum_id']) )
+				{
+					$this->row_process($row);
+					$this->data_ext[ $row['topic_id'] ] = $row;
+				}
+			}
+			$db->sql_freeresult($result);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			$forums_denied = array();
+			while ( $row = $db->sql_fetchrow($result) )
+			{
+				if ( !$forums_denied[ $row['forum_id'] ] && $user->auth(POST_FORUM_URL, 'auth_read', $row['forum_id']) )
+				{
+					$this->row_process($row);
+					$this->data_ext[ $row['topic_id'] ] = $row;
+				}
+				else
+				{
+					$forums_denied[ $row['forum_id'] ] = true;
+				}
+			}
+			$db->sql_freeresult($result);
+			unset($forums_denied);
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_user.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.16 - 31/10/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.18 - 19/04/2006
+#
+#-----[ FIND ]------------------------------------------------
+#
+
+class user
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+
+define('MAX_UNREADS_COOKIES', 150);
+define('MAX_UNREADS_DB', 300);
+#
+#-----[ FIND ]------------------------------------------------
+#
+	function dst_in_action($date)
+	{
+		static $years;
+
+		$year = date('Y', $date);
+		$month = date('m', $date);
+		$day = date('d', $date);
+		$hour = date('His', $date);
+		if ( ($month == 04) || ($month == 10) )
+		{
+			// April
+			if ( $month == 04 )
+			{
+				if ( isset($years[$year]) && isset($years[$year]['f']) )
+				{
+					$first_sunday = $years[$year]['f'];
+				}
+				else
+				{
+					$day_of_week = date('w', mktime(2, 0, 0, $month, 1, $year));
+					$first_sunday = ($day_of_week == 0) ? 1 : 8 - $day_of_week;
+					$years[$year]['f'] = $first_sunday;
+				}
+				return ($day == $first_sunday) ? ($hour >= 020000) : ($day > $first_sunday);
+			}
+
+			// October
+			else
+			{
+				if ( isset($years[$year]) && isset($years[$year]['t']) )
+				{
+					$last_sunday = $years[$year]['t'];
+				}
+				else
+				{
+					$last_sunday = 31 - date('w', mktime(2, 0, 0, $month, 31, $year));
+					$years[$year]['t'] = $last_sunday;
+				}
+				return ($day == $last_sunday) ? ($hour < 020000) : ($day < $last_sunday);
+			}
+		}
+		else
+		{
+			return ($month > 04) && ($month < 10);
+		}
+	}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	function dst_in_action($date)
+	{
+		return intval($this->data['user_dst']);
+	}
+#
+#-----[ FIND ]------------------------------------------------
+#
+	function read_cookies($keep_forums=false)
+	{
+		global $db, $HTTP_COOKIE_VARS;
+
+		// read cookies
+		if ( isset($this->cookies) )
+		{
+			return;
+		}
+
+		// read setup
+		$cookies_setup = $this->get_cookies_setup();
+		foreach ( $cookies_setup as $var => $value )
+		{
+			$$var = $value;
+		}
+
+		// get default cookies
+		$this->cookies = array(
+			'f_all' => isset($HTTP_COOKIE_VARS[$base_name . '_f_all']) ? intval($HTTP_COOKIE_VARS[$base_name . '_f_all']) : 0,
+			'forums' => isset($HTTP_COOKIE_VARS[$base_name . '_f']) ? unserialize($HTTP_COOKIE_VARS[$base_name . '_f']) : array(),
+			'topics' => isset($HTTP_COOKIE_VARS[$base_name . '_t']) ? unserialize($HTTP_COOKIE_VARS[$base_name . '_t']) : array(),
+		);
+
+		$unreads = array();
+		$last_extraction = $this->data['session_logged_in'] ? $this->data['user_lastvisit'] : time()-300;
+
+		// 60 days limit
+		if ( $reset = ($last_extraction < (time() - 5184000)) && $this->data['session_logged_in'] )
+		{
+			$last_extraction = time() - 5184000;
+		}
+
+		if ( $keep_unreads )
+		{
+			// get unreaded topic_ids and the extraction date
+			if ( $keep_unreads_db )
+			{
+				$unreads = empty($this->data['user_unread_topics']) || $reset ? array() : unserialize($this->data['user_unread_topics']);
+				if ( !empty($this->data['user_unread_date']) && !$reset )
+				{
+					$last_extraction = $this->data['user_unread_date'];
+				}
+			}
+			else
+			{
+				$unreads = !$reset && isset($HTTP_COOKIE_VARS[$base_name . '_t_u']) ? unserialize($HTTP_COOKIE_VARS[$base_name . '_t_u']) : array();
+				$date = intval($HTTP_COOKIE_VARS[$base_name . '_t_ud']);
+				if ( !empty($date) && !$reset )
+				{
+					$last_extraction = $date;
+				}
+			}
+
+			// re-add floor to topic_time for each topic_id
+			$floor = 0;
+			if ( !empty($unreads) )
+			{
+				$floor = intval($unreads[0]);
+				unset($unreads[0]);
+			}
+			foreach( $unreads as $topic_id => $topic_time )
+			{
+				if ( intval($topic_id) > 0 )
+				{
+					$unreads[ intval($topic_id) ] = intval($topic_time) + $floor;
+				}
+				else
+				{
+					unset($unreads[$topic_id]);
+				}
+			}
+		}
+		else
+		{
+			// reclaim some memory
+			if ( isset($this->data['user_unread_topics']) )
+			{
+				unset($this->data['user_unread_topics']);
+			}
+			$unreads = array();
+		}
+
+		$this->cookies['unreads'] = array();
+		$this->cookies['unreads_date'] = time();
+		$this->cookies['f_unreads'] = array();
+		if ( $this->data['session_logged_in'] || $keep_unreads )
+		{
+			// get new unreaded topics
+			$count_unreads = count($unreads);
+			$sql = 'SELECT topic_id, topic_time, topic_last_time, forum_id
+						FROM ' . TOPICS_TABLE . '
+						WHERE topic_moved_id = 0
+							AND ' . ($count_unreads ? '(' : '') . 'topic_last_time > ' . intval($last_extraction) .
+								($count_unreads ? (($count_unreads > 1) ? ' OR topic_id IN(' . implode(', ', array_keys($unreads)) . ')' : ' OR topic_id = ' . _first_key($unreads)) . ')' : '');
+			$result = $db->sql_query($sql, false, __LINE__, __FILE__);
+			while ( $row = $db->sql_fetchrow($result) )
+			{
+				// last time we've marked readed a forum or the topic
+				$cooky_all = empty($this->cookies['f_all']) ? 0 : intval($this->cookies['f_all']);
+				$cooky_f = empty($this->cookies['forums'][ $row['forum_id'] ]) ? 0 : intval($this->cookies['forums'][ $row['forum_id'] ]);
+				$cooky_t = empty($this->cookies['topics'][ $row['topic_id'] ]) ? 0 : intval($this->cookies['topics'][ $row['topic_id'] ]);
+				$last_topic_mark = max($cooky_all, $cooky_f, $cooky_t);
+
+				// if we've marked the topics since the last unreaded extraction, it is no more unreaded
+				if ( ($last_topic_mark > $last_extraction) && isset($unreads[ $row['topic_id'] ]) )
+				{
+					unset($unreads[ $row['topic_id'] ]);
+				}
+
+				// some post may have been deleted
+				if ( !empty($unreads[ $row['topic_id'] ]) && ($row['topic_last_time'] < $unreads[ $row['topic_id'] ]) )
+				{
+					$unreads[ $row['topic_id'] ] = intval($row['topic_last_time']);
+				}
+
+				// let's try to get a last visit to the topic time
+				$last_topic_visit = $last_topic_mark;
+
+				// no mark yet : get the previous last visit time for this topic
+				if ( empty($last_topic_visit) && !empty($unreads[ $row['topic_id'] ]) )
+				{
+					$last_topic_visit = intval($unreads[ $row['topic_id'] ]);
+				}
+
+				// no mark nor first visit : this is a bran new topic for us :)
+				if ( empty($last_topic_visit) )
+				{
+					$last_topic_visit = intval($last_extraction);
+				}
+
+				// does the topic has moved since the last time we've visited it ?
+				if ( $row['topic_last_time'] > $last_topic_visit )
+				{
+					$this->cookies['unreads'][ $row['topic_id'] ] = $last_topic_visit;
+					$this->cookies['f_unreads'][ $row['forum_id'] ] = true;
+
+					// clean if present the topic level cookie mark
+					if ( isset($this->cookies['topics'][ $row['topic_id'] ]) )
+					{
+						unset($this->cookies['topics'][ $row['topic_id'] ]);
+					}
+
+					// we need to keep the forum where stand the unreaded topics
+					if ( $keep_forums )
+					{
+						$this->cookies['unreads_per_forums'][ $row['forum_id'] ][] = $row['topic_id'];
+					}
+				}
+			}
+		}
+	}
+
+	function write_cookies($cookies_asked='')
+	{
+		global $db;
+
+		// cookies not readed : read them
+		if ( !isset($this->cookies) )
+		{
+			$this->read_cookies();
+		}
+
+		// make an array with the cookies asked
+		if ( empty($cookies_asked) )
+		{
+			$cookies_asked = array_keys($this->cookies);
+		}
+		if ( !is_array($cookies_asked) )
+		{
+			$cookies_asked = array($cookies_asked);
+		}
+
+		// read setup
+		$cookies_setup = $this->get_cookies_setup();
+		foreach ( $cookies_setup as $var => $value )
+		{
+			$$var = $value;
+		}
+		$one_year = time() + 31536000;
+
+		// store cookies
+		$count_cookies_asked = count($cookies_asked);
+		for ( $i = 0; $i < $count_cookies_asked; $i++ )
+		{
+			$cookie = $cookies_asked[$i];
+			switch ( $cookie )
+			{
+				// default phpBB cookies : cookies duration : session
+				case 'f_all':
+					setcookie($base_name . '_f_all', intval($this->cookies[$cookie]), 0, $path, $domain, $secure);
+					break;
+				case 'forums':
+					setcookie($base_name . '_f', serialize($this->cookies[$cookie]), 0, $path, $domain, $secure);
+					break;
+				case 'topics':
+					// sort the topics by lower time first
+					$count_cookies = count($this->cookies[$cookie]);
+					if ( $count_cookies )
+					{
+						asort($this->cookies[$cookie]);
+					}
+					// limit the number of topics to 150
+					while ( ($count_cookies > 150) && (list($topic_id, $topic_time) = each($this->cookies[$cookie])) )
+					{
+						unset($this->cookies[$cookie][$topic_id]);
+						$count_cookies--;
+					}
+					// cookie duration : session
+					setcookie($base_name . '_t', serialize($this->cookies[$cookie]), 0, $path, $domain, $secure);
+					break;
+
+				// unreaded topics : cookie duration : one year
+				case 'unreads':
+					if ( $keep_unreads )
+					{
+						// sort the topics by lower time first
+						$count_cookies = count($this->cookies[$cookie]);
+						if ( $count_cookies )
+						{
+							asort($this->cookies[$cookie]);
+						}
+						// limit the number of topics to 300
+						while ( ($count_cookies > 300) && (list($topic_id, $topic_time) = each($this->cookies[$cookie])) )
+						{
+							unset($this->cookies[$cookie][$topic_id]);
+							$count_cookies--;
+						}
+
+						// substract the lower time to reduce the cookie size
+						$floor = 0;
+						if ( $count_cookies )
+						{
+							$floor = $this->cookies[$cookie][ _first_key($this->cookies[$cookie]) ];
+							foreach ( $this->cookies[$cookie] as $topic_id => $topic_time )
+							{
+								$this->cookies[$cookie][$topic_id] -= $floor;
+							}
+							$this->cookies[$cookie][0] = $floor;
+						}
+
+						// finaly, output the value
+						if ( $keep_unreads_db )
+						{
+							// update users table
+							$sql = 'UPDATE ' . USERS_TABLE . '
+										SET user_unread_topics = ' . ($floor ? '\'' . serialize($this->cookies[$cookie]) . '\'' : '\'\'') . ',
+											user_unread_date = ' . intval($this->cookies['unreads_date']) . '
+										WHERE user_id = ' . intval($this->data['user_id']);
+							$db->sql_query($sql, false, __LINE__, __FILE__);
+						}
+						else
+						{
+							setcookie($base_name . '_t_u', serialize(($floor ? $this->cookies['unreads'] : array())), $one_year, $path, $domain, $secure);
+							setcookie($base_name . '_t_ud', intval($this->cookies['unreads_date']), $one_year, $path, $domain, $secure);
+						}
+					}
+					break;
+				default:
+					break;
+			}
+		}
+	}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	function read_cookies($keep_forums=false)
+	{
+		global $db, $HTTP_COOKIE_VARS;
+
+		// read cookies
+		if ( isset($this->cookies) )
+		{
+			return;
+		}
+
+		// read setup
+		$cookies_setup = $this->get_cookies_setup();
+		foreach ( $cookies_setup as $var => $value )
+		{
+			$$var = $value;
+		}
+		unset($cookies_setup);
+
+		$unreads = array();
+		$last_extraction = $this->data['session_logged_in'] ? $this->data['user_lastvisit'] : time()-300;
+
+		// 60 days limit
+		if ( $reset = ($last_extraction < (time() - 5184000)) && $this->data['session_logged_in'] )
+		{
+			$last_extraction = time() - 5184000;
+		}
+
+		// regular phpBB cookies
+		if ( !$keep_unreads )
+		{
+			$this->cookies = array(
+				'f_all' => isset($HTTP_COOKIE_VARS[$base_name . '_f_all']) ? intval($HTTP_COOKIE_VARS[$base_name . '_f_all']) : 0,
+				'forums' => isset($HTTP_COOKIE_VARS[$base_name . '_f']) ? unserialize($HTTP_COOKIE_VARS[$base_name . '_f']) : array(),
+				'topics' => isset($HTTP_COOKIE_VARS[$base_name . '_t']) ? unserialize($HTTP_COOKIE_VARS[$base_name . '_t']) : array(),
+			);
+
+			// reclaim some memory
+			if ( isset($this->data['user_unread_topics']) )
+			{
+				unset($this->data['user_unread_topics']);
+			}
+		}
+
+		// keep unreads activated
+		else
+		{
+			// get unreaded topic_ids and the extraction date
+			if ( $keep_unreads_db )
+			{
+				$unreads = empty($this->data['user_unread_topics']) || $reset ? array() : unserialize($this->data['user_unread_topics']);
+				if ( !empty($this->data['user_unread_date']) && !$reset )
+				{
+					$last_extraction = $this->data['user_unread_date'];
+				}
+			}
+			else
+			{
+				$unreads = !$reset && isset($HTTP_COOKIE_VARS[$base_name . '_t_u']) ? unserialize($HTTP_COOKIE_VARS[$base_name . '_t_u']) : array();
+				$date = intval($HTTP_COOKIE_VARS[$base_name . '_t_ud']);
+				if ( !empty($date) && !$reset )
+				{
+					$last_extraction = $date;
+				}
+			}
+
+			// let's go
+			$tmp = array();
+			if ( !empty($unreads) && is_array($unreads) )
+			{
+				// get floor time
+				$floor_time = isset($unreads[0]) && (intval($unreads[0]) >= 0) ? intval($unreads[0]) : 0;
+
+				// re-add floor_time to topic_time for each topic_id
+				foreach( $unreads as $topic_id => $topic_time )
+				{
+					if ( (intval($topic_id) > 0) && (intval($topic_time) + $floor_time > 0) )
+					{
+						$tmp[ intval($topic_id) ] = intval($topic_time) + $floor_time;
+					}
+				}
+			}
+			$unreads = $tmp;
+			unset($tmp);
+
+			// re-add floor to topic_time for each topic_id
+			$floor = 0;
+			if ( !empty($unreads) )
+			{
+				$floor = intval($unreads[0]);
+				unset($unreads[0]);
+			}
+			foreach( $unreads as $topic_id => $topic_time )
+			{
+				if ( intval($topic_id) > 0 )
+				{
+					$unreads[ intval($topic_id) ] = intval($topic_time) + $floor;
+				}
+				else
+				{
+					unset($unreads[$topic_id]);
+				}
+			}
+		}
+
+		$this->cookies['unreads'] = array();
+		$this->cookies['unreads_date'] = time();
+		$this->cookies['f_unreads'] = array();
+		if ( $this->data['session_logged_in'] || $keep_unreads )
+		{
+			// get new unreaded topics
+			$sql = 'SELECT topic_id, topic_time, topic_last_time, forum_id
+						FROM ' . TOPICS_TABLE . '
+						WHERE topic_moved_id = 0
+							AND ' . (empty($unreads) ? '' : '(') . 'topic_last_time > ' . intval($last_extraction) . (empty($unreads) ? '' : (count($unreads) == 1 ? '
+								OR topic_id = ' . _first_key($unreads) . ')' : '
+								OR topic_id IN(' . implode(', ', array_keys($unreads)) . '))')) . '
+						ORDER BY topic_last_time DESC
+						LIMIT ' . ($keep_unreads_db ? MAX_UNREADS_DB : MAX_UNREADS_COOKIES);
+			$result = $db->sql_query($sql, false, __LINE__, __FILE__);
+			while ( $row = $db->sql_fetchrow($result) )
+			{
+				// some posts may have been deleted, making the unread mark no more valid, so the topic may not have been selected
+				if ( intval($unreads[ $row['topic_id'] ]) && ($unreads[ $row['topic_id'] ] > $row['topic_last_time']) && ($row['topic_last_time'] < $last_extraction) )
+				{
+					continue;
+				}
+
+				// regular phpBB cookies
+				if ( !$keep_unreads )
+				{
+					$cooky_all = empty($this->cookies['f_all']) ? 0 : intval($this->cookies['f_all']);
+					$cooky_f = empty($this->cookies['forums'][ $row['forum_id'] ]) ? 0 : intval($this->cookies['forums'][ $row['forum_id'] ]);
+					$cooky_t = empty($this->cookies['topics'][ $row['topic_id'] ]) ? 0 : intval($this->cookies['topics'][ $row['topic_id'] ]);
+					$topic_last_visit = max($cooky_all, $cooky_f, $cooky_t);
+					if ( $topic_last_visit == 0 )
+					{
+						$topic_last_visit = $last_extraction;
+					}
+					if ( $topic_last_visit >= $row['topic_last_time'] )
+					{
+						continue;
+					}
+				}
+
+				// keep unreads activated
+				else
+				{
+					$topic_last_visit = intval($unreads[ $row['topic_id'] ]) ? intval($unreads[ $row['topic_id'] ]) : $last_extraction;
+				}
+
+				// store it
+				$this->cookies['unreads'][ $row['topic_id'] ] = $topic_last_visit;
+				$this->cookies['f_unreads'][ $row['forum_id'] ] = true;
+
+				// we need to keep the forum where stand the unreaded topics
+				if ( $keep_forums )
+				{
+					$this->cookies['unreads_per_forums'][ $row['forum_id'] ][] = $row['topic_id'];
+				}
+			}
+			$db->sql_freeresult($result);
+		}
+	}
+
+	function write_cookies($cookies_asked='')
+	{
+		global $db;
+
+		// cookies not readed : read them
+		if ( !isset($this->cookies) )
+		{
+			$this->read_cookies();
+		}
+
+		// make an array with the cookies asked
+		if ( empty($cookies_asked) )
+		{
+			$cookies_asked = array_keys($this->cookies);
+		}
+		if ( !is_array($cookies_asked) )
+		{
+			$cookies_asked = array($cookies_asked);
+		}
+
+		// read setup
+		$cookies_setup = $this->get_cookies_setup();
+		foreach ( $cookies_setup as $var => $value )
+		{
+			$$var = $value;
+		}
+		unset($cookies_setup);
+		$one_year = time() + 31536000;
+
+		// regular phpBB cookies
+		if ( !$keep_unreads )
+		{
+			// maximize the topics cooky
+			if ( $count_cookies = count($this->cookies['topics']) )
+			{
+				arsort($this->cookies['topics']);
+				if ( $count_cookies > MAX_UNREADS_COOKIES )
+				{
+					array_splice($this->cookies['topics'], MAX_UNREADS_COOKIES + 1);
+				}
+			}
+
+			// cookie duration : session
+			setcookie($base_name . '_f_all', intval($this->cookies['f_all']), 0, $path, $domain, $secure);
+			setcookie($base_name . '_f', serialize($this->cookies['forums']), 0, $path, $domain, $secure);
+			setcookie($base_name . '_t', serialize($this->cookies['topics']), 0, $path, $domain, $secure);
+		}
+
+		// keep unreads
+		else
+		{
+			if ( $count_cookies = count($this->cookies['unreads']) )
+			{
+				// maximize the array
+				$max_unreads = $keep_unreads_db ? MAX_UNREADS_DB : MAX_UNREADS_COOKIES;
+				if ( $count_cookies > $max_unreads )
+				{
+					arsort($this->cookies['unreads']);
+					array_splice($this->cookies['unreads'], $max_unreads + 1);
+				}
+
+				// get floor time
+				asort($this->cookies['unreads']);
+				reset($this->cookies['unreads']);
+				list(, $floor_time) = @each($this->cookies['unreads']);
+
+				// substract the lower time to reduce the cookie size
+				$tmp = array(0 => $floor_time);
+				foreach ( $this->cookies['unreads'] as $topic_id => $topic_time )
+				{
+					$tmp[$topic_id] = $topic_time - $floor_time;
+				}
+			}
+			else
+			{
+				$tmp = array();
+			}
+
+			// finaly, output the value
+			if ( $keep_unreads_db )
+			{
+				// update users table
+				$sql = 'UPDATE ' . USERS_TABLE . '
+							SET user_unread_topics = ' . (empty($tmp) ? '\'\'' : '\'' . $db->sql_escape_string(serialize($tmp)) . '\'') . ',
+								user_unread_date = ' . intval($this->cookies['unreads_date']) . '
+							WHERE user_id = ' . intval($this->data['user_id']);
+				$db->sql_query($sql, false, __LINE__, __FILE__);
+			}
+			else
+			{
+				setcookie($base_name . '_t_u', serialize($tmp), $one_year, $path, $domain, $secure);
+				setcookie($base_name . '_t_ud', intval($this->cookies['unreads_date']), $one_year, $path, $domain, $secure);
+			}
+			unset($tmp);
+		}
+	}
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$sql = 'UPDATE ' . GROUPS_TABLE . '
+					SET ' . $db->sql_update . '
+					WHERE group_moderator = ' . intval($this->data['user_id']);
+		$db->sql_query($sql, false, __LINE__, __FILE__);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+		// delete sessions & sessions keys
+		$sql = 'DELETE FROM ' . SESSIONS_TABLE . '
+					WHERE session_user_id = ' . intval($this->data['user_id']);
+		$db->sql_query($sql, false, __LINE__, __FILE__);
+
+		$sql = 'DELETE FROM ' . SESSIONS_KEYS_TABLE . '
+					WHERE user_id = ' . intval($this->data['user_id']);
+		$db->sql_query($sql, false, __LINE__, __FILE__);
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/functions.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: functions.php,v 1.133.2.38 2005/12/19 18:01:36 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: functions.php,v 1.133.2.44 2006/02/26 19:37:50 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$str = rtrim($str, $charlist);
+	}
+
+	return $str;
+}
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+/**
+* Our own generator of random values
+* This uses a constantly changing value as the base for generating the values
+* The board wide setting is updated once per page if this code is called
+* With thanks to Anthrax101 for the inspiration on this one
+* Added in phpBB 2.0.20
+*/
+function dss_rand()
+{
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+	global $db, $board_config, $dss_seeded;
+*/
+//-- add
+	global $db, $board_config;
+	static $dss_seeded;
+//-- fin mod : categories hierarchy --------------------------------------------
+
+	$val = $board_config['rand_seed'] . microtime();
+	$val = md5($val);
+	$board_config['rand_seed'] = md5($board_config['rand_seed'] . $val . 'a');
+   
+	if($dss_seeded !== true)
+	{
+		$sql = "UPDATE " . CONFIG_TABLE . " SET
+			config_value = '" . $board_config['rand_seed'] . "'
+			WHERE config_name = 'rand_seed'";
+		
+		if( !$db->sql_query($sql) )
+		{
+			message_die(GENERAL_ERROR, "Unable to reseed PRNG", "", __LINE__, __FILE__, $sql);
+		}
+
+		$dss_seeded = true;
+	}
+
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+	return substr($val, 16);
+*/
+//-- add
+	// fix a typo
+	return substr($val, 4, 16);
+//-- fin mod : categories hierarchy --------------------------------------------
+}
+#
+#-----[ FIND ]------------------------------------------------
+#
+	if ( !($row = $db->sql_fetchrow($result)) )
+	{
+		message_die(CRITICAL_ERROR, "Could not get theme data for themes_id [$style]");
+	}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	if ( !($row = $db->sql_fetchrow($result)) )
+	{
+		// We are trying to setup a style which does not exist in the database
+		// Try to fallback to the board default (if the user had a custom style)
+		// and then any users using this style to the default if it succeeds
+		if ( $style != $board_config['default_style'])
+		{
+			$sql = 'SELECT *
+				FROM ' . THEMES_TABLE . '
+				WHERE themes_id = ' . $board_config['default_style'];
+			if ( !($result = $db->sql_query($sql)) )
+			{
+				message_die(CRITICAL_ERROR, 'Could not query database for theme info');
+			}
+
+			if ( $row = $db->sql_fetchrow($result) )
+			{
+				$db->sql_freeresult($result);
+
+				$sql = 'UPDATE ' . USERS_TABLE . '
+					SET user_style = ' . $board_config['default_style'] . "
+					WHERE user_style = $style";
+				if ( !($result = $db->sql_query($sql)) )
+				{
+					message_die(CRITICAL_ERROR, 'Could not update user theme info');
+				}
+			}
+			else
+			{
+				message_die(CRITICAL_ERROR, "Could not get theme data for themes_id [$style]");
+			}
+		}
+		else
+		{
+			message_die(CRITICAL_ERROR, "Could not get theme data for themes_id [$style]");
+		}
+	}
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$row = $themes->data[$style];
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	if ( !$row = $themes->data[$style] )
+	{
+		// reset the users style
+		if ( $style != intval($config->data['default_style']) )
+		{
+			$sql = 'UPDATE ' . USERS_TABLE . '
+				SET user_style = ' . intval($config->data['default_style']) . '
+				WHERE user_style = ' . intval($style);
+			$db->sql_query($sql, false, __LINE__, __FILE__);
+		}
+		$style = intval($config->data['default_style']);
+	}
+	if ( !$row = $themes->data[$style] )
+	{
+		message_die(CRITICAL_ERROR, 'Could not get theme data for themes_id [' . intval($style) . ']');
+	}
+#
+#-----[ FIND ]------------------------------------------------
+#
+			$debug_text .= '</br /><br />Line : ' . $err_line . '<br />File : ' . basename($err_file);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			$debug_text .= '<br /><br />Line : ' . $err_line . '<br />File : ' . basename($err_file);
+#
+#-----[ FIND ]------------------------------------------------
+#
+		if ( empty($template) )
+		{
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+			$template = new Template($phpbb_root_path . 'templates/' . $board_config['board_template']);
+*/
+//-- add
+			$template = new template_class($phpbb_root_path . 'templates/' . $board_config['board_template']);
+//-- fin mod : categories hierarchy --------------------------------------------
+		}
+		if ( empty($theme) )
+		{
+			$theme = setup_style($board_config['default_style']);
+		}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		if ( empty($template) || empty($theme) )
+		{
+			$theme = setup_style($board_config['default_style']);
+		}
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+// here we replaced : 
+//	$url . '">HERE
+// with
+//	$url_ampersand . '">HERE
+//-- modified
+		echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"><meta http-equiv="refresh" content="0; url=' . $server_protocol . $server_name . $server_port . $script_name . $url . '"><title>Redirect</title></head><body><div align="center">If your browser does not support meta redirection please click <a href="' . $server_protocol . $server_name . $server_port . $script_name . $url_ampersand . '">HERE</a> to be redirected</div></body></html>';
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+		echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"><meta http-equiv="refresh" content="0; url=' . $server_protocol . $server_name . $server_port . $script_name . $url . '"><title>Redirect</title></head><body><div align="center">If your browser does not support meta redirection please click <a href="' . $server_protocol . $server_name . $server_port . $script_name . $url . '">HERE</a> to be redirected</div></body></html>';
+*/
+//-- add
+		echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"><meta http-equiv="refresh" content="0; url=' . $server_protocol . $server_name . $server_port . $script_name . $url . '"><title>Redirect</title></head><body><div align="center">If your browser does not support meta redirection please click <a href="' . $server_protocol . $server_name . $server_port . $script_name . $url_ampersand . '">HERE</a> to be redirected</div></body></html>';
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/functions_admin.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+// here we added
+//	, $differ=false
+//-- modify
+function sync($type, $id = false, $differ=false)
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+function sync($type, $id = false)
+*/
+//-- add
+function sync($type, $id = false, $differ=false)
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/functions_post.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: functions_post.php,v 1.9.2.40 2005/12/22 11:34:02 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: functions_post.php,v 1.9.2.49 2006/03/14 20:40:32 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+function prepare_message($message, $html_on, $bbcode_on, $smile_on, $bbcode_uid = 0)
+{
+	global $board_config, $html_entities_match, $html_entities_replace;
+
+	//
+	// Clean up the message
+	//
+	$message = trim($message);
+
+	if ($html_on)
+	{
+		$allowed_html_tags = split(',', $board_config['allow_html_tags']);
+
+		$end_html = 0;
+		$start_html = 1;
+		$tmp_message = '';
+		$message = ' ' . $message . ' ';
+
+		while ($start_html = strpos($message, '<', $start_html))
+		{
+			$tmp_message .= preg_replace($html_entities_match, $html_entities_replace, substr($message, $end_html + 1, ($start_html - $end_html - 1)));
+
+			if ($end_html = strpos($message, '>', $start_html))
+			{
+				$length = $end_html - $start_html + 1;
+				$hold_string = substr($message, $start_html, $length);
+
+				if (($unclosed_open = strrpos(' ' . $hold_string, '<')) != 1)
+				{
+					$tmp_message .= preg_replace($html_entities_match, $html_entities_replace, substr($hold_string, 0, $unclosed_open - 1));
+					$hold_string = substr($hold_string, $unclosed_open - 1);
+				}
+
+				$tagallowed = false;
+				for ($i = 0; $i < sizeof($allowed_html_tags); $i++)
+				{
+					$match_tag = trim($allowed_html_tags[$i]);
+					if (preg_match('#^<\/?' . $match_tag . '[> ]#i', $hold_string))
+					{
+						$tagallowed = (preg_match('#^<\/?' . $match_tag . ' .*?(style[\t ]*?=|on[\w]+[\t ]*?=)#i', $hold_string)) ? false : true;
+					}
+				}
+
+				$tmp_message .= ($length && !$tagallowed) ? preg_replace($html_entities_match, $html_entities_replace, $hold_string) : $hold_string;
+
+				$start_html += $length;
+			}
+			else
+			{
+				$tmp_message .= preg_replace($html_entities_match, $html_entities_replace, substr($message, $start_html, strlen($message)));
+
+				$start_html = strlen($message);
+				$end_html = $start_html;
+			}
+		}
+
+		if (!$end_html || ($end_html != strlen($message) && $tmp_message != ''))
+		{
+			$tmp_message .= preg_replace($html_entities_match, $html_entities_replace, substr($message, $end_html + 1));
+		}
+
+		$message = ($tmp_message != '') ? trim($tmp_message) : trim($message);
+	}
+	else
+	{
+		$message = preg_replace($html_entities_match, $html_entities_replace, $message);
+	}
+
+	if($bbcode_on && $bbcode_uid != '')
+	{
+		$message = bbencode_first_pass($message, $bbcode_uid);
+	}
+
+	return $message;
+}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+function prepare_message($message, $html_on, $bbcode_on, $smile_on, $bbcode_uid = 0)
+{
+	global $board_config, $html_entities_match, $html_entities_replace;
+
+	//
+	// Clean up the message
+	//
+	$message = trim($message);
+
+	if ($html_on)
+	{
+		// If HTML is on, we try to make it safe
+		// This approach is quite agressive and anything that does not look like a valid tag
+		// is going to get converted to HTML entities
+		$message = stripslashes($message);
+		$html_match = '#<[^\w<]*(\w+)((?:"[^"]*"|\'[^\']*\'|[^<>\'"])+)?>#';
+		$matches = array();
+
+		$message_split = preg_split($html_match, $message);
+		preg_match_all($html_match, $message, $matches);
+
+		$message = '';
+
+		foreach ($message_split as $part)
+		{
+			$tag = array(array_shift($matches[0]), array_shift($matches[1]), array_shift($matches[2]));
+			$message .= htmlspecialchars($part) . clean_html($tag);
+		}
+
+		$message = addslashes($message);
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+		$message = str_replace('&quot;', '\&quot;', $message);
+//-- fin mod : categories hierarchy --------------------------------------------
+	}
+	else
+	{
+		$message = preg_replace($html_entities_match, $html_entities_replace, $message);
+	}
+
+	if($bbcode_on && $bbcode_uid != '')
+	{
+		$message = bbencode_first_pass($message, $bbcode_uid);
+	}
+
+	return $message;
+}
+#
+#-----[ FIND ]------------------------------------------------
+#
+					$temp_option_text[$option_id] = htmlspecialchars($option_text);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+					$temp_option_text[intval($option_id)] = htmlspecialchars($option_text);
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- fin mod : categories hierarchy ---------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- fin mod : categories hierarchy ---------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+	if ($mode == 'window')
+	{
+		$template->pparse('smiliesbody');
+
+		include($phpbb_root_path . 'includes/page_tail.'.$phpEx);
+	}
+}
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+/**
+* Called from within prepare_message to clean included HTML tags if HTML is
+* turned on for that post
+* @param array $tag Matching text from the message to parse
+*/
+function clean_html($tag)
+{
+	global $board_config;
+
+	if (empty($tag[0]))
+	{
+		return '';
+	}
+
+	$allowed_html_tags = preg_split('/, */', strtolower($board_config['allow_html_tags']));
+	$disallowed_attributes = '/^(?:style|on)/i';
+
+	// Check if this is an end tag
+	preg_match('/<[^\w\/]*\/[\W]*(\w+)/', $tag[0], $matches);
+	if (sizeof($matches))
+	{
+		if (in_array(strtolower($matches[1]), $allowed_html_tags))
+		{
+			return  '</' . $matches[1] . '>';
+		}
+		else
+		{
+			return  htmlspecialchars('</' . $matches[1] . '>');
+		}
+	}
+
+	// Check if this is an allowed tag
+	if (in_array(strtolower($tag[1]), $allowed_html_tags))
+	{
+		$attributes = '';
+		if (!empty($tag[2]))
+		{
+			preg_match_all('/[\W]*?(\w+)[\W]*?=[\W]*?(["\'])((?:(?!\2).)*)\2/', $tag[2], $test);
+			for ($i = 0; $i < sizeof($test[0]); $i++)
+			{
+				if (preg_match($disallowed_attributes, $test[1][$i]))
+				{
+					continue;
+				}
+				$attributes .= ' ' . $test[1][$i] . '=' . $test[2][$i] . str_replace(array('[', ']'), array('&#91;', '&#93;'), htmlspecialchars($test[3][$i])) . $test[2][$i];
+			}
+		}
+		if (in_array(strtolower($tag[1]), $allowed_html_tags))
+		{
+			return '<' . $tag[1] . $attributes . '>';
+		}
+		else
+		{
+			return htmlspecialchars('<' . $tag[1] . $attributes . '>');
+		}
+	}
+	// Finally, this is not an allowed tag so strip all the attibutes and escape it
+	else
+	{
+		return htmlspecialchars('<' .   $tag[1] . '>');
+	}
+}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/page_header.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+$nav_links_html .= "\n" . '<link rel="copyright" href="http://phpBB.com" title="phpBB.com">';
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+$nav_links_html .= "\n" . '<link rel="copyright" href="http://www.phpBB.com" title="phpBB.com">';
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/prune.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+*   $Id: prune.php,v 1.19.2.6 2003/03/18 23:23:57 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+*   $Id: prune.php,v 1.19.2.7 2006/01/29 17:31:16 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+function prune($forum_id, $prune_date, $prune_all = false)
+{
+	global $db, $lang;
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+	// Before pruning, lets try to clean up the invalid topic entries
+	$sql = 'SELECT topic_id FROM ' . TOPICS_TABLE . '
+		WHERE topic_last_post_id = 0';
+	if ( !($result = $db->sql_query($sql)) )
+	{
+		message_die(GENERAL_ERROR, 'Could not obtain lists of topics to sync', '', __LINE__, __FILE__, $sql);
+	}
+
+	while( $row = $db->sql_fetchrow($result) )
+	{
+		sync('topic', $row['topic_id']);
+	}
+
+	$db->sql_freeresult($result);
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$sql = "SELECT t.topic_id 
+		FROM " . POSTS_TABLE . " p, " . TOPICS_TABLE . " t
+		WHERE t.forum_id = $forum_id
+			$prune_all 
+			AND ( p.post_id = t.topic_last_post_id 
+				OR t.topic_last_post_id = 0 )";
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	$sql = "SELECT t.topic_id 
+		FROM " . POSTS_TABLE . " p, " . TOPICS_TABLE . " t
+		WHERE t.forum_id = $forum_id
+			$prune_all 
+			AND p.post_id = t.topic_last_post_id";
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/sessions.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: sessions.php,v 1.58.2.16 2005/10/30 15:17:14 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: sessions.php,v 1.58.2.23 2006/04/05 12:42:23 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+		list($sec, $usec) = explode(' ', microtime());
+		mt_srand((float) $sec + ((float) $usec * 100000));
+		$session_id = md5(uniqid(mt_rand(), true));
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		$session_id = md5(dss_rand());
+#
+#-----[ FIND ]------------------------------------------------
+#
+			list($sec, $usec) = explode(' ', microtime());
+			mt_srand(hexdec(substr($session_id, 0, 8)) + (float) $sec + ((float) $usec * 1000000));
+			$auto_login_key = uniqid(mt_rand(), true);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			$auto_login_key = dss_rand() . dss_rand();
+#
+#-----[ FIND ]------------------------------------------------
+#
+	if (!empty($board_config['max_autologin_time']) && $board_config['max_autologin_time'] > 0)
+	{
+		$sql = 'DELETE FROM ' . SESSIONS_KEYS_TABLE . '
+			WHERE last_login < ' . (time() - (86400 * (int) $board_config['max_autologin_time']));
+		$db->sql_query($sql);
+	}
+
+	return true;
+}
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+/**
+* Reset all login keys for the specified user
+* Called on password changes
+*/
+function session_reset_keys($user_id, $user_ip)
+{
+	global $db, $userdata;
+
+	$key_sql = ($user_id == $userdata['user_id'] && !empty($userdata['session_key'])) ? "AND key_id != '" . md5($userdata['session_key']) . "'" : '';
+
+	$sql = 'DELETE FROM ' . SESSIONS_KEYS_TABLE . '
+		WHERE user_id = ' . (int) $user_id . "
+			$key_sql";
+
+	if ( !$db->sql_query($sql) )
+	{
+		message_die(CRITICAL_ERROR, 'Error removing auto-login keys', '', __LINE__, __FILE__, $sql);
+	}
+
+	$where_sql = 'session_user_id = ' . (int) $user_id;
+	$where_sql .= ($user_id == $userdata['user_id']) ? " AND session_id <> '" . $userdata['session_id'] . "'" : '';
+	$sql = 'DELETE FROM ' . SESSIONS_TABLE . "
+		WHERE $where_sql";
+	if ( !$db->sql_query($sql) )
+	{
+		message_die(CRITICAL_ERROR, 'Error removing user session(s)', '', __LINE__, __FILE__, $sql);
+	}
+
+	if ( !empty($key_sql) )
+	{
+		$auto_login_key = dss_rand() . dss_rand();
+
+		$current_time = time();
+		
+		$sql = 'UPDATE ' . SESSIONS_KEYS_TABLE . "
+			SET last_ip = '$user_ip', key_id = '" . md5($auto_login_key) . "', last_login = $current_time
+			WHERE key_id = '" . md5($userdata['session_key']) . "'";
+		
+		if ( !$db->sql_query($sql) )
+		{
+			message_die(CRITICAL_ERROR, 'Error updating session key', '', __LINE__, __FILE__, $sql);
+		}
+
+		// And now rebuild the cookie
+		$sessiondata['userid'] = $user_id;
+		$sessiondata['autologinid'] = $autologin_id;
+		$cookiename = $board_config['cookie_name'];
+		$cookiepath = $board_config['cookie_path'];
+		$cookiedomain = $board_config['cookie_domain'];
+		$cookiesecure = $board_config['cookie_secure'];
+
+		setcookie($cookiename . '_data', serialize($sessiondata), $current_time + 31536000, $cookiepath, $cookiedomain, $cookiesecure);
+		
+		$userdata['session_key'] = $auto_login_key;
+		unset($sessiondata);
+		unset($auto_login_key);
+	}
+}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/usercp_avatar.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: usercp_avatar.php,v 1.8.2.22 2005/10/30 15:17:14 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: usercp_avatar.php,v 1.8.2.23 2006/01/27 21:23:22 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+	if ( !preg_match('#^(http)|(ftp):\/\/#i', $avatar_filename) )
+	{
+		$avatar_filename = 'http://' . $avatar_filename;
+	}
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+	$avatar_filename = substr($avatar_filename, 0, 100);
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/usercp_confirm.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: usercp_confirm.php,v 1.1.2.2 2005/12/29 11:51:11 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: usercp_confirm.php,v 1.1.2.3 2006/03/25 14:22:43 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$_png = define_raw_pngs();
+
+	$char = substr($code, -1);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	$_png = define_raw_pngs();
+
+	$c = intval($HTTP_GET_VARS['c']);
+	$char = substr($code, $c - 1, 1);
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/usercp_register.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   $Id: usercp_register.php,v 1.20.2.70 2005/12/29 11:51:11 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *   $Id: usercp_register.php,v 1.20.2.74 2006/04/05 12:42:23 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$signature = str_replace('<br />', "\n", $signature);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	$signature = (isset($signature)) ? str_replace('<br />', "\n", $signature) : '';
+	$signature_bbcode_uid = '';
+#
+#-----[ FIND ]------------------------------------------------
+#
+			if ($row = $db->sql_fetchrow($result))
+			{
+				// Only compare one char if the zlib-extension is not loaded
+				if (!@extension_loaded('zlib'))
+				{
+					$row['code'] = substr($row['code'], -1);
+				}
+
+				if ($row['code'] != $confirm_code)
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			if ($row = $db->sql_fetchrow($result))
+			{
+				if ($row['code'] != $confirm_code)
+#
+#-----[ FIND ]------------------------------------------------
+#
+			$sql = "UPDATE " . USERS_TABLE . "
+				SET " . $username_sql . $passwd_sql . "user_email = '" . str_replace("\'", "''", $email) ."', user_icq = '" . str_replace("\'", "''", $icq) . "', user_website = '" . str_replace("\'", "''", $website) . "', user_occ = '" . str_replace("\'", "''", $occupation) . "', user_from = '" . str_replace("\'", "''", $location) . "', user_interests = '" . str_replace("\'", "''", $interests) . "', user_sig = '" . str_replace("\'", "''", $signature) . "', user_sig_bbcode_uid = '$signature_bbcode_uid', user_viewemail = $viewemail, user_aim = '" . str_replace("\'", "''", str_replace(' ', '+', $aim)) . "', user_yim = '" . str_replace("\'", "''", $yim) . "', user_msnm = '" . str_replace("\'", "''", $msn) . "', user_attachsig = $attachsig, user_allowsmile = $allowsmilies, user_allowhtml = $allowhtml, user_allowbbcode = $allowbbcode, user_allow_viewonline = $allowviewonline, user_notify = $notifyreply, user_notify_pm = $notifypm, user_popup_pm = $popup_pm, user_timezone = $user_timezone, user_dateformat = '" . str_replace("\'", "''", $user_dateformat) . "', user_lang = '" . str_replace("\'", "''", $user_lang) . "', user_style = $user_style, user_active = $user_active, user_actkey = '" . str_replace("\'", "''", $user_actkey) . "'" . $avatar_sql . "
+				WHERE user_id = $user_id";
+			if ( !($result = $db->sql_query($sql)) )
+			{
+				message_die(GENERAL_ERROR, 'Could not update users table', '', __LINE__, __FILE__, $sql);
+			}
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+			// We remove all stored login keys since the password has been updated
+			// and change the current one (if applicable)
+			if ( !empty($passwd_sql) )
+			{
+				session_reset_keys($user_id, $user_ip);
+			}
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$username = stripslashes($username);
+	$email = stripslashes($email);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+	$cur_password = '';
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$username = $userdata['username'];
+	$email = $userdata['user_email'];
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+	$cur_password = '';
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$confirm_chars = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',  'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',  'U', 'V', 'W', 'X', 'Y', 'Z', '1', '2', '3', '4', '5', '6', '7', '8', '9');
+
+		list($usec, $sec) = explode(' ', microtime()); 
+		mt_srand($sec * $usec); 
+
+		$max_chars = count($confirm_chars) - 1;
+		$code = '';
+		for ($i = 0; $i < 6; $i++)
+		{
+			$code .= $confirm_chars[mt_rand(0, $max_chars)];
+		}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		// Generate the required confirmation code
+		// NB 0 (zero) could get confused with O (the letter) so we make change it
+		$code = dss_rand();
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+		$code = strtoupper(str_replace('0', 'o', substr($code, 6)));
+*/
+//-- add
+		// fix a typo
+		$code = strtoupper(str_replace('0', 'o', substr($code, 2, 6)));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+		'USERNAME' => $username,
+		'CUR_PASSWORD' => $cur_password,
+		'NEW_PASSWORD' => $new_password,
+		'PASSWORD_CONFIRM' => $password_confirm,
+		'EMAIL' => $email,
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		'USERNAME' => isset($username) ? $username : '',
+		'CUR_PASSWORD' => isset($cur_password) ? $cur_password : '',
+		'NEW_PASSWORD' => isset($new_password) ? $new_password : '',
+		'PASSWORD_CONFIRM' => isset($password_confirm) ? $password_confirm : '',
+		'EMAIL' => isset($email) ? $email : '',
+#
+#-----[ OPEN ]------------------------------------------------
+#
+language/lang_english/email/group_request.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+A user has requested to join a group you moderator on {SITENAME}.
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+A user has requested to join a group you moderate on {SITENAME}.
+#
+#-----[ OPEN ]------------------------------------------------
+#
+language/lang_english/email/user_activate_passwd.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+If sucessful you will be able to login using the following password:
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+If successful you will be able to login using the following password:
+#
+#-----[ OPEN ]------------------------------------------------
+#
+language/lang_english/lang_admin.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *     $Id: lang_admin.php,v 1.35.2.13 2005/12/29 11:51:12 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *     $Id: lang_admin.php,v 1.35.2.17 2006/02/05 15:59:48 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+$lang['Autologin_time_explain'] =
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+// Search Flood Control - added 2.0.20
+$lang['Search_Flood_Interval'] = 'Search Flood Interval';
+$lang['Search_Flood_Interval_explain'] = 'Number of seconds a user must wait between search requests';
+#
+#-----[ FIND ]------------------------------------------------
+#
+$lang['Click_return_smileadmin'] =
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+$lang['Confirm_delete_smiley'] = 'Are you sure you want to delete this Smiley?';
+#
+#-----[ FIND ]------------------------------------------------
+#
+$lang['Click_return_wordadmin'] =
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+$lang['Confirm_delete_word'] = 'Are you sure you want to delete this word censor?';
+#
+#-----[ FIND ]------------------------------------------------
+#
+$lang['Click_return_rankadmin'] =
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+$lang['Confirm_delete_rank'] = 'Are you sure you want to delete this rank?';
+#
+#-----[ OPEN ]------------------------------------------------
+#
+language/lang_english/lang_extend_cat_hierarchy.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+$lang['Past_users_zero_total'] = 'There has been no users online within the last 24 hours :: ';
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+$lang['Past_users_zero_total'] = 'There have been no users online within the last 24 hours :: ';
+#
+#-----[ FIND ]------------------------------------------------
+#
+$lang['Past_users_total'] = 'There has been <b>%d</b> users online within the last 24 hours :: ';
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+$lang['Past_users_total'] = 'There have been <b>%d</b> users online within the last 24 hours :: ';
+#
+#-----[ FIND ]------------------------------------------------
+#
+$lang['Hour_users_zero_total'] = 'There has been no users online within the current hour :: ';
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+$lang['Hour_users_zero_total'] = 'There have been no users online within the current hour :: ';
+#
+#-----[ FIND ]------------------------------------------------
+#
+$lang['Hour_users_total'] = 'There has been <b>%d</b> users online within the current hour :: ';
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+$lang['Hour_users_total'] = 'There have been <b>%d</b> users online within the current hour :: ';
+#
+#-----[ OPEN ]------------------------------------------------
+#
+language/lang_english/lang_main.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *     $Id: lang_main.php,v 1.85.2.20 2005/12/30 09:51:02 acydburn Exp $
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *     $Id: lang_main.php,v 1.85.2.21 2006/02/05 15:59:48 grahamje Exp $
+#
+#-----[ FIND ]------------------------------------------------
+#
+$lang['Found_search_matches'] =
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+$lang['Search_Flood_Error'] = 'You cannot make another search so soon after your last; please try again in a short while.';
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/ptifo/admin/auths_def_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+	</td>
+	<!-- END title -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	</span></td>
+	<!-- END title -->
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/ptifo/admin/board_config_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<tr>
+		<td class="row1">{L_FLOOD_INTERVAL} <br /><span class="gensmall">{L_FLOOD_INTERVAL_EXPLAIN}</span></td>
+		<td class="row2"><input class="post" type="text" size="3" maxlength="4" name="flood_interval" value="{FLOOD_INTERVAL}" /></td>
+	</tr>
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+	<tr>
+		<td class="row1">{L_SEARCH_FLOOD_INTERVAL} <br /><span class="gensmall">{L_SEARCH_FLOOD_INTERVAL_EXPLAIN}</span></td>
+		<td class="row2"><input class="post" type="text" size="3" maxlength="4" name="search_flood_interval" value="{SEARCH_FLOOD_INTERVAL}" /></td>
+	</tr>
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/ptifo/admin/forum_fprune_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+			<!-- BEGIN prune -->{row.PRUNED_POSTS}<!-- END prune -->&nbsp;
+		</td>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			<!-- BEGIN prune -->{row.PRUNED_POSTS}<!-- END prune -->&nbsp;
+		</span></td>
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/ptifo/admin/group_edit_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+class="post" type="text" class="post"
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+class="post" type="text" class="post"
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+class="post" type="text"
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/ptifo/admin/icons_list_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+class="catbottom"
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+class="catbottom"
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+class="catBottom"
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/ptifo/admin/topics_attr_list_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+class="catbottom"
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+class="catbottom"
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+class="catBottom"
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/ptifo/admin/user_ban_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+class="post" type="text" class="post"
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+class="post" type="text" class="post"
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+class="post" type="text"
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/ptifo/confirm_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+		<th class="thHead" height="25" valign="middle"><span class="tableTitle">{MESSAGE_TITLE}</span></th>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		<th class="thHead" height="25" valign="middle">{MESSAGE_TITLE}</th>
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/ptifo/cp_generic.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+class="catbottom"
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+class="catbottom"
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+class="catBottom"
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/ptifo/overall_header.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+width="12" height="13" border="0"
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+width="12" height="13" border="0"
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+border="0"
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/ptifo/posting_bbcode.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+<!--
+// bbCode control by
+// subBlue design
+// www.subBlue.com
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+<!--//
+
+//
+// bbCode control by subBlue design : www.subBlue.com
+//
+// Fix for smilies insert position on Mozilla is copyright
+// - TerraFrost (http://www.frostjedi.com)
+// - Markus Petrux (http://www.phpmix.com)
+//
+#
+#-----[ FIND ]------------------------------------------------
+#
+function emoticon(text) {
+	var txtarea = document.post.message;
+	text = ' ' + text + ' ';
+	if (txtarea.createTextRange && txtarea.caretPos) {
+		var caretPos = txtarea.caretPos;
+		caretPos.text = caretPos.text.charAt(caretPos.text.length - 1) == ' ' ? caretPos.text + text + ' ' : caretPos.text + text;
+		txtarea.focus();
+	} else {
+		txtarea.value  += text;
+		txtarea.focus();
+	}
+}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+// include the insert smilies fixes for Mozilla
+function emoticon(text) {
+	emoticon_insert(document.post.message, text);
+}
+
+function emoticon_insert(txtarea, text)
+{
+	text = ' ' + text + ' ';
+	if (txtarea.createTextRange && txtarea.caretPos) 
+	{
+		var caretPos = txtarea.caretPos;
+		var baseHeight;
+		if ( is_ie ) {
+			baseHeight = document.selection.createRange().duplicate().boundingHeight;
+		}
+		if (baseHeight != txtarea.caretPos.boundingHeight) {
+			txtarea.focus();
+			storeCaret(txtarea);
+		}
+		caretPos.text = caretPos.text.charAt(caretPos.text.length - 1) == ' ' ? caretPos.text + text + ' ' : caretPos.text + text;
+		txtarea.focus();
+	}
+	else if ( (txtarea.selectionEnd | txtarea.selectionEnd == 0) && (txtarea.selectionStart | txtarea.selectionStart == 0) )
+	{
+		mozInsert(txtarea, text, "");
+	}
+	else
+	{
+		txtarea.value  += text;
+		txtarea.focus();
+	}
+}
+
+// insert smilies fixes for Mozilla
+function mozInsert(txtarea, openTag, closeTag) {
+	var scrollTop = ( typeof(txtarea.scrollTop) == 'number' ? txtarea.scrollTop : -1 );
+	if (txtarea.selectionEnd > txtarea.value.length) {
+		txtarea.selectionEnd = txtarea.value.length;
+	}
+
+	var startPos = txtarea.selectionStart;
+	var endPos = txtarea.selectionEnd + openTag.length;
+	txtarea.value = txtarea.value.slice(0, startPos) + openTag + txtarea.value.slice(startPos);
+	txtarea.value = txtarea.value.slice(0, endPos) + closeTag + txtarea.value.slice(endPos);
+	txtarea.selectionStart = startPos + openTag.length;
+	txtarea.selectionEnd = endPos;
+	txtarea.focus();
+	if (scrollTop >= 0) {
+		txtarea.scrollTop = scrollTop;
+	}
+}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/ptifo/posting_smilies.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+
+<script language="javascript" type="text/javascript">
+<!--
+function emoticon(text) {
+	text = ' ' + text + ' ';
+	if (opener.document.forms['post'].message.createTextRange && opener.document.forms['post'].message.caretPos) {
+		var caretPos = opener.document.forms['post'].message.caretPos;
+		caretPos.text = caretPos.text.charAt(caretPos.text.length - 1) == ' ' ? text + ' ' : text;
+		opener.document.forms['post'].message.focus();
+	} else {
+	opener.document.forms['post'].message.value  += text;
+	opener.document.forms['post'].message.focus();
+	}
+}
+//-->
+</script>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+# *snip*
+#
+
+#
+#-----[ FIND ]------------------------------------------------
+#
+javascript:emoticon(
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+javascript:emoticon(
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+javascript:opener.emoticon(
+#
+#-----[ FIND ]------------------------------------------------
+#
+{L_MORE_SMILIES}</a></td>
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+{L_MORE_SMILIES}</a></td>
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+{L_MORE_SMILIES}</a></span></td>
+#
+#-----[ FIND ]------------------------------------------------
+#
+class="catbottom"
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+class="catbottom"
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+class="catBottom"
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/ptifo/search_results_posts.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+title="{searchresults.sub_type.L_SUB_TYPE}" class="absbottom" alt=""
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+title="{searchresults.sub_type.L_SUB_TYPE}" class="absbottom" alt=""
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+title="{searchresults.sub_type.L_SUB_TYPE}" class="absbottom"
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/admin/auths_def_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+	</td>
+	<!-- END title -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	</span></td>
+	<!-- END title -->
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/admin/board_config_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<tr>
+		<td class="row1">{L_FLOOD_INTERVAL} <br /><span class="gensmall">{L_FLOOD_INTERVAL_EXPLAIN}</span></td>
+		<td class="row2"><input class="post" type="text" size="3" maxlength="4" name="flood_interval" value="{FLOOD_INTERVAL}" /></td>
+	</tr>
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+	<tr>
+		<td class="row1">{L_SEARCH_FLOOD_INTERVAL} <br /><span class="gensmall">{L_SEARCH_FLOOD_INTERVAL_EXPLAIN}</span></td>
+		<td class="row2"><input class="post" type="text" size="3" maxlength="4" name="search_flood_interval" value="{SEARCH_FLOOD_INTERVAL}" /></td>
+	</tr>
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/admin/forum_fprune_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+			<!-- BEGIN prune -->{row.PRUNED_POSTS}<!-- END prune -->&nbsp;
+		</td>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			<!-- BEGIN prune -->{row.PRUNED_POSTS}<!-- END prune -->&nbsp;
+		</span></td>
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/admin/group_edit_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+class="post" type="text" class="post"
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+class="post" type="text" class="post"
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+class="post" type="text"
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/admin/icons_list_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+class="catbottom"
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+class="catbottom"
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+class="catBottom"
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/admin/topics_attr_list_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+class="catbottom"
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+class="catbottom"
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+class="catBottom"
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/admin/user_ban_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+class="post" type="text" class="post"
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+class="post" type="text" class="post"
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+class="post" type="text"
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/confirm_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+		<th class="thHead" height="25" valign="middle"><span class="tableTitle">{MESSAGE_TITLE}</span></th>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		<th class="thHead" height="25" valign="middle">{MESSAGE_TITLE}</th>
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/cp_generic.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+class="catbottom"
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+class="catbottom"
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+class="catBottom"
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/posting_bbcode.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+<!--
+// bbCode control by
+// subBlue design
+// www.subBlue.com
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+<!--//
+
+//
+// bbCode control by subBlue design : www.subBlue.com
+//
+// Fix for smilies insert position on Mozilla is copyright
+// - TerraFrost (http://www.frostjedi.com)
+// - Markus Petrux (http://www.phpmix.com)
+//
+#
+#-----[ FIND ]------------------------------------------------
+#
+function emoticon(text) {
+	var txtarea = document.post.message;
+	text = ' ' + text + ' ';
+	if (txtarea.createTextRange && txtarea.caretPos) {
+		var caretPos = txtarea.caretPos;
+		caretPos.text = caretPos.text.charAt(caretPos.text.length - 1) == ' ' ? caretPos.text + text + ' ' : caretPos.text + text;
+		txtarea.focus();
+	} else {
+		txtarea.value  += text;
+		txtarea.focus();
+	}
+}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+// include the insert smilies fixes for Mozilla
+function emoticon(text) {
+	emoticon_insert(document.post.message, text);
+}
+
+function emoticon_insert(txtarea, text)
+{
+	text = ' ' + text + ' ';
+	if (txtarea.createTextRange && txtarea.caretPos) 
+	{
+		var caretPos = txtarea.caretPos;
+		var baseHeight;
+		if ( is_ie ) {
+			baseHeight = document.selection.createRange().duplicate().boundingHeight;
+		}
+		if (baseHeight != txtarea.caretPos.boundingHeight) {
+			txtarea.focus();
+			storeCaret(txtarea);
+		}
+		caretPos.text = caretPos.text.charAt(caretPos.text.length - 1) == ' ' ? caretPos.text + text + ' ' : caretPos.text + text;
+		txtarea.focus();
+	}
+	else if ( (txtarea.selectionEnd | txtarea.selectionEnd == 0) && (txtarea.selectionStart | txtarea.selectionStart == 0) )
+	{
+		mozInsert(txtarea, text, "");
+	}
+	else
+	{
+		txtarea.value  += text;
+		txtarea.focus();
+	}
+}
+
+// insert smilies fixes for Mozilla
+function mozInsert(txtarea, openTag, closeTag) {
+	var scrollTop = ( typeof(txtarea.scrollTop) == 'number' ? txtarea.scrollTop : -1 );
+	if (txtarea.selectionEnd > txtarea.value.length) {
+		txtarea.selectionEnd = txtarea.value.length;
+	}
+
+	var startPos = txtarea.selectionStart;
+	var endPos = txtarea.selectionEnd + openTag.length;
+	txtarea.value = txtarea.value.slice(0, startPos) + openTag + txtarea.value.slice(startPos);
+	txtarea.value = txtarea.value.slice(0, endPos) + closeTag + txtarea.value.slice(endPos);
+	txtarea.selectionStart = startPos + openTag.length;
+	txtarea.selectionEnd = endPos;
+	txtarea.focus();
+	if (scrollTop >= 0) {
+		txtarea.scrollTop = scrollTop;
+	}
+}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/posting_smilies.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+
+<script language="javascript" type="text/javascript">
+<!--
+function emoticon(text) {
+	text = ' ' + text + ' ';
+	if (opener.document.forms['post'].message.createTextRange && opener.document.forms['post'].message.caretPos) {
+		var caretPos = opener.document.forms['post'].message.caretPos;
+		caretPos.text = caretPos.text.charAt(caretPos.text.length - 1) == ' ' ? text + ' ' : text;
+		opener.document.forms['post'].message.focus();
+	} else {
+	opener.document.forms['post'].message.value  += text;
+	opener.document.forms['post'].message.focus();
+	}
+}
+//-->
+</script>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+# *snip*
+#
+
+#
+#-----[ FIND ]------------------------------------------------
+#
+javascript:emoticon(
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+javascript:emoticon(
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+javascript:opener.emoticon(
+#
+#-----[ FIND ]------------------------------------------------
+#
+{L_MORE_SMILIES}</a></td>
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+{L_MORE_SMILIES}</a></td>
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+{L_MORE_SMILIES}</a></span></td>
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/search_results_posts.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+<img src="{I_TOPIC}" alt="" align="middle">
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+<img src="{I_TOPIC}" alt="" align="middle">
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+<img src="{I_TOPIC}" alt="" align="middle" />
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/viewonline_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+<img src="{I_SPACER}" width="1" height="1" alt=".">
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+<img src="{I_SPACER}" width="1" height="1" alt=".">
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+<img src="{I_SPACER}" width="1" height="1" alt="." />
+#
+#-----[ SAVE/CLOSE ALL FILES ]--------------------------------
+#
+# EoM

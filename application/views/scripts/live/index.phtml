@@ -1,0 +1,65 @@
+<!-- USERS -->
+<div style="width: 800px; margin-left:auto; margin-right: auto;">
+<table class="players" cellspacing="0" cellpadding="0" width="100%">
+	<tr class="head title">
+		<td>Online users</td>
+	</tr>
+	<tr>
+		<td style="border-bottom: 0px; line-height: 20px;">
+            <?= (integer)Onlineusers::count() ?> unregistered users online<br/>
+			<? if( $this->users ): ?>
+                registered users: 
+				<? $num = count( $this->users );
+				foreach( $this->users as $i => $user ): ?>
+				<? if( $user->playerId ): ?>
+					<a href="/player/index/id/<?= $user->playerId ?>"><?= new Racenet_IngameColors($user->playerName) ?></a>
+				<? else: ?>
+					<a href="/forum/profile.php?mode=viewprofile&u=<?= $user->userId ?>"><?= $user->userName ?></a>
+				<? endif; ?>
+				<?= ( $i < $num-1 ? ', ' : '' ) ?>
+			<? endforeach; ?>
+			<? else: ?>
+				no registered users online
+			<? endif; ?>
+		</td>
+	</tr>
+</table>
+
+
+<div class="livespacer" style="clear: both;"></div>
+
+<div class="racenet_headrow">
+        Latest personal records
+    </div>
+    <div class="racenet_row" id="playedMaps">
+        <table width="100%">
+            <thead style="font-weight: bold;">
+                <td>Player</td>
+                <td>Map</td>
+                <td>Points.</td>
+                <td>Time</td>
+                <td>Tries</td>
+                <td>Duration</td>
+                <td>Date</td>
+                <td>Server</td>
+            </thead>
+	    <? foreach($this->personalRecords as $highscore): ?>
+            <tr>
+                <td><a href="/player/index/id/<?= $highscore->player_id ?>"><?= new Racenet_IngameColors($highscore->Player->name) ?></a>
+                <td><a class="wmtt" rel="<?= $highscore->Map->getWmttImage() ?>" href="/maps/details/id/<?= $highscore->Map->id ?>"><?= $highscore->Map->name ?></a></td>
+                <td><?= $highscore->points ?></td>
+                <td><?= $this->Racetime($highscore->time, Racenet_Filter_Racetime::FORMAT_INGAME, Racenet_Filter_Racetime::KEEP_LEADING_ZEROS) ?></td>
+                <td><?= $highscore->tries ?></td>
+                <td><?= $this->Racetime($highscore->duration) ?></td>
+                <td><span style="font-size: 10px;"><?= $highscore->created ?></span></td>
+                <td><a style="font-size: 10px;" href="/server/<?= $highscore->Server->ident ?>"><?= new Racenet_IngameColors(str_replace('warsow-race.net', '', $highscore->Server->servername)) ?></a></td>
+            </tr>
+        <? endforeach; ?>
+        </table>
+    </div>
+
+</div>
+
+<br/>
+<br/>
+<br/>

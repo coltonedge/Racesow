@@ -1,0 +1,10 @@
+<? if( $this->item->hasItems() ): ?>
+<ul>
+	<? foreach( $this->item->getItems() as $item ):
+	?><li>
+		<a href="<?= $item->getHref() ?>" title="<?= $item->getTitle() ?>"><?= $item->getContent() ?></a>
+		<?= $this->partial( 'subnavigation.phtml', array( 'item' => $item ) ) ?>
+	</li>
+	<? endforeach; ?>
+</ul>
+<? endif; ?>

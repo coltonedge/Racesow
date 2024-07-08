@@ -1,0 +1,86 @@
+<div style="margin-left: auto; margin-right: auto; width: 900px;">
+    
+	<? if ($this->invitations->count()): ?>
+	<table class="racenet" border="0" width="100%">
+        <thead>
+          <td colspan="9">
+              <div style="float: left;">
+                  Group invitations
+              </div>
+              <div style="clear: both;"></div>
+          </td>
+        </thead>
+		<? foreach ($this->invitations as $invitation): ?>
+		<tr class="racenet_row">
+			<td colspan="7" style="width: 600px;"><?= $invitation->Clan->name ?></td>
+			<td style="width: 100px;"><a href="<?= $this->url(array('controller' => 'groups', 'action' => 'accept', 'id' => $invitation->id), null, true) ?>">accept</a></td>
+			<td style="width: 100px;"><a href="<?= $this->url(array('controller' => 'groups', 'action' => 'decline', 'id' => $invitation->id), null, true) ?>">decline</a></td>
+		</tr>
+		<? endforeach ?>
+		<tr>
+			<td colspan="9" style="height: 30px;">
+				&nbsp;
+			</td>
+		</tr>
+	</table>
+	<? endif ?>
+	<table class="racenet" border="0" width="100%">
+		<thead>
+          <td colspan="9">
+              <div style="float: left;">
+                  Clans & Groups
+              </div>
+			  <div style="float: right">
+				<a style="font-size: 14px;" href="<?= $this->url(array('controller' => 'groups', 'action' => 'edit'), null, true) ?>">create new group</a>
+			  </div>
+              <div style="clear: both;"></div>
+          </td>
+        </thead>
+		
+    	<? if ($this->messages): ?>
+		<tr><td colspan="9">
+		<ul style="list-style: none; color: #0f0; font-weight: bold;">
+		<? foreach ($this->messages as $message): ?>
+			<li><?= $message ?></li>       
+		<? endforeach ?>
+		</ul></td></tr>
+		<? endif; ?>
+        <? if ($this->paginator): ?>
+        
+        <tr>
+            <td colspan="9">
+                <?= $renderedPaginator = $this->paginationControl($this->paginator, 'Sliding', 'zend_paginator.phtml') ?>
+             </td>
+        </tr>
+    
+        <tr class="racenet_semihead rankedmaps_click">
+            <td style="width: 600px; text-align: left;">
+                Name
+            </td>
+			<td style="width: 100px; text-align: left;">
+                Tag
+            </td>
+            <td style="width: 100px; text-align: left;">
+                Members
+            </td>
+            <td style="width: 100px; text-align: left;">
+                Points
+            </td>
+            <td style="text-align: center;">
+                &nbsp;
+            </td>
+        </tr>
+
+        <?= $this->partialLoop('/groups/group.phtml', $this->paginator->getIterator()) ?>
+
+        <tr>
+           <td colspan="9">
+               <?= $renderedPaginator ?>
+           </td>
+        </tr>
+        
+    </table>        
+    <? else: ?>
+    <br/>No players are currently ranked        
+    <? endif; ?>
+</div>

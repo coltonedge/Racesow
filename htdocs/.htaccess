@@ -1,0 +1,10 @@
+#AuthUserFile /srv/apache2/warsow-race.net/www/.htpasswd
+#AuthType Basic
+#AuthName "Racenet development"
+#require valid-user
+
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule .* index.php [L]
+

@@ -1,0 +1,127 @@
+<?
+    $order = $this->ranking->order;
+    $dir = $this->ranking->dir;
+?>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    
+    $.ajax({
+        url: '/maps/demo/name/<?= urlencode(strtolower($this->map->name)) ?>',
+        type: 'get',
+        success: function(result) {
+        
+            if (!result.match(/The page you were looking for doesn't exist/)) {
+            
+                $('#image').html(result);
+            }
+        }
+    });
+});
+</script>
+
+<div style="width: 910px; margin-left: auto; margin-right: auto;">
+    
+    <div class="racenet_headrow">
+		Map <span style="color: #fff;"><?= $this->map->name ?></span>
+    </div>
+    
+    <div class="racenet_row">
+        <div id="image" style="float: left;">
+            <a href="javascript:void(0);" onClick="download_map( <?= $this->map->id ?>, 'http://downloads.warsow-race.net/warsow/pk3s/racesow/<?= urlencode( $this->map->file ) ?>' );">
+                <img title="Download <?= $this->map->name ?> now!" border="0" style="float: left; width: 350px; height: 263px; margin-left: 20px;" src="<?= $this->map->getlevelshot() ?>" alt="Levelshot missing -.-'" />
+				<? $this->headMeta()->appendName('og:image', 'http://www.warsow-race.net'. $this->map->getlevelshot()); ?>
+            </a>
+        </div>
+        <div style="float: right; width: 460px; height: 263px; margin-right: 10px;">
+	        <div style="position: relative; left: 12px;" class="fb-like" data-href="http://www.warsow-race.net<?= $this->url() ?>" data-send="false" data-width="450" data-show-faces="false" data-colorscheme="dark" data-font="verdana"></div>
+			<table border="0" width="400" style="margin: 0 10px">
+	            <tr>
+                    <td>Name:</td>
+                    <td><?= $this->map->name ?></td>
+                </tr>
+				<tr>
+                    <td>Mapper:</td>
+                    <td><?= $this->map->Mapper->name ?></td>
+                </tr>
+	            <tr>
+                    <td>Type:</td>
+                    <td><?= $this->map->freestyle == 1 ? 'Freestyle' : 'Race' ?></td>
+                </tr>
+	            <? if ($this->map->freestyle == 0): ?>
+                <tr>
+                    <td>Record:</td>
+                    <td><?= ($highscore = $this->map->getHighscore()) ? $this->Racetime($highscore, Racenet_Filter_Racetime::FORMAT_INGAME, false) : '-' ?></td>
+                </tr>
+                <? endif ?>
+	            <tr>
+                    <td>Playtime:</td>
+                    <td><?= $this->Racetime($this->map->playtime) ?></td>
+                </tr>
+		<? if ($this->map->freestyle == 'false'): ?>
+	            <tr>
+                    <td>Races:</td>
+                    <td><?= $this->NumberFormat($this->map->races) ?></td>
+                </tr>
+		<? endif ?>
+	            <tr>
+                    <td>Pakfile:</td>
+                    <td>
+                        <a href="javascript:void(0);" onClick="download_map( <?= $this->map->id ?>, 'http://downloads.warsow-race.net/warsow/pk3s/racesow/<?= urlencode( $this->map->file ) ?>' );"><?= $this->map->file ?></a>
+                    </td>
+                </tr>
+	            <tr>
+                    <td>Downloads:</td>
+                    <td><?= $this->NumberFormat($this->map->downloads) ?></td>
+                </tr>
+                <tr id="communityrating" style="height: 17px;">
+	                <td>Community rating:</td>
+	                <td class="rating" style="width: 200px;">
+	                    <?= $this->partial("rating-out.phtml", array("name" => str_replace('#', '23', $this->map->name ). "_community", "rating" => $this->map->rating * 4, "disabled" => true, "split" => 2, "info" => "({$this->map->ratings} rating". ($this->map->ratings != 1 ? 's' : '') .")")) ?>
+	                </td>
+	            </tr>
+	            <tr id="yourrating" style="height: 17px;">
+	                <td>Your rating:</td>
+	                <td class="rating" style="width: 200px;">
+	                    <?= $this->partial("rating.phtml", array("name" => str_replace('#', '23', $this->map->name ) ."_you", "rating" => $this->userRating, "disabled" => false, "split" => 2, "info" => null)) ?>
+	                    <input type="hidden" name="id" class="id" value="<?= $this->map->id ?>" />
+	                </td>
+	            </tr>
+	            <tr id="message">
+	               <td colspan="2">
+	                   &nbsp;
+	               </td>
+	            </tr>
+	        </table>
+
+            <div id="map_items" style="float: left;">
+		        <div style="margin: 8px 0 0 10px">
+		        <? if($this->map->Items->count()): ?>
+		            <? foreach($this->map->Items as $item): ?>
+		                <img style="margin: 5px;" src="/gfx/icons/<?= $item->item ?>.gif" alt="<?= $item->item ?>" />  
+		            <? endforeach; ?>
+		        <? else: ?>
+		            <span class="info">No items on this map</span>
+		        <? endif; ?>
+		        </div>
+		    </div>
+		    <div style="clear: both;"></div>
+        </div>
+    
+        <div style="clear: both;"></div>
+    </div>
+    
+	<? if (!empty($this->map->oneliner)): ?>
+		<h3><?= $this->Nickname($this->map->oneliner) ?></h3>
+	<? endif ?>
+</div>
+
+
+<? if ($this->map->freestyle == 0): ?>
+<div id="mapRanking" style="margin-left: auto; margin-right: auto; margin-top: 40px;  width: 910px;">
+    <script type="text/javascript">
+        Racenet.Request.forceTarget = '#mapRanking';
+    </script>
+    <?= $this->partial('maps/ranking.phtml', null, null, false) ?>
+</div>
+<? endif ?>

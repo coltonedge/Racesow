@@ -1,0 +1,4 @@
+# don't spider de player recs
+User-agent: *
+Disallow: /player/
+Disallow: /maps/

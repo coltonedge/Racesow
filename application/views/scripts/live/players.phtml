@@ -1,0 +1,7 @@
+					<? if( $server->getPlayers() ): foreach( $server->getPlayers() as $player ): ?>
+						<a href="/player/<?= $player->id ?>/"><?= new Racenet_IngameColors($player->nick) ?> <?= $player->time ? $player->time/1000 : '' ?></a><br/>
+					<? endforeach; endif; ?>
+					<br/>
+					<? if( $server->chatEnabled() ): ?>
+					<a href="javascript:void(0);" rel="<?= $server->getPort() ?>" class="chat_enable">open ingame-chat</a>
+					<? endif; ?>

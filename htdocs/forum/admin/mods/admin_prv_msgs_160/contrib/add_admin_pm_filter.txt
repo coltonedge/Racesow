@@ -1,0 +1,153 @@
+############################################################################
+#     Author: cYbercOsmOnauT on phpbb.com forums.
+#Description: I guess many admins out there don't want to get their own private 
+#             messages listed. So I created the following addon. It creates a 
+#             toggle for showing own pm's or not. 
+#
+#Original Post: http://www.phpbb.com/phpBB/viewtopic.php?t=307862&start=15
+############################################################################
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+admin/admin_priv_msgs.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+$pmtype_text = ($pmtype != PRIVMSGS_ALL_MAIL) ? "AND pm.privmsgs_type = $pmtype" : '';
+
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+$filter_own_text = (!$board_config['aprvmOwn']) ? "AND pm.privmsgs_from_userid <> ". $userdata['user_id'] ." AND pm.privmsgs_to_userid <> ". $userdata['user_id'] : '';
+
+#
+#-----[ FIND ]------------------------------------------
+#
+   default:
+   {
+      $sql = 'SELECT pm.*, pmt.* FROM ' . PRIVMSGS_TABLE . "$archive_text pm, " . PRIVMSGS_TEXT_TABLE . " pmt
+            WHERE pm.privmsgs_id = pmt.privmsgs_text_id
+
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+            $filter_own_text
+
+#
+#-----[ FIND ]------------------------------------------
+#
+      'L_SHOW_IP' =>$lang['Show_IP'],
+
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+      'L_SHOW_OWN' =>$lang['Show_Own'],
+
+#
+#-----[ FIND ]------------------------------------------
+#
+      'URL_SHOW_IP_OFF' => ($board_config['aprvmIP'] == 1) ? '<a href="' . append_sid($aprvmUtil->urlStart . '&config_name=aprvmIP&config_value=0') . "\">{$lang['Disable']}</a>" : $lang['Disable'],
+
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+      'URL_SHOW_OWN_ON' => ($board_config['aprvmOwn'] == 0) ? '<a href="' . append_sid($aprvmUtil->urlStart . '&config_name=aprvmOwn&config_value=1') . "\">{$lang['Enable']}</a>" : $lang['Enable'],
+      'URL_SHOW_OWN_OFF' => ($board_config['aprvmOwn'] == 1) ? '<a href="' . append_sid($aprvmUtil->urlStart . '&config_name=aprvmOwn&config_value=0') . "\">{$lang['Disable']}</a>" : $lang['Disable'],
+
+#
+#-----[ FIND ]------------------------------------------
+#
+      $configList = array('aprvmArchive'
+
+#
+#-----[ IN-LINE FIND ]------------------------------------------
+#
+'aprvmIP'
+
+#
+#-----[ IN-LINE AFTER, ADD ]------------------------------------------
+#
+, 'aprvmOwn'
+
+#
+#-----[ FIND ]------------------------------------------
+#
+                     'aprvmIP' => $lang['Show_IP']);
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+                     'aprvmIP' => $lang['Show_IP'],
+                     'aprvmOwn' => $lang['Show_Own']);
+
+#
+#-----[ FIND ]------------------------------------------
+#
+      $configDefaults = array('0',
+
+#
+#-----[ IN-LINE FIND ]------------------------------------------
+#
+'1'
+
+#
+#-----[ IN-LINE AFTER, ADD ]------------------------------------------
+#
+, '1'
+
+#
+#-----[ FIND ]------------------------------------------
+#
+      global $db, $filter_from_text, $filter_to_text, $filter_from, $filter_to, $lang, $template, $order;
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+      global $db, $filter_from_text, $filter_to_text, $filter_own_text, $filter_from, $filter_to, $lang, $template, $order, $userdata;
+
+#
+#-----[ FIND ]------------------------------------------
+#
+         WHERE 1
+
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+         $filter_own_text
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+language/lang_english/lang_admin_priv_msgs.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+$lang['Show_IP'] = 'Show IP Address';
+
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+$lang['Show_Own'] = 'Show Own PMs';
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+templates/subSilver/admin/admin_priv_msgs_body.tpl
+
+#
+#-----[ FIND ]------------------------------------------
+#
+{L_SHOW_IP} - {URL_SHOW_IP_ON} | {URL_SHOW_IP_OFF}<br />
+
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+{L_SHOW_OWN} - {URL_SHOW_OWN_ON} | {URL_SHOW_OWN_OFF}<br />
+
+#
+#-----[ SAVE/CLOSE ALL FILES ]------------------------------------------
+#
+# EoM

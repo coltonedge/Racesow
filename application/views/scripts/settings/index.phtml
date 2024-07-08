@@ -1,0 +1,28 @@
+
+<div style="margin-left: auto; margin-right: auto; width: 600px;">
+	<div class="racenet_headrow">
+		My racenet account
+	</div>
+	
+	<? if ($this->messages): ?>
+	<ul style="list-style: none; color: #0f0; font-weight: bold;">
+    <? foreach ($this->messages as $message): ?>
+        <li><?= $message ?></li>       
+    <? endforeach ?>
+    </ul>
+	<? endif; ?>
+	
+
+	<div class="racenet_row" style="position: relative; height: 345px;">
+		<div style="position: absolute;">
+			<?= $this->form ?>
+		</div>
+		<? $src = '/forum/images/avatars/'. $this->user->user_avatar ?>
+		<? if (is_file(PATH_HTDOCS . $src)): ?>
+		<img style="position: absolute; right: 8px; top: 8px;" src="<?= $src ?>" />
+		<? endif ?>
+	</div> 
+	
+	
+	<span style="font-style: italic; font-size: 10px;">* mandatory field</span>
+</div>

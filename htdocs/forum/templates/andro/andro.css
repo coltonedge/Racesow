@@ -1,0 +1,254 @@
+/*
+  Andromeda Boards Theme for phpBB2+
+  Created by Dubird
+  http://www.dubird.net
+ */
+
+ /* General page style. The scroll bar colours only visible in IE5.5+ */
+body { 
+	background-color:#45395F;
+scrollbar-face-color : #313E5F;
+scrollbar-highlight-color : #8081A0;
+scrollbar-shadow-color : #453053;
+scrollbar-3dlight-color : #8081A0;
+scrollbar-arrow-color : #D6D6F7;
+scrollbar-track-color : #453053;
+scrollbar-darkshadow-color: #453053;
+}
+
+/* General font families for common tags */
+font{ font-family: Verdana, Arial, Helvetica, sans-serif }
+td	{ font-family: Verdana, Arial, Helvetica, sans-serif }
+p	{ font-family: Verdana, Arial, Helvetica, sans-serif }
+hr	{ height: 0px; border: solid #888BB0 0px; border-top-width: 1px;}
+
+
+/* This is the border line & background colour round the entire page */
+.bodyline	{ background-color:#3E3452; border: 0px; }
+
+/* This is the outline round the main forum tables */
+.forumline	{ background-color:#302843; border: 2px #302843 solid }
+
+/*
+  Main table cell colours and backgrounds
+  Styles that use bitmap backgrounds are commented "Uses Bitmap"
+  Note that netscape 4 takes paths to bitmap files relative from
+  the html file rather than from the style sheet.
+  Hence, to maintain compatibility, all styles using bitmaps have
+  their "background : url(templates/subSilver/images/bitmap.gif);"
+  setting defined in overall_header.tpl 
+*/
+
+
+TH			{ font-family: Verdana, Arial, Helvetica, sans-serif; background-color: #453053; height: 25px; font-size: 11px; font-weight: bold; color: #ffffff; border:1px solid #302843;
+}  /* Uses Bitmap */
+TD.tablebg	{ background-color: #000000 }
+TD.cat		{ background-color: #3B5B7D; height: 28px; border:1px solid #302843 }  /* Uses Bitmap */
+TD.row1		{ background-color: #453053; border:1px solid #302843;  border-left-width: 0px; border-top-width: 0px; border-right-width: 1px; border-bottom-width: 1px }
+TD.row2		{ background-color: 	#453053; border:1px solid #302843;  border-left-width: 0px; border-top-width: 0px; border-right-width: 1px; border-bottom-width: 1px }
+TD.row3		{ background-color: #453053; border:1px solid #302843;  border-left-width: 0px; border-top-width: 0px; border-right-width: 1px; border-bottom-width: 1px}
+
+/* This is the spacer row between post replies */
+TD.spaceRow { background-color: #444578; }
+
+/*
+  This is for the table cell above the Topics, Post & Last posts on the index.php page
+  By default this is the fading out gradiated silver background.
+  However, you could replace this with a bitmap specific for each forum
+*/
+TD.rowpic	{ background-color: #45395F; border: #302843; border-left-width: 0px; border-top-width: 0px; border-right-width: 1px; border-bottom-width: 1px} /* Uses Bitmap */
+
+/*
+  Setting additional nice borders for the main table cells.
+  The names indicate which sides the border will be on.
+  Don't worry if you don't understand this, just ignore it :-)
+*/
+TD.catHead,TD.catSides,TD.catLeft,TD.catRight,TD.catBottom { background-color:#45395F; height: 28px; border: #453053; border-style: solid; }  /* Uses Bitmap */
+
+TD.catHead	 { height: 29px; border-left-width: 1px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px }
+TD.catSides  { border-left-width: 1px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px }
+TD.catLeft	 { border-left-width: 1px; border-top-width: 0px; border-right-width: 0px; border-bottom-width: 1px }
+TD.catRight	 { border-left-width: 0px; border-top-width: 0px; border-right-width: 1px; border-bottom-width: 1px }
+TD.catBottom { height: 29px; border-left-width: 1px; border-top-width: 0px; border-right-width: 1px; border-bottom-width: 1px }
+
+TH.thHead,TH.thSides,TH.thTop,TH.thLeft,TH.thRight,TH.thBottom,TH.thCornerL,TH.thCornerR { border: #453053; border-style: solid; }
+
+TH.thHead	 { font-weight : bold; font-size: 12px; height: 25px; border-left-width: 1px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 0px }
+TH.thSides	 { border-left-width: 1px; border-top-width: 0px; border-right-width: 1px; border-bottom-width: 1px }
+TH.thTop	 { border-left-width: 0px; border-top-width: 1px; border-right-width: 0px; border-bottom-width: 1px }
+TH.thLeft	 { border-left-width: 1px; border-top-width: 0px; border-right-width: 0px; border-bottom-width: 1px }
+TH.thRight	 { border-left-width: 0px; border-top-width: 0px; border-right-width: 1px; border-bottom-width: 1px }
+TH.thBottom  { border-left-width: 1px; border-top-width: 0px; border-right-width: 1px; border-bottom-width: 1px }
+TH.thCornerL { border-left-width: 1px; border-top-width: 1px; border-right-width: 0px; border-bottom-width: 1px }
+TH.thCornerR { border-left-width: 0px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px }
+
+TD.row3Right	 { background-color: #45395F; border: #453053; border-style: solid;  border-left-width: 0px; border-top-width: 0px; border-right-width: 1px; border-bottom-width: 1px }
+
+
+
+/* The largest text used in the index page title and toptic title etc. */
+.maintitle	{ font-family: Arial, Helvetica, sans-serif; font-size : 22px; font-weight : bold; text-decoration : none; line-height : 120%; color : #D6D6F7;}
+
+
+a {
+
+outline: none; /* remove dotted border in Firefox */
+}
+
+a {
+
+	color : #D6D6E7;
+}
+a:hover {
+
+	text-decoration: underline !important;
+	color : #ECECFA;
+}
+
+td {
+
+	text-align: center;
+}
+
+td.row1, td.row2, td.catLeft, td.rowpic {
+	text-align: left;
+}
+
+/* General normal text */
+.gen		{ font-size : 12px; color : #ECECFA; }
+a.gen		{ color: #D6D6E7; text-decoration: none; }
+a.gen:hover	{ color : #D6D6E7; }
+
+/* General medium text */
+.genmed		{ font-size : 11px; color : #ECECFA; }
+a.genmed	{ text-decoration: none; color : #D6D6E7; }
+a.genmed:hover	{ color : #D6D6E7; }
+
+
+/* General small */
+.gensmall	{ font-size : 10px; color : #ECECFA; }
+a.gensmall	{ color: ##D6D6E7; text-decoration: none; }
+a.gensmall:hover{ color : #D6D6E7; }
+
+
+/* The register, login, search etc links at the top of the page */
+.mainmenu		{ font-size : 11px; text-decoration : none; color : #ECECFA }
+a.mainmenu		{ text-decoration: none; font-weight: bold;  }
+a.mainmenu:hover{ color : #D6D6E7; background-color: transparent !important; }
+
+table.priv a, .gensmall a		{ text-decoration : none; color : #ECECFA }
+
+/* Forum category titles */
+.cattitle		{ font-size : 12px; letter-spacing: 1px; font-weight : bold; text-decoration : none; color : #D6D6F7}
+a.cattitle		{ text-decoration: none; color : #D6D6F7; }
+a.cattitle:hover{ text-decoration: underline; }
+
+
+/* Forum title: Text and link to the forums used in: index.php */
+.forumlink		{ font-size : 12px; font-weight : bold; text-decoration : none; color : #D6D6E7; }
+a.forumlink		{ text-decoration: none; color : #D6D6E7; }
+a.forumlink:hover{ color : #D6D6E7; }
+
+
+/* Used for the navigation text, (Page 1,2,3 etc) and the navigation bar when in a forum */
+.nav			{ font-size : 11px; font-weight : bold; text-decoration : none; color : #BAC3CC;}
+a.nav			{ text-decoration: none; color : #BFC0FB; }
+a.nav:hover		{ text-decoration: underline; }
+
+
+/* titles for the topics: could specify viewed link colour too */
+.topictitle			{ font-size : 11px; font-weight : bold; text-decoration : none; color : #ECECFA; }
+a.topictitle		{ text-decoration: none; color : #D6D6E7; }
+a.topictitle:hover	{ color : #D6D6E7; }
+a.topictitle:visited{ text-decoration: underline;  }
+
+
+/* Name of poster in viewmsg.php and viewtopic.php and other places */
+.name			{ font-size : 11px; text-decoration : none; color : #BAC3CC;}
+a.name			{ color: #D6D6E7; text-decoration: none;}
+a.name:hover	{ color : #D6D6E7;}
+
+/* Location, number of posts, post date etc */
+.postdetails		{ font-size : 10px; color : #DFDFEB; }
+a.postdetails		{ color: #5C5D4C; text-decoration: none; }
+a.postdetails:hover	{ color: #FF7800; text-decoration: underline; }
+
+
+/* The content of the posts (body of text) */
+.postbody { font-size : 12px; line-height: 18px}
+a.postlink	{ text-decoration: none; color : #FF7800 }
+a.postlink:hover { text-decoration: underline; color : #FF7800}
+
+
+/* Quote Code (currently not used) */
+.code { 
+	font-family: Courier, "Courier New", sans-serif; font-size: 11px; color: #D5D6E1;
+	background-color: #49495B; border: #453053; border-style: solid;
+	border-left-width: 1px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px
+}
+
+.quote {
+	font-family: Verdana, Arial, sans-serif; font-size: 11px; color: #D5D6E1; line-height: 125%;
+	background-color: #49495B; border: #453053; border-style: solid;
+	border-left-width: 1px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px
+}
+
+.editedby { font-size : 10px; line-height : 100%; color : #D9D9D9; }
+
+
+/* Form elements */
+input,textarea, select {
+	color : #ffffff;
+	font-family : Verdana, Arial, Helvetica, sans-serif;
+	font-size : 11px;
+	font-weight : normal;
+	border: 1px solid #737abc;
+}
+
+/* The text input fields background colour */
+input.post, textarea.post, select {
+	background-color : #3E3452;
+	color: #ffffff;
+}
+
+input { text-indent : 2px; }
+
+/* The buttons used for bbCode styling in message post */
+input.button {
+	background-color : #48425C;
+	color : #ffffff;
+	font-family : Verdana, Arial, Helvetica, sans-serif;
+	font-size : 11px;
+}
+
+/* The main submit button option */
+input.mainoption {
+	background-color : #48425C;
+	font-weight : bold;
+	color : #ffffff;
+}
+
+/* None-bold submit button */
+input.liteoption {
+	background-color : #48425C;
+	font-weight : normal;
+	color : #ffffff;
+}
+
+/* This is the line in the posting page which shows the rollover
+  help line. This is actually a text box, but if set to be the same
+  colour as the background no one will know ;)
+*/
+.helpline { background-color: #48425C; border-style: none; }
+
+/* Copyright and bottom info */
+.copyright		{ font-family: Verdana, Arial, Helvetica, sans-serif; color: #C8C8C8; font-size: 10px; letter-spacing: -1px;}
+a.copyright		{ color: #B8BED2; text-decoration: none;}
+a.copyright:hover { color: #B8BED2; text-decoration: underline;}
+
+
+
+
+
+
+

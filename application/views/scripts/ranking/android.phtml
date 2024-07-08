@@ -1,0 +1,32 @@
+<table width="100%" border="0">
+<tr>
+	<td>
+		<font color="#737ABC"><b>Pos.</b></font><
+	</td>
+	<td>           
+        <font color="#737ABC"><b>Player</b></font>
+    </td>
+	<td>         
+        <font color="#737ABC"><b>Skill</b></font>
+    </td>
+	<td>
+		<font color="#737ABC"><b>Points</b></font>
+	</td>
+</tr>
+<? foreach ($this->ranking->paginator->getIterator() as $player): ?>
+<tr>
+	<td>
+		<font color="#737ABC"><?= $player->position ? $player->position .'.' : '-' ?></font>
+	</td>
+	<td>           
+        <?= new Racenet_IngameColors($player->name, null, true) ?>
+    </td>
+	<td>         
+        <font color="#737ABC"><?= round($player->skill,2) ?></font>
+    </td>
+	<td>
+		<font color="#737ABC"><?= $this->NumberFormat($player->points) ?></font>
+	</td>
+</tr>
+<? endforeach ?>
+</table>

@@ -1,0 +1,88 @@
+<?
+    $order = $this->ranking->order;
+    $dir = $this->ranking->dir;
+?>
+
+<div style="margin-left: auto; margin-right: auto; width: 850px;">
+    
+    <table class="racenet" border="0">
+        <thead>
+            <td colspan="9">
+                <div style="float: left;">
+                    |
+					Map <span style="color: #fff;"><?= $this->map->name ?></span>
+					|
+					<a class="headrow_link" href="<?= $this->url(array('controller' => 'maps', 'action' => 'details', 'id' => $this->map->id), null, true) ?>">details</a>
+					|
+					<a class="headrow_link" href="<?= $this->url(array('controller' => 'maps', 'action' => 'races', 'id' => $this->map->id), null, true) ?>">highscores</a>
+                </div>
+                <form id="search" method="get" onsubmit="return false;" style="float: right; margin-bottom: 1px;">
+                    <? if ($this->ranking->message): ?>
+                        <span style="font-size: 12px; font-family: Arial; font-style: normal; color: red;"><?= $this->ranking->message ?></span>
+                    <? endif; ?>
+					<input name="search" class="search" type="text" value="<?= $this->ranking->getSearchPreset() ?>" rel="<?= $this->ranking->getSearchPreset(true) ?>" onfocus="if(this.value == $(this).attr('rel')) this.value = '';" onblur="if(this.value=='') this.value = $(this).attr('rel');" />
+					<input title="show only players matching your search" type="submit" onclick="return Racenet.Request.search(this, '<?= $this->url(array("filter" => ":value", "hl" => null, "page" => null)) ?>', 'nickname');" class="ajaxsearch" name="search" value="filter" />
+					<input title="show all players and highlight matches" type="submit" onclick="return Racenet.Request.search(this, '<?= $this->url(array("hl" => ":value", "filter" => null, "page" => null)) ?>', 'nickname');" class="ajaxsearch" name="highlight" value="highlight" />
+					<input title="jump to previous matches" type="button" onclick="return Racenet.Request.search(this, '<?= $this->url(array("page" => $this->ranking->prevMatchedPage)) ?>', 'nickname');" value="&lt;" <?= !$this->ranking->prevMatchedPage ? 'disabled="disabled" ' : '' ?>/>
+					<input title="jump to following matches" type="button" onclick="return Racenet.Request.search(this, '<?= $this->url(array("page" => $this->ranking->nextMatchedPage)) ?>', 'nickname');" value="&gt;" <?= !$this->ranking->nextMatchedPage ? 'disabled="disabled" ' : '' ?>/>
+					<input title="clear the current search or highlight" type="submit"  onclick="return Racenet.Request.search(this, '<?= $this->url(array("hl" => null, "filter" => null, "page" => $this->page)) ?>', 'nickname');" value="clear" <?= (!$this->ranking->filter && !$this->ranking->highlight ? 'disabled="disabled"' : '') ?> />
+              </form>
+                <div style="clear: both;"></div>
+            </td>
+        </thead>
+    
+        <? if ($this->ranking->paginator): ?>
+        
+        <tr>
+            <td colspan="9">
+                <?= $renderedPaginator = $this->paginationControl($this->ranking->paginator, 'Sliding', 'zend_paginator.phtml') ?>
+             </td>
+        </tr>
+    
+        <tr class="racenet_semihead rankedmaps_click">
+            <td style="width: 70px; text-align: center;">
+                <a onclick="return Racenet.Request.load(this);" style="color: <?= $order == 'pos' ? ($dir == 'ASC' ? '#00ff00' : '#ff0000') : '#fff' ?>" href="<?= $this->url(array('page' => null, 'order' => 'pos', 'dir' => ($order == 'pos' ? ($dir == 'ASC' ? 'desc' : 'asc') : null))) ?>">Pos.</a>
+                <a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("page" => null, "order" => "pos", "dir" => "asc" )) ?>" title="ascending"><img src="/gfx/icons/ico_up.gif" border="0" align="absmiddle"></a><a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("page" => null, "order" => "pos", "dir" => "desc" )) ?>" title="descending"><img src="/gfx/icons/ico_down.gif" border="0" align="absmiddle"></a>
+            </td>
+            <td style="width: 160px;">          
+                <a onclick="return Racenet.Request.load(this);" style="color: <?= $order == 'simplified' ? ($dir == 'ASC' ? '#00ff00' : '#ff0000') : '#fff' ?>" href="<?= $this->url(array('page' => null, 'order' => 'simplified', 'dir' => ($order == 'simplified' ? ($dir == 'ASC' ? 'desc' : 'asc') : null))) ?>">Name</a>
+                <a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("page" => null, "order" => "simplified", "dir" => "asc" )) ?>" title="ascending"><img src="/gfx/icons/ico_up.gif" border="0" align="absmiddle"></a><a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("page" => null, "order" => "simplified", "dir" => "desc" )) ?>" title="descending"><img src="/gfx/icons/ico_down.gif" border="0" align="absmiddle"></a>
+            </td>
+            <td style="width: 120px;">         
+                <a onclick="return Racenet.Request.load(this);" style="color: <?= $order == 'time' ? ($dir == 'ASC' ? '#00ff00' : '#ff0000') : '#fff' ?>" href="<?= $this->url(array('page' => null, 'order' => 'time', 'dir' => ($order == 'time' ? ($dir == 'ASC' ? 'desc' : 'asc') : null))) ?>">Record</a>
+                <a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("page" => null, "order" => "time", "dir" => "asc" )) ?>" title="ascending"><img src="/gfx/icons/ico_up.gif" border="0" align="absmiddle"></a><a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("page" => null, "order" => "time", "dir" => "desc" )) ?>" title="descending"><img src="/gfx/icons/ico_down.gif" border="0" align="absmiddle"></a>
+            </td>
+            <td style="width: 80px;">
+                <a onclick="return Racenet.Request.load(this);" style="color: <?= $order == 'points' ? ($dir == 'ASC' ? '#00ff00' : '#ff0000') : '#fff' ?>" href="<?= $this->url(array('page' => null, 'order' => 'points', 'dir' => ($order == 'points' ? ($dir == 'ASC' ? 'desc' : 'asc') : null))) ?>">Points</a>
+                <a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("page" => null, "order" => "points", "dir" => "asc" )) ?>" title="ascending"><img src="/gfx/icons/ico_up.gif" border="0" align="absmiddle"></a><a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("page" => null, "order" => "points", "dir" => "desc" )) ?>" title="descending"><img src="/gfx/icons/ico_down.gif" border="0" align="absmiddle"></a>
+            </td>
+            <td style="width: 90px;">         
+                <a onclick="return Racenet.Request.load(this);" style="color: <?= $order == 'races' ? ($dir == 'ASC' ? '#00ff00' : '#ff0000') : '#fff' ?>" href="<?= $this->url(array('page' => null, 'order' => 'races', 'dir' => ($order == 'races' ? ($dir == 'ASC' ? 'desc' : 'asc') : null))) ?>">Races</a>
+                <a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("page" => null, "order" => "races", "dir" => "asc" )) ?>" title="ascending"><img src="/gfx/icons/ico_up.gif" border="0" align="absmiddle"></a><a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("page" => null, "order" => "races", "dir" => "desc" )) ?>" title="descending"><img src="/gfx/icons/ico_down.gif" border="0" align="absmiddle"></a>
+            </td>
+            <td style="width: 130px;">         
+                <a onclick="return Racenet.Request.load(this);" style="color: <?= $order == 'playtime' ? ($dir == 'ASC' ? '#00ff00' : '#ff0000') : '#fff' ?>" href="<?= $this->url(array('page' => null, 'order' => 'playtime', 'dir' => ($order == 'playtime' ? ($dir == 'ASC' ? 'desc' : 'asc') : null))) ?>">Playtime</a>
+                <a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("page" => null, "order" => "playtime", "dir" => "asc" )) ?>" title="ascending"><img src="/gfx/icons/ico_up.gif" border="0" align="absmiddle"></a><a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("page" => null, "order" => "playtime", "dir" => "desc" )) ?>" title="descending"><img src="/gfx/icons/ico_down.gif" border="0" align="absmiddle"></a>
+            </td>
+            <td style="width: 130px;">         
+                <a onclick="return Racenet.Request.load(this);" style="color: <?= $order == 'created' ? ($dir == 'ASC' ? '#00ff00' : '#ff0000') : '#fff' ?>" href="<?= $this->url(array('page' => null, 'order' => 'created', 'dir' => ($order == 'created' ? ($dir == 'ASC' ? 'desc' : 'asc') : null))) ?>">Date</a>
+                <a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("page" => null, "order" => "created", "dir" => "asc" )) ?>" title="ascending"><img src="/gfx/icons/ico_up.gif" border="0" align="absmiddle"></a><a onclick="return Racenet.Request.load(this);" href="<?= $this->url(array("page" => null, "order" => "created", "dir" => "desc" )) ?>" title="descending"><img src="/gfx/icons/ico_down.gif" border="0" align="absmiddle"></a>
+            </td>
+            <td style="width: 20px; text-align: center;">
+                &nbsp;
+            </td>
+        </tr>
+
+        <?= $this->partialLoop('/maps/race.phtml', $this->ranking->paginator->getIterator()) ?>
+
+        <tr>
+           <td colspan="9">
+               <?= $renderedPaginator ?>
+           </td>
+        </tr>
+        
+    </table>        
+    <? else: ?>
+    <br/>No players are currently ranked        
+    <? endif; ?>
+</div>

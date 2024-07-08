@@ -1,0 +1,108 @@
+<?
+	$request = Zend_Controller_Front::getInstance()->getRequest();
+	$controllerName = $request->getControllerName();
+	$ajax = $request->isXmlHttpRequest();
+	$account = RacenetAccount::getInstance();
+?>
+
+<? if( !$ajax ): ?>
+<?= ( $request->getActionName() != 'server' &&  $this->server->advertise == -1 ? $this->render($controllerName.'/ad.phtml') : '' ) ?>
+<div id="server_<?= $this->server->id ?>">
+<? else: ?>
+<? endif; ?>
+
+	<table class="players" cellspacing="0" cellpadding="0" width="800">
+		<tr class="head">
+			<td colspan="3"><?= strlen($this->server->hostname) != 0  ? new Racenet_IngameColors($this->server->hostname) : ('Server "'. $this->server->id .'" is currently offline...') ?></td>
+		</tr>
+		<tr>
+			<td colspan="3">
+				<a href="warsow://<?= $this->server->ip .':'. $this->server->port ?>" style="font-size: 12px; font-family: verdana; font-weight: bold;">
+					warsow://<?= $this->server->ip.':'. $this->server->port?>
+				</a>
+				<a href="hlsw://<?= $this->server->ip .'.'. $this->server->port ?>">
+					<img title="add to hlsw" align="absmiddle" src="/gfx/icons/hlswicon.jpg" border="0"/>
+				</a>
+                <?= $this->server->gametype?> on <? if ($this->server->map && isset($this->server->map->name)): ?><a href="/maps/details/id/<?= $this->server->map->id ?>/"><?= $this->server->map->name ?></a> for <?= $this->server->matchtime?> <i>(min:sec)</i><? endif; ?>
+				<a href="javascript:refresh_server('<?= $this->server->id ?>');">refresh</a>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3" style="text-align: center;">
+				<img  width="350" height="263" src="<?= $this->server->levelshot ?>" style="float: left;"/>
+				<div style="float: left; margin: 10px; text-align: left; line-height: 20px;">
+				<!--<i>the player list is currently not working...</i>//-->
+				<? $players = $this->server->players; // surpress a notice caused by magic getter/setter
+				    foreach ($players as $player): ?>
+                        <? if (isset($player->id)): ?>
+                            <a href="/player/index/id/<?= $player->id ?>/"><?= new Racenet_IngameColors($player->name) ?> <?= (isset($player->time) ? $player->time : '') ? $player->time/1000 : '' ?></a><br/>
+                        <? else: ?>
+                            <?= new Racenet_IngameColors($player->name) ?><br/>
+                        <? endif ?>
+					<? endforeach; ?>
+				</div>
+			</td>
+		</tr>
+		<? if ($this->server->info): ?>
+		<tr>
+			<td>
+				<i><?= $this->server->info ?></i>
+			</td>
+		</tr>
+		<? endif; ?>
+		<? if( $this->server->isProtected ): ?>
+			<? if( $account->user_id != -1 ): ?>
+		<tr>
+			<td>
+				<b>The current password is <input style="color: #0f0; width: 75px; text-align: center; font-weight: bold;" value="<?= $this->server->password ?>" /></b>
+			</td>
+		</tr>
+			<? else: ?>
+		<tr>
+			<td>
+				<span style="color: red; font-weight: bold;">You need to be logged in to get the password!</span>
+			</td>
+		</tr>
+			<? endif; ?>
+		<? endif; ?>
+	</table>
+
+<? if( !$ajax ): ?>
+</div>
+<? if( $this->server->chat['enabled'] ): ?>
+	<table class="players" cellspacing="0" cellpadding="0" width="800">
+		<? if((integer)$account->user_id > 1 ): ?>
+		<tr>
+			<td>
+				<a href="javascript:void(0);" rel="<?= $this->server->port ?>" class="chat_enable">open ingame-chat</a>
+			</td>
+		</tr>
+		<? endif; ?>
+		<tr>
+			<td style="border-bottom: none;">
+				<? if( !$account->isLoggedIn() ): ?>
+					<span style="color: red; font-weight: bold;">You need to be logged in to view the chat!</span>
+				<? elseif( !$account->hasIngameLinkage() ): ?>
+					<span style="color: red; font-weight: bold;">You need <a href="/ingame/">ingame-linkage</a> to chat with ingame players!</span>
+				<? else: ?>
+					<div id="iframe<?= $this->server->port ?>"></div>
+					<div id="chat_hidden<?= $this->server->port ?>" style="display: none;">
+						<input type="hidden" id="nick<?= $this->server->port ?>" value="<?= $account->IngameLinkage->Player->name ?>" />
+						<table border="0" cellspacing="0" width="100%" class="clean">
+						<tr>
+							<td><input type="text" id="text<?= $this->server->port ?>" value="" style="width: 100%;"/></td>
+							<td width="30"><input type="button" value="send" id="send<?= $this->server->port ?>" /></td>
+						</tr>
+						<tr>
+							<td colspan="2" style="color: #fff; text-align: right;"><label for="autoscroll">enable automatic scrolling</label><input type="checkbox" value="1" id="autoscroll<?= $this->server->port ?>" checked="true"/></td>
+						</tr>
+						</table>
+					</div>
+				<? endif; ?>
+			</td>
+		</tr>		
+	</table>
+<? endif; ?>
+<div class="livespacer"></div>
+<?= ( $request->getActionName() == 'server' || $this->server->advertise == 1 ? $this->render($controllerName.'/ad.phtml') : '' ) ?>
+<? endif; ?>

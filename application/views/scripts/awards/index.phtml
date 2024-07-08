@@ -1,0 +1,26 @@
+<div style="margin-left: auto; margin-right: auto; width: 600px;">
+    <div class="racenet_headrow">
+        Latest Awards
+    </div>
+    <table class="ranking" style="margin-left: auto; margin-right: auto;">
+        <? foreach($this->lastawards as $award): ?>
+        <tr>
+            <td><img src="/gfx/icons/ico_<?=$award->type?>.jpg"/></td>
+            <td><a href="<?= $this->url(array("controller" => "player", "id" => $award->Player->id), null, true)?>/"><?= new Racenet_IngameColors($award->Player->name) ?></td>
+            <td><?= $award->getDetails()?></td>
+        </tr>
+        <? endforeach; ?>
+    </table>
+
+    <div class="racenet_headrow" style="margin-left: auto; margin-right: auto; width: 400px; margin-top:30px;">
+        Award legend
+    </div>
+    <table class="ranking" style="margin-left: auto; margin-right: auto; width: 400px;">
+        <? foreach(Award::$AWARD_TITLES as $type => $title): ?>
+        <tr>
+            <td><img src="/gfx/icons/ico_<?=$type?>.jpg"/></td>
+            <td><b><?=$title?></b></td>
+        </tr>
+        <? endforeach; ?>
+    </table>
+</div>

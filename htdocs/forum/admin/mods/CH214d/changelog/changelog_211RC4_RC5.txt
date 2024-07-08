@@ -1,0 +1,394 @@
+
+________________________________________________________________________________
+
+#=============================================================
+#	Changes between 2.1.1 RC 4 & 2.1.1 RC 5
+#=============================================================
+Since 2005/05/01 :
+
+- rebuild the installation onto phpBB 2.0.15,
+- add in privmsg.php the send to the template the detailed links and pics,
+- remove from posting_body.tpl the moderators lines (as they aren't filled),
+- clean some large replaced blocks from the added // in front of the line,
+- prevent relog in ACP when .htaccess is present,
+- fixed a timestamp issue when DST is activated server side
+
+#
+#-----[ OPEN ]------------------------------------------------
+#
+posting.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+// if ( $result = $db->sql_query($sql) )
+// {
+//	$post_info = $db->sql_fetchrow($result);
+//	$db->sql_freeresult($result);
+//
+//	$forum_id = $post_info['forum_id'];
+//	$forum_name = $post_info['forum_name'];
+//
+//	$is_auth = auth(AUTH_ALL, $forum_id, $userdata, $post_info);
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+# here we remove the // in front of line and prefer /* */
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+if ( $result = $db->sql_query($sql) )
+{
+	$post_info = $db->sql_fetchrow($result);
+	$db->sql_freeresult($result);
+
+	$forum_id = $post_info['forum_id'];
+	$forum_name = $post_info['forum_name'];
+
+	$is_auth = auth(AUTH_ALL, $forum_id, $userdata, $post_info);
+*/
+//-- add
+#
+#-----[ OPEN ]------------------------------------------------
+#
+privmsg.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+	'SUBJECT_LENGTH' => intval($config->data['topic_title_length']),
+));
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+# this is required for a smoother template handling
+#
+	'SUBJECT_LENGTH' => intval($config->data['topic_title_length']),
+
+	'U_INBOX' => $config->url('privmsg', array('folder' => 'inbox'), true),
+	'L_INBOX' => $user->lang('Inbox'),
+	'I_INBOX' => $user->img('pm_inbox'),
+	'U_OUTBOX' => $config->url('privmsg', array('folder' => 'outbox'), true),
+	'L_OUTBOX' => $user->lang('Outbox'),
+	'I_OUTBOX' => $user->img('pm_outbox'),
+	'U_SENTBOX' => $config->url('privmsg', array('folder' => 'sentbox'), true),
+	'L_SENTBOX' => $user->lang('Sentbox'),
+	'I_SENTBOX' => $user->img('pm_sentbox'),
+	'U_SAVEBOX' => $config->url('privmsg', array('folder' => 'savebox'), true),
+	'L_SAVEBOX' => $user->lang('Savebox'),
+	'I_SAVEBOX' => $user->img('pm_savebox'),
+));
+$template->set_switch('inbox', ($folder == 'inbox') || empty($folder));
+$template->set_switch('outbox', ($folder == 'outbox'));
+$template->set_switch('sentbox', ($folder == 'sentbox'));
+$template->set_switch('savebox', ($folder == 'savebox'));
+#
+#-----[ OPEN ]------------------------------------------------
+#
+viewtopic.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+// $is_auth = auth(AUTH_ALL, $forum_id, $userdata, $forum_topic_data);
+//
+// if( !$is_auth['auth_view'] || !$is_auth['auth_read'] )
+// {
+//	if ( !$userdata['session_logged_in'] )
+//	{
+//		$redirect = ( isset($post_id) ) ? POST_POST_URL . "=$post_id" : POST_TOPIC_URL . "=$topic_id";
+//		$redirect .= ( isset($start) ) ? "&start=$start" : '';
+//		redirect(append_sid("login.$phpEx?redirect=viewtopic.$phpEx&$redirect", true));
+//	}
+//
+//	$message = ( !$is_auth['auth_view'] ) ? $lang['Topic_post_not_exist'] : sprintf($lang['Sorry_auth_read'], $is_auth['auth_read_type']);
+//
+//	message_die(GENERAL_MESSAGE, $message);
+// }
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+# here we remove the // in front of line and prefer /* */
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+$is_auth = auth(AUTH_ALL, $forum_id, $userdata, $forum_topic_data);
+
+if( !$is_auth['auth_view'] || !$is_auth['auth_read'] )
+{
+	if ( !$userdata['session_logged_in'] )
+	{
+		$redirect = ( isset($post_id) ) ? POST_POST_URL . "=$post_id" : POST_TOPIC_URL . "=$topic_id";
+		$redirect .= ( isset($start) ) ? "&start=$start" : '';
+		redirect(append_sid("login.$phpEx?redirect=viewtopic.$phpEx&$redirect", true));
+	}
+
+	$message = ( !$is_auth['auth_view'] ) ? $lang['Topic_post_not_exist'] : sprintf($lang['Sorry_auth_read'], $is_auth['auth_read_type']);
+
+	message_die(GENERAL_MESSAGE, $message);
+}
+*/
+//-- add
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+// $sql = "SELECT *
+//	FROM " . RANKS_TABLE . "
+//	ORDER BY rank_special, rank_min";
+// if ( !($result = $db->sql_query($sql)) )
+// {
+//	message_die(GENERAL_ERROR, "Could not obtain ranks information.", '', __LINE__, __FILE__, $sql);
+// }
+//
+// $ranksrow = array();
+// while ( $row = $db->sql_fetchrow($result) )
+// {
+//	$ranksrow[] = $row;
+// }
+// $db->sql_freeresult($result);
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+# here we remove the // in front of line and prefer /* */
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+$sql = "SELECT *
+	FROM " . RANKS_TABLE . "
+	ORDER BY rank_special, rank_min";
+if ( !($result = $db->sql_query($sql)) )
+{
+	message_die(GENERAL_ERROR, "Could not obtain ranks information.", '', __LINE__, __FILE__, $sql);
+}
+
+$ranksrow = array();
+while ( $row = $db->sql_fetchrow($result) )
+{
+	$ranksrow[] = $row;
+}
+$db->sql_freeresult($result);
+*/
+//-- add
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/pagestart.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+if (!$userdata['session_admin'])
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+// check if .htaccess is available
+if ( ($userdata['session_admin'] == true) || @file_exists('./.htaccess') )
+{
+	$userdata['session_admin'] = true;
+}
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/bbcode.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+//		global $db, $board_config;
+//		$orig = $repl = array();
+//
+//		$sql = 'SELECT * FROM ' . SMILIES_TABLE;
+//		if( !$result = $db->sql_query($sql) )
+//		{
+//			message_die(GENERAL_ERROR, "Couldn't obtain smilies data", "", __LINE__, __FILE__, $sql);
+//		}
+//		$smilies = $db->sql_fetchrowset($result);
+//		if (count($smilies))
+//		{
+//			usort($smilies, 'smiley_sort');
+//		}
+//
+//		for ($i = 0; $i < count($smilies); $i++)
+//		{
+//			$orig[] = "/(?<=.\W|\W.|^\W)" . phpbb_preg_quote($smilies[$i]['code'], "/") . "(?=.\W|\W.|\W$)/";
+//			$repl[] = '<img src="'. $board_config['smilies_path'] . '/' . $smilies[$i]['smile_url'] . '" alt="' . $smilies[$i]['emoticon'] . '" border="0" />';
+//		}
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+# here we remove the // in front of line and prefer /* */
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+		global $db, $board_config;
+		$orig = $repl = array();
+
+		$sql = 'SELECT * FROM ' . SMILIES_TABLE;
+		if( !$result = $db->sql_query($sql) )
+		{
+			message_die(GENERAL_ERROR, "Couldn't obtain smilies data", "", __LINE__, __FILE__, $sql);
+		}
+		$smilies = $db->sql_fetchrowset($result);
+
+		if (count($smilies))
+		{
+			usort($smilies, 'smiley_sort');
+		}
+
+		for ($i = 0; $i < count($smilies); $i++)
+		{
+			$orig[] = "/(?<=.\W|\W.|^\W)" . phpbb_preg_quote($smilies[$i]['code'], "/") . "(?=.\W|\W.|\W$)/";
+			$repl[] = '<img src="'. $board_config['smilies_path'] . '/' . $smilies[$i]['smile_url'] . '" alt="' . $smilies[$i]['emoticon'] . '" border="0" />';
+		}
+*/
+//-- add
+#
+#-----[ OPEN ]------------------------------------------------
+#
+# You may prefer copy this one from the pack if you didn't modified it
+#
+includes/class_user.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.11 - 09/01/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.12 - 08/05/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+	function cvt_user_to_sys_date($user_timestamp)
+	{
+		if ( empty($user_timestamp) )
+		{
+			return 0;
+		}
+
+		// get user timezone & dst
+		$user_timezone = (intval($this->data['user_timezone']) + intval($this->data['user_dst'])) * 3600;
+
+		// get board timezone
+		$sys_timezone = $user_timestamp - mktime(@gmdate('H', $user_timestamp), @gmdate('i', $user_timestamp), @gmdate('s', $user_timestamp), @gmdate('m', $user_timestamp), @gmdate('d', $user_timestamp), @gmdate('Y', $user_timestamp));
+
+		// apply the time zone diff to the user timestamp
+		return ($user_timestamp - $user_timezone) + $sys_timezone;
+	}
+
+	// this one will convert a system timestamp to the user timestamp
+	function cvt_sys_to_user_date($sys_timestamp)
+	{
+		$date = explode(', ', $this->date($sys_timestamp, 'H, i, s, m, d, Y', false));
+		return mktime($date[0], $date[1], $date[2], $date[3], $date[4], $date[5]);
+	}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	function cvt_user_to_sys_date($user_timestamp)
+	{
+		if ( empty($user_timestamp) )
+		{
+			return 0;
+		}
+		$user_timestamp = $user_timestamp - intval((doubleval($this->data['user_timezone']) + intval($this->data['user_dst'])) * 3600);
+		return @gmmktime(date('H', $user_timestamp), date('i', $user_timestamp), date('s', $user_timestamp), date('m', $user_timestamp), date('d', $user_timestamp), date('Y', $user_timestamp));
+	}
+
+	// this one will convert a system timestamp to the user timestamp
+	function cvt_sys_to_user_date($sys_timestamp)
+	{
+		if ( empty($sys_timestamp) )
+		{
+			return 0;
+		}
+		$date = explode(', ', $this->date($sys_timestamp, 'H, i, s, m, d, Y', false));
+		return mktime($date[0], $date[1], $date[2], $date[3], $date[4], $date[5]);
+	}
+#
+#-----[ FIND ]------------------------------------------------
+#
+		// get user timezone & dst
+		$time_zone = (intval($this->data['user_timezone']) + intval($this->data['user_dst'])) * 3600;
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		// get user timezone & dst
+		$time_zone = intval((doubleval($this->data['user_timezone']) + intval($this->data['user_dst'])) * 3600);
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/sessions.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+# only the first
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+		$sql = str_replace('SET ', 'SET user_session_logged = ' . intval($login) . ', ', $sql);
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+# add a tab
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+			$sql = str_replace('SET ', 'SET user_session_logged = ' . intval($login) . ', ', $sql);
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/posting_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+	</span><span class="gensmall"><br />
+		<!-- BEGIN moderators -->
+		<b>{L_MODERATORS}:&nbsp;</b>
+		<!-- BEGIN mod -->
+		<a href="{moderators.mod.U_MOD}" title="{moderators.mod.L_MOD_TITLE}" class="gensmall">{moderators.mod.L_MOD}</a>{moderators.mod.L_SEP}
+		<!-- END mod -->
+		<!-- END moderators -->
+	</span></td>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+# *snip*
+#
+	</span></td>
+#
+#-----[ FIND ]------------------------------------------------
+#
+<table width="100%" cellspacing="2" border="0" align="center">
+<tr>
+	<td nowrap="nowrap" align="right"><span class="gensmall">{JUMPBOX}</span></td>
+</tr>
+</table>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+# jumpbox.tpl has already his table
+#
+{JUMPBOX}
+#
+#-----[ SAVE/CLOSE ALL FILES ]--------------------------------
+#
+# EoM
+
+________________________________________________________________________________

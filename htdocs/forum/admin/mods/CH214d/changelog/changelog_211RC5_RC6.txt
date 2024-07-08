@@ -1,0 +1,4363 @@
+#=============================================================
+#	Changes between 2.1.1 RC 5 & 2.1.1 RC 6
+#=============================================================
+#	Since 2005/08/21 :
+#		- rebuild the installation onto phpBB 2.0.17,
+#		- continue to clean // in front of deleted/replaced blocks,
+#		- ptifo template added, subSilver template reviewed to enhance W3C compliancy,
+#		- add the dst management at user level,
+#		- rewrite the installer,
+#		- optimize the template parser,
+#		- optimize the topics list reading,
+#		- add the topic calendar pics
+# ________________________________________________________________________________
+#
+# First part : regular phpBB files modifications (line 71)
+# Second part : language changelog (line 1787)
+# Third part : template (.tpl) modifications (line 1994)
+# ________________________________________________________________________________
+#
+#
+#-----[ DIY INSTRUCTIONS ]------------------------------------
+#
+DELETE includes/_cp_patches/patch_ucp_prefs.php
+DELETE includes/_cp_patches/patch_ucp_prefs_ch.php
+#
+#-----[ COPY ]------------------------------------------------
+#
+COPY root/index.php TO index.php
+COPY root/usercp.php TO usercp.php
+#
+#-----[ COPY ]------------------------------------------------
+#
+COPY root/admin/admin_auth.php TO admin/admin_auth.php
+COPY root/admin/admin_auths_def.php TO admin/admin_auths_def.php
+COPY root/admin/admin_caches.php TO admin/admin_caches.php
+COPY root/admin/admin_forums.php TO admin/admin_forums.php
+COPY root/admin/admin_icons.php TO admin/admin_icons.php
+COPY root/admin/admin_topics_attr.php TO admin/admin_topics_attr.php
+#
+#-----[ COPY ]------------------------------------------------
+#
+COPY root/includes/_cp_patches/patch_ucp_preferences.php TO includes/_cp_patches/patch_ucp_preferences.php
+COPY root/includes/acp/acp_generic.php TO includes/acp/acp_generic.php
+COPY root/includes/ucp/ucp_generic.php TO includes/ucp/ucp_generic.php
+#
+#-----[ COPY ]------------------------------------------------
+#
+COPY root/includes/class_config.php TO includes/class_config.php
+COPY root/includes/class_cp.php TO includes/class_cp.php
+COPY root/includes/class_db.php TO includes/class_db.php
+COPY root/includes/class_form.php TO includes/class_form.php
+COPY root/includes/class_forums.php TO includes/class_forums.php
+COPY root/includes/class_groups.php TO includes/class_groups.php
+COPY root/includes/class_groups_select.php TO includes/class_groups_select.php
+COPY root/includes/class_install.php TO includes/class_install.php
+COPY root/includes/class_run_stats.php TO includes/class_run_stats.php
+COPY root/includes/class_stats.php TO includes/class_stats.php
+COPY root/includes/class_template.php TO includes/class_template.php
+COPY root/includes/class_topics.php TO includes/class_topics.php
+COPY root/includes/class_user.php TO includes/class_user.php
+COPY root/includes/js_dom_menu.js TO includes/js_dom_menu.js
+COPY root/includes/js_dom_timezone.js TO includes/js_dom_timezone.js
+#
+#-----[ COPY ]------------------------------------------------
+#
+COPY root/install_cat/*.* TO install_cat/*.*
+# ________________________________________________________________________________
+#
+#
+#
+#=============================================================
+#
+#	First part : regular phpBB files modifications
+#
+#=============================================================
+#
+#-----[ OPEN ]------------------------------------------------
+#
+common.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+// include($phpbb_root_path . 'includes/template.'.$phpEx);
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+include($phpbb_root_path . 'includes/template.'.$phpEx);
+*/
+//-- add
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+// $sql = "SELECT *
+//	FROM " . CONFIG_TABLE;
+// if( !($result = $db->sql_query($sql)) )
+// {
+//	message_die(CRITICAL_ERROR, "Could not query config information", "", __LINE__, __FILE__, $sql);
+// }
+//
+// while ( $row = $db->sql_fetchrow($result) )
+// {
+//	$board_config[$row['config_name']] = $row['config_value'];
+// }
+//-- add
+// include basic classes def
+include($phpbb_root_path . 'includes/class_config.' . $phpEx);
+include($phpbb_root_path . 'includes/class_groups.' . $phpEx);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+$sql = "SELECT *
+	FROM " . CONFIG_TABLE;
+if( !($result = $db->sql_query($sql)) )
+{
+	message_die(CRITICAL_ERROR, "Could not query config information", "", __LINE__, __FILE__, $sql);
+}
+
+while ( $row = $db->sql_fetchrow($result) )
+{
+	$board_config[$row['config_name']] = $row['config_value'];
+}
+*/
+//-- add
+// include basic classes def
+include($phpbb_root_path . 'includes/class_config.' . $phpEx);
+#
+#-----[ FIND ]------------------------------------------------
+#
+if ( !defined('IN_LOGIN') && !defined('IN_INSTALL') && (($config->data['mod_cat_hierarchy'] != '2.1.1') || defined('RUN_CH_INSTALL')) )
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+if ( !defined('IN_LOGIN') && !defined('IN_INSTALL') && (($config->data['mod_cat_hierarchy'] != CH_CURRENT_VERSION) || defined('RUN_CH_INSTALL')) )
+#
+#-----[ FIND ]------------------------------------------------
+#
+// user objects
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+include($config->url('includes/class_groups'));
+#
+#-----[ OPEN ]------------------------------------------------
+#
+faq.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+				'U_FAQ_ID' => $faq_block[$i][$j]['id'])
+			);
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+			$template->set_switch('faq_block.faq_row.light', !($j % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+				'U_FAQ_ID' => $faq_block[$i][$j]['id'])
+			);
+#
+#-----[ FIND ]------------------------------------------------
+#
+				'U_FAQ_LINK' => '#' . $faq_block[$i][$j]['id'])
+			);
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+			$template->set_switch('faq_block_link.faq_row_link.light', !($j % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+				'U_FAQ_LINK' => '#' . $faq_block[$i][$j]['id'])
+			);
+*/
+//-- add
+				'U_FAQ_LINK' => '#' . $faq_block[$i][$j]['id'],
+				'U_FAQ_ID' => $faq_block[$i][$j]['id'],
+			));
+			$template->set_switch('faq_block.faq_row.light', !($j % 2));
+			$template->set_switch('faq_block_link.faq_row_link.light', !($j % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+modcp.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+<?php
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- fix : post tag missing ----------------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+	'U_MOD_CP' => $config->url('modcp', array(POST_FORUM_URL => $forum_id, 'sid' => $user->data['session_id'])),
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	'U_MOD_CP' => $config->url('modcp', array(POST_FORUM_URL => $forum_id, 'sid' => $user->data['session_id']), true),
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//	else if ( $forum_id )
+//	{
+//		$redirect = "viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id";
+//	}
+//	else
+//	{
+//		$redirect = "index.$phpEx";
+//	}
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+	else if ( $forum_id )
+	{
+		$redirect = "viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id";
+	}
+	else
+	{
+		$redirect = "index.$phpEx";
+	}
+*/
+//-- add
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+//				$redirect_page = "viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id&amp;sid=" . $userdata['session_id'];
+//-- add
+				$redirect_page = $config->url('index', array(POST_FORUM_URL => $forum_id, 'sid' => $userdata['session_id']));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+				$redirect_page = "viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id&amp;sid=" . $userdata['session_id'];
+*/
+//-- add
+				$redirect_page = $config->url('index', array(POST_FORUM_URL => $forum_id, 'sid' => $userdata['session_id']), true);
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+				$u_link = $config->url('modcp', array(POST_FORUM_URL => $forum_id, 'sid' => $user->data['session_id']));
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+				$u_link = $config->url('modcp', array(POST_FORUM_URL => $forum_id, 'sid' => $user->data['session_id']), true);
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//				sync('forum', $old_forum_id);
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+				sync('forum', $old_forum_id);
+*/
+//-- add
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+//			$message = $message . '<br \><br \>' . sprintf($lang['Click_return_forum'], '<a href="' . "viewforum.$phpEx?" . POST_FORUM_URL . "=$old_forum_id&amp;sid=" . $userdata['session_id'] . '">', '</a>');
+//-- add
+			$message = $message . '<br \><br \>' . sprintf($lang['Click_return_forum'], '<a href="' . $config->url('index', array(POST_FORUM_URL => $old_forum_id, 'sid' => $userdata['session_id'])) . '">', '</a>');
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+			$message = $message . '<br \><br \>' . sprintf($lang['Click_return_forum'], '<a href="' . "viewforum.$phpEx?" . POST_FORUM_URL . "=$old_forum_id&amp;sid=" . $userdata['session_id'] . '">', '</a>');
+*/
+//-- add
+			$message = $message . '<br \><br \>' . sprintf($lang['Click_return_forum'], '<a href="' . $config->url('index', array(POST_FORUM_URL => $old_forum_id, 'sid' => $userdata['session_id']), true) . '">', '</a>');
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+//		$message = $message . '<br \><br \>' . sprintf($lang['Click_return_forum'], '<a href="' . "viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id&amp;sid=" . $userdata['session_id'] . '">', '</a>');
+//-- add
+		$message = $message . '<br \><br \>' . sprintf($lang['Click_return_forum'], '<a href="' . $config->url('index', array(POST_FORUM_URL => $forum_id, 'sid' => $userdata['session_id'])) . '">', '</a>');
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+		$message = $message . '<br \><br \>' . sprintf($lang['Click_return_forum'], '<a href="' . "viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id&amp;sid=" . $userdata['session_id'] . '">', '</a>');
+*/
+//-- add
+		$message = $message . '<br \><br \>' . sprintf($lang['Click_return_forum'], '<a href="' . $config->url('index', array(POST_FORUM_URL => $forum_id, 'sid' => $userdata['session_id']), true) . '">', '</a>');
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+//		$message = $message . '<br \><br \>' . sprintf($lang['Click_return_forum'], '<a href="' . "viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id&amp;sid=" . $userdata['session_id'] . '">', '</a>');
+//-- add
+		$message = $message . '<br \><br \>' . sprintf($lang['Click_return_forum'], '<a href="' . $config->url('index', array(POST_FORUM_URL => $forum_id, 'sid' => $userdata['session_id'])) . '">', '</a>');
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+		$message = $message . '<br \><br \>' . sprintf($lang['Click_return_forum'], '<a href="' . "viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id&amp;sid=" . $userdata['session_id'] . '">', '</a>');
+*/
+//-- add
+		$message = $message . '<br \><br \>' . sprintf($lang['Click_return_forum'], '<a href="' . $config->url('index', array(POST_FORUM_URL => $forum_id, 'sid' => $userdata['session_id']), true) . '">', '</a>');
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+					$u_link = $config->url('modcp', array('mode' => 'split', POST_FORUM_URL => $forum_id, POST_TOPIC_URL => $topic_id, 'sid' => $user->data['session_id']));
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+					$u_link = $config->url('modcp', array('mode' => 'split', POST_FORUM_URL => $forum_id, POST_TOPIC_URL => $topic_id, 'sid' => $user->data['session_id']), true);
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//				sync('forum', $forum_id);
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+				sync('forum', $forum_id);
+*/
+//-- add
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//					'U_VIEW_FORUM' => append_sid("viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id"), 
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+					'U_VIEW_FORUM' => append_sid("viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id"), 
+*/
+//-- add
+#
+#-----[ FIND ]------------------------------------------------
+#
+						'POST_ID' => $post_id,
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+//-- fix : post tag missing ----------------------------------------------------
+//-- delete
+/*
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+*/
+//-- add
+						'U_POST_ID' => $post_id,
+//-- fin fix : post tag missing ------------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//			'U_VIEW_FORUM' => append_sid("viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id"), 
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+			'U_VIEW_FORUM' => append_sid("viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id"), 
+*/
+//-- add
+#
+#-----[ OPEN ]------------------------------------------------
+#
+posting.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//		$redirect = "viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id";
+//-- add
+		$redirect = $config->url('index', array(POST_FORUM_URL => $forum_id));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+		$redirect = "viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id";
+*/
+//-- add
+		$redirect = $config->url('index', array(POST_FORUM_URL => $forum_id), true);
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+	if ( _read('last_post', TYPE_INT) != $topic_last_post_id )
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	if ( _read('last_post', TYPE_INT, $topic_last_post_id) != $topic_last_post_id )
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//		message_die(GENERAL_MESSAGE, sprintf($lang['Sorry_' . $is_auth_type], $is_auth[$is_auth_type . "_type"]));
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+		message_die(GENERAL_MESSAGE, sprintf($lang['Sorry_' . $is_auth_type], $is_auth[$is_auth_type . "_type"]));
+*/
+//-- add
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//	'U_VIEW_FORUM' => append_sid("viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id"))
+// );
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+	'U_VIEW_FORUM' => append_sid("viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id"))
+);
+*/
+//-- add
+#
+#-----[ OPEN ]------------------------------------------------
+#
+profile.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+$navigation->display();
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+// pic buttons
+_button('submit');
+$template->assign_vars(array(
+	'I_SUBMIT' => $user->img('cmd_submit'),
+	'S_SUBMIT' => $user->lang('cmd_submit'),
+));
+#
+#-----[ OPEN ]------------------------------------------------
+#
+search.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+
+	function read(&$search_results, $total_match_count)
+	{
+		global $db, $user;
+
+		$this->total_topics = $total_match_count;
+		$start = $this->parms['start'];
+		$ppage = $this->parms['ppage'];
+
+		// read topics
+		// -----------
+		// t is topic
+		// u is topic author
+		// ul is last post author
+		$sql = 'SELECT t.*, u.username, ul.username AS last_post_username
+					FROM ' . TOPICS_TABLE . ' t
+						LEFT JOIN ' . USERS_TABLE . ' u ON u.user_id = t.topic_poster
+						LEFT JOIN ' . USERS_TABLE . ' ul ON ul.user_id = t.topic_last_poster
+					WHERE topic_id IN(' . $search_results . ')
+					ORDER BY t.topic_last_time DESC
+					LIMIT ' . $start . ', ' . $ppage;
+
+		// read results
+		$result = $db->sql_query($sql, false, __LINE__, __FILE__);
+		while ( $row = $db->sql_fetchrow($result) )
+		{
+			$row['topic_unread'] = !empty($user->cookies['unreads']) && !empty($user->cookies['unreads'][ $row['topic_id'] ]);
+			if ( ($row['topic_poster'] != ANONYMOUS) && !empty($row['username']) )
+			{
+				$row['topic_first_username'] = $row['username'];
+				unset($row['username']);
+			}
+			if ( ($row['topic_last_poster'] != ANONYMOUS) && !empty($row['last_post_username']) )
+			{
+				$row['topic_last_username'] = $row['last_post_username'];
+				unset($row['username']);
+			}
+			$this->data_ext[ $row['topic_id'] ] = $row;
+		}
+		$db->sql_freeresult($result);
+
+		// search topics the viewer has posted in
+		if ( !empty($this->data_ext) && $user->data['session_logged_in'] )
+		{
+			$sql = 'SELECT DISTINCT topic_id
+						FROM ' . POSTS_TABLE . '
+						WHERE poster_id = ' . intval($user->data['user_id']) . '
+							AND topic_id IN(' . implode(', ', array_keys($this->data_ext)) . ')
+						GROUP BY topic_id';
+			$result = $db->sql_query($sql, false, __LINE__, __FILE__);
+			while ( $row = $db->sql_fetchrow($result) )
+			{
+				// moved topics are selected, so don't add them to the main selection
+				if ( isset($this->data_ext[ $row['topic_id'] ]) )
+				{
+					$this->data_ext[ $row['topic_id'] ]['topic_own'] = true;
+				}
+			}
+			$db->sql_freeresult($result);
+		}
+	}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+
+	function read(&$search_results, $total_match_count)
+	{
+		global $db, $user;
+
+		$this->total_topics = $total_match_count;
+		$start = $this->parms['start'];
+		$ppage = $this->parms['ppage'];
+
+		// read topics
+		$sql = 'SELECT *
+					FROM ' . TOPICS_TABLE . '
+					WHERE topic_id IN(' . $search_results . ')
+					ORDER BY topic_last_time DESC
+					LIMIT ' . $start . ', ' . $ppage;
+
+		// read results
+		$result = $db->sql_query($sql, false, __LINE__, __FILE__);
+		$this->pre_process();
+		while ( $row = $db->sql_fetchrow($result) )
+		{
+			$this->row_process($row);
+			$this->data_ext[ $row['topic_id'] ] = $row;
+		}
+		$db->sql_freeresult($result);
+
+		// get complementary data
+		$this->post_process();
+	}
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//				if ( $userdata['session_logged_in'] )
+//				{
+//					$sql = "SELECT post_id 
+//						FROM " . POSTS_TABLE . " 
+//						WHERE post_time >= " . $userdata['user_lastvisit'];
+//				}
+//				else
+//				{
+//					redirect(append_sid("login.$phpEx?redirect=search.$phpEx&search_id=newposts", true));
+//				}
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+				if ( $userdata['session_logged_in'] )
+				{
+					$sql = "SELECT post_id 
+						FROM " . POSTS_TABLE . " 
+						WHERE post_time >= " . $userdata['user_lastvisit'];
+				}
+				else
+				{
+					redirect(append_sid("login.$phpEx?redirect=search.$phpEx&search_id=newposts", true));
+				}
+*/
+//-- add
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//		$tracking_topics = ( isset($HTTP_COOKIE_VARS[$board_config['cookie_name'] . '_t']) ) ? unserialize($HTTP_COOKIE_VARS[$board_config['cookie_name'] . '_t']) : array();
+//		$tracking_forums = ( isset($HTTP_COOKIE_VARS[$board_config['cookie_name'] . '_f']) ) ? unserialize($HTTP_COOKIE_VARS[$board_config['cookie_name'] . '_f']) : array();
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+		$tracking_topics = ( isset($HTTP_COOKIE_VARS[$board_config['cookie_name'] . '_t']) ) ? unserialize($HTTP_COOKIE_VARS[$board_config['cookie_name'] . '_t']) : array();
+		$tracking_forums = ( isset($HTTP_COOKIE_VARS[$board_config['cookie_name'] . '_f']) ) ? unserialize($HTTP_COOKIE_VARS[$board_config['cookie_name'] . '_f']) : array();
+*/
+//-- add
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//			$forum_url = append_sid("viewforum.$phpEx?" . POST_FORUM_URL . '=' . $searchset[$i]['forum_id']);
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+			$forum_url = append_sid("viewforum.$phpEx?" . POST_FORUM_URL . '=' . $searchset[$i]['forum_id']);
+*/
+//-- add
+#
+#-----[ OPEN ]------------------------------------------------
+#
+viewonline.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- deleted
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//		if ( $row['session_page'] < 1 || !$is_auth_ary[$row['session_page']]['auth_view'] )
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+		if ( $row['session_page'] < 1 || !$is_auth_ary[$row['session_page']]['auth_view'] )
+*/
+//-- add
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//			$location_url = append_sid("viewforum.$phpEx?" . POST_FORUM_URL . '=' . $row['session_page']);
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+			$location_url = append_sid("viewforum.$phpEx?" . POST_FORUM_URL . '=' . $row['session_page']);
+*/
+//-- add
+#
+#-----[ OPEN ]------------------------------------------------
+#
+viewtopic.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$redirect = empty($post_id) || !empty($start) ? array(POST_TOPIC_URL => $topic_id) : array(POST_POST_URL => $post_id);
+		redirect($config->url('viewtopic', $redirect + array('start' => intval($start)), true));
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		redirect($config->url('login', array('redirect' => str_replace('?', '&', $config->url('viewtopic', empty($post_id) || !empty($start) ? array(POST_TOPIC_URL => $topic_id, 'start' => intval($start)) : array(POST_POST_URL => $post_id, 'start' => intval($start))))), true));
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+// $view_forum_url = append_sid("viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id");
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+$view_forum_url = append_sid("viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id");
+*/
+//-- add
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//	if ( $userdata['session_logged_in'] && $postrow[$i]['post_time'] > $userdata['user_lastvisit'] && $postrow[$i]['post_time'] > $topic_last_read )
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+	if ( $userdata['session_logged_in'] && $postrow[$i]['post_time'] > $userdata['user_lastvisit'] && $postrow[$i]['post_time'] > $topic_last_read )
+*/
+//-- add
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//	if ( ( $userdata['user_id'] == $poster_id && $is_auth['auth_edit'] ) || $is_auth['auth_mod'] )
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+	if ( ( $userdata['user_id'] == $poster_id && $is_auth['auth_edit'] ) || $is_auth['auth_mod'] )
+*/
+//-- add
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+//		$l_edited_by = '<br /><br />' . sprintf($l_edit_time_total, $poster, create_date($board_config['default_dateformat'], $postrow[$i]['post_edit_time'], $board_config['board_timezone']), $postrow[$i]['post_edit_count']);
+//-- add
+		$l_edited_by = '<br />' . sprintf($l_edit_time_total, $poster, create_date($board_config['default_dateformat'], $postrow[$i]['post_edit_time'], $board_config['board_timezone']), $postrow[$i]['post_edit_count']);
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+		$l_edited_by = '<br /><br />' . sprintf($l_edit_time_total, $poster, create_date($board_config['default_dateformat'], $postrow[$i]['post_edit_time'], $board_config['board_timezone']), $postrow[$i]['post_edit_count']);
+*/
+//-- add
+		$l_edited_by = '<br />' . sprintf($l_edit_time_total, $poster, $user->date($postrow[$i]['post_edit_time']), $postrow[$i]['post_edit_count']);
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//		'U_POST_ID' => $postrow[$i]['post_id'])
+//	);
+// }
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+		'U_POST_ID' => $postrow[$i]['post_id'])
+	);
+}
+*/
+//-- add
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/admin_board.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+include($phpbb_root_path . 'includes/functions_selects.'.$phpEx);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+// pic buttons
+_button('submit');
+$template->assign_vars(array(
+	'I_SUBMIT' => $user->img('cmd_submit'),
+	'S_SUBMIT' => $user->lang('cmd_submit'),
+));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/admin_groups.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+		}
+
+*/
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		}
+*/
+//-- add
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/admin_styles.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+								$working_data = $$sub_dir;
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+								if ( !empty($working_data) && is_array($working_data) )
+								{
+									foreach ( $working_data as $style_id => $style_data )
+									{
+										$working_data[$style_id]['install_to'] = $sub_dir;
+									}
+								}
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+						"U_STYLES_INSTALL" => append_sid("admin_styles.$phpEx?mode=addnew&amp;style=" . urlencode($installable_themes[$i]['style_name']) . "&amp;install_to=" . urlencode($installable_themes[$i]['template_name'])))
+					);
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+					$template->set_switch('styles.light', !($i % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+						"U_STYLES_INSTALL" => append_sid("admin_styles.$phpEx?mode=addnew&amp;style=" . urlencode($installable_themes[$i]['style_name']) . "&amp;install_to=" . urlencode($installable_themes[$i]['template_name'])))
+					);
+*/
+//-- add
+						'U_STYLES_INSTALL' => $config->url('admin/admin_styles', array('mode' => 'addnew', 'style' => urlencode($installable_themes[$i]['style_name']), 'install_to' => urlencode($installable_themes[$i]['install_to'])), true),
+					));
+					$template->set_switch('styles.light', !($i % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/admin_users.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+if( !empty($setmodules) )
+{
+	$filename = basename(__FILE__);
+	$module['Users']['Manage'] = $filename;
+
+	return;
+}
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+define('IN_PROFILE', true);
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$user_style = ( $HTTP_POST_VARS['style'] ) ? intval( $HTTP_POST_VARS['style'] ) : $board_config['default_style'];
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+*/
+//-- add
+		$user_style = _read('style', TYPE_INT, $config->data['default_style']);
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/index.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+	while( $file = @readdir($dir) )
+	{
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+		if ( in_array(str_replace('.' . $phpEx, '', $file), $denied_scripts) )
+		{
+			$file = '';
+		}
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$version_info = '<a href="' . $config->url('admin/index', array('pane' => 'right', 'vchk' => true), true) . '" class="gen" /><img src="' . $user->img('cmd_check') . '" border="0" align="absbottom" /></a><br /><br />' . $version_info;
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	$version_info = '<a href="' . $config->url('admin/index', array('pane' => 'right', 'vchk' => true), true) . '" class="gen"><img src="' . $user->img('cmd_check') . '" border="0" class="absbottom" /></a><br /><br />' . $version_info;
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/page_footer_admin.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+
+$template->pparse('page_footer');
+
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+// send run stat (page generation, sql time, requests dump...)
+$stat_run = new stat_run_class(microtime());
+if ( (_read('pane') != 'left') && defined('DEBUG') && defined('DEBUG_SQL_ADMIN') )
+{
+	$stat_run->display();
+}
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#----------[ REPLACE WITH ]-----------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+if ( (_read('pane') != 'left') && defined('DEBUG') && defined('DEBUG_SQL_ADMIN') )
+{
+	// send run stat (page generation, sql time, requests dump...)
+	include($config->url('includes/class_run_stats'));
+	$stat_run = new stat_run_class(microtime());
+	$stat_run->display();
+}
+//-- fin mod : categories hierarchy --------------------------------------------
+
+$template->pparse('page_footer');
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/auth.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+*/
+//-- fin mod : categories hierarchy --------------------------------------------
+
+function auth_check_user($type, $key, $u_access, $is_admin)
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+
+function auth_check_user($type, $key, $u_access, $is_admin)
+#
+#-----[ FIND ]------------------------------------------------
+#
+	return $auth_user;
+}
+
+?>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	return $auth_user;
+}
+*/
+//-- fin mod : categories hierarchy --------------------------------------------
+
+?>
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/db.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+// $db = new sql_db($dbhost, $dbuser, $dbpasswd, $dbname, false);
+//-- add
+include_once($phpbb_root_path . 'includes/class_db.' . $phpEx);
+$db = new db_class($dbhost, $dbuser, $dbpasswd, $dbname, false);
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+$db = new sql_db($dbhost, $dbuser, $dbpasswd, $dbname, false);
+*/
+//-- add
+include_once($phpbb_root_path . 'includes/class_db.' . $phpEx);
+$db = new db_class($dbhost, $dbuser, $dbpasswd, $dbname, false);
+unset($dbhost);
+unset($dbuser);
+unset($dbpasswd);
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/functions.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+
+//	$is_auth = auth(AUTH_VIEW, AUTH_LIST_ALL, $userdata);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+//	$is_auth = auth(AUTH_VIEW, AUTH_LIST_ALL, $userdata);
+#
+#-----[ FIND ]------------------------------------------------
+#
+	if ( substr($action, 0, strlen('viewforum')) == 'viewforum' )
+	{
+		$action = 'index';
+	}
+	else if ( substr($action, 0, strlen('modcp')) == 'modcp' )
+	{
+		$action = 'modcp';
+	}
+	$action = $config->url($action);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	if ( eregi('^viewforum', $action) )
+	{
+		$action = 'index';
+	}
+	else if ( eregi('^modcp', $action) )
+	{
+		$action = 'modcp';
+	}
+	$action = $config->url($action, '', true);
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+//	if ( !$board_config['override_user_style'] )
+//	{
+//		if ( $userdata['user_id'] != ANONYMOUS && $userdata['user_style'] > 0 )
+//		{
+//			if ( $theme = setup_style($userdata['user_style']) )
+//			{
+//				return;
+//			}
+//		}
+//	}
+//
+//	$theme = setup_style($board_config['default_style']);
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+	if ( !$board_config['override_user_style'] )
+	{
+		if ( $userdata['user_id'] != ANONYMOUS && $userdata['user_style'] > 0 )
+		{
+			if ( $theme = setup_style($userdata['user_style']) )
+			{
+				return;
+			}
+		}
+	}
+
+	$theme = setup_style($board_config['default_style']);
+*/
+//-- add
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+
+	$sql = "SELECT *
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+	$sql = "SELECT *
+#
+#-----[ FIND ]------------------------------------------------
+#
+# the whole function create_date()
+#
+	global $board_config, $lang;
+	static $translate;
+
+	if ( empty($translate) && $board_config['default_lang'] != 'english' )
+	{
+		@reset($lang['datetime']);
+		while ( list($match, $replace) = @each($lang['datetime']) )
+		{
+			$translate[$match] = $replace;
+		}
+	}
+
+	return ( !empty($translate) ) ? strtr(@gmdate($format, $gmepoch + (3600 * $tz)), $translate) : @gmdate($format, $gmepoch + (3600 * $tz));
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+*/
+//-- add
+	global $user;
+	return $user->date($gmepoch, $format);
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//	if(defined('HAS_DIED'))
+//	{
+//		die("message_die() was called multiple times. This isn't supposed to happen. Was message_die() used in page_tail.php?");
+//	}
+//	
+//	define(HAS_DIED, 1);
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+	if(defined('HAS_DIED'))
+	{
+		die("message_die() was called multiple times. This isn't supposed to happen. Was message_die() used in page_tail.php?");
+	}
+	
+	define('HAS_DIED', 1);
+*/
+//-- add
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//			$template = new Template($phpbb_root_path . 'templates/' . $board_config['board_template']);
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+			$template = new Template($phpbb_root_path . 'templates/' . $board_config['board_template']);
+*/
+//-- add
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$url = preg_replace('#^\/?(.*?)\/?$#', '/\1', trim($url));
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+	}
+	else
+	{
+		$server_protocol = $server_name = $server_port = $script_name = '';
+	}
+//-- fin mod : categories hierarchy --------------------------------------------
+
+	// Redirect via an HTML form for PITA webservers
+	if (@preg_match('/Microsoft|WebSTAR|Xitami/', getenv('SERVER_SOFTWARE')))
+	{
+		header('Refresh: 0; URL=' . $server_protocol . $server_name . $server_port . $script_name . $url);
+		echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"><meta http-equiv="refresh" content="0; url=' . $server_protocol . $server_name . $server_port . $script_name . $url . '"><title>Redirect</title></head><body><div align="center">If your browser does not support meta redirection please click <a href="' . $server_protocol . $server_name . $server_port . $script_name . $url . '">HERE</a> to be redirected</div></body></html>';
+		exit;
+	}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+	$url = preg_replace('#^\/?(.*?)\/?$#', '/\1', trim($url));
+*/
+//-- add
+		$url = preg_replace('#^\/?(.*?)\/?$#', '/\1', trim(preg_replace('#^(\.\/)(.*)$#', '\2', $url)));
+	}
+	else
+	{
+		$server_protocol = $server_name = $server_port = $script_name = '';
+	}
+	$url_ampersand = $url;
+	$url = str_replace('&amp;', '&', $url);
+//-- fin mod : categories hierarchy --------------------------------------------
+
+	// Redirect via an HTML form for PITA webservers
+	if (@preg_match('/Microsoft|WebSTAR|Xitami/', getenv('SERVER_SOFTWARE')))
+	{
+		header('Refresh: 0; URL=' . $server_protocol . $server_name . $server_port . $script_name . $url);
+//-- mod : categories hierarchy ------------------------------------------------
+// here we replaced : 
+//	$url . '">HERE
+// with
+//	$url_ampersand . '">HERE
+//-- modified
+		echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"><meta http-equiv="refresh" content="0; url=' . $server_protocol . $server_name . $server_port . $script_name . $url . '"><title>Redirect</title></head><body><div align="center">If your browser does not support meta redirection please click <a href="' . $server_protocol . $server_name . $server_port . $script_name . $url_ampersand . '">HERE</a> to be redirected</div></body></html>';
+//-- fin mod : categories hierarchy --------------------------------------------
+		exit;
+	}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/functions_post.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//	$message = $lang['Stored'] . '<br /><br />' . sprintf($lang['Click_view_message'], '<a href="' . append_sid("viewtopic.$phpEx?" . POST_POST_URL . "=" . $post_id) . '#' . $post_id . '">', '</a>') . '<br /><br />' . sprintf($lang['Click_return_forum'], '<a href="' . append_sid("viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id") . '">', '</a>');
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+	$message = $lang['Stored'] . '<br /><br />' . sprintf($lang['Click_view_message'], '<a href="' . append_sid("viewtopic.$phpEx?" . POST_POST_URL . "=" . $post_id) . '#' . $post_id . '">', '</a>') . '<br /><br />' . sprintf($lang['Click_return_forum'], '<a href="' . append_sid("viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id") . '">', '</a>');
+*/
+//-- add
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//				$sql = "SELECT MAX(post_id) AS last_post_id
+//					FROM " . POSTS_TABLE . " 
+//					WHERE topic_id = $topic_id";
+//				if (!($result = $db->sql_query($sql)))
+//				{
+//					message_die(GENERAL_ERROR, 'Error in deleting post', '', __LINE__, __FILE__, $sql);
+//				}
+//
+//				if ($row = $db->sql_fetchrow($result))
+//				{
+//					$topic_update_sql .= ', topic_last_post_id = ' . $row['last_post_id'];
+//				}
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+				$sql = "SELECT MAX(post_id) AS last_post_id
+					FROM " . POSTS_TABLE . " 
+					WHERE topic_id = $topic_id";
+				if (!($result = $db->sql_query($sql)))
+				{
+					message_die(GENERAL_ERROR, 'Error in deleting post', '', __LINE__, __FILE__, $sql);
+				}
+
+				if ($row = $db->sql_fetchrow($result))
+				{
+					$topic_update_sql .= ', topic_last_post_id = ' . $row['last_post_id'];
+				}
+*/
+//-- add
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+//				$sql = "SELECT MAX(post_id) AS last_post_id
+//					FROM " . POSTS_TABLE . " 
+//					WHERE forum_id = $forum_id"; 
+//				if (!($result = $db->sql_query($sql)))
+//				{
+//					message_die(GENERAL_ERROR, 'Error in deleting post', '', __LINE__, __FILE__, $sql);
+//				}
+//
+//				if ($row = $db->sql_fetchrow($result))
+//				{
+//					$forum_update_sql .= ($row['last_post_id']) ? ', forum_last_post_id = ' . $row['last_post_id'] : ', forum_last_post_id = 0';
+//				}
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+				$sql = "SELECT MAX(post_id) AS last_post_id
+					FROM " . POSTS_TABLE . " 
+					WHERE forum_id = $forum_id"; 
+				if (!($result = $db->sql_query($sql)))
+				{
+					message_die(GENERAL_ERROR, 'Error in deleting post', '', __LINE__, __FILE__, $sql);
+				}
+
+				if ($row = $db->sql_fetchrow($result))
+				{
+					$forum_update_sql .= ($row['last_post_id']) ? ', forum_last_post_id = ' . $row['last_post_id'] : ', forum_last_post_id = 0';
+				}
+*/
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+//	$sql = "UPDATE " . FORUMS_TABLE . " SET 
+//		$forum_update_sql 
+//		WHERE forum_id = $forum_id";
+//	if (!$db->sql_query($sql))
+//	{
+//		message_die(GENERAL_ERROR, 'Error in posting', '', __LINE__, __FILE__, $sql);
+//	}
+//-- fin mod : categories hierarchy ---------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+	$sql = "UPDATE " . FORUMS_TABLE . " SET 
+		$forum_update_sql 
+		WHERE forum_id = $forum_id";
+	if (!$db->sql_query($sql))
+	{
+		message_die(GENERAL_ERROR, 'Error in posting', '', __LINE__, __FILE__, $sql);
+	}
+*/
+//-- fin mod : categories hierarchy ---------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//		$meta = '<meta http-equiv="refresh" content="3;url=' . append_sid("viewforum.$phpEx?" . POST_FORUM_URL . '=' . $forum_id) . '">';
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+		$meta = '<meta http-equiv="refresh" content="3;url=' . append_sid("viewforum.$phpEx?" . POST_FORUM_URL . '=' . $forum_id) . '">';
+*/
+//-- add
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//	$message .=  '<br /><br />' . sprintf($lang['Click_return_forum'], '<a href="' . append_sid("viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id") . '">', '</a>');
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+	$message .=  '<br /><br />' . sprintf($lang['Click_return_forum'], '<a href="' . append_sid("viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id") . '">', '</a>');
+*/
+//-- add
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//	$sql = "SELECT emoticon, code, smile_url   
+//		FROM " . SMILIES_TABLE . " 
+//		ORDER BY smilies_id";
+//	if ($result = $db->sql_query($sql))
+//	{
+//		$num_smilies = 0;
+//		$rowset = array();
+//		while ($row = $db->sql_fetchrow($result))
+//		{
+//			if (empty($rowset[$row['smile_url']]))
+//			{
+//				$rowset[$row['smile_url']]['code'] = str_replace("'", "\\'", str_replace('\\', '\\\\', $row['code']));
+//				$rowset[$row['smile_url']]['emoticon'] = $row['emoticon'];
+//				$num_smilies++;
+//			}
+//		}
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+	$sql = "SELECT emoticon, code, smile_url   
+		FROM " . SMILIES_TABLE . " 
+		ORDER BY smilies_id";
+	if ($result = $db->sql_query($sql))
+	{
+		$num_smilies = 0;
+		$rowset = array();
+		while ($row = $db->sql_fetchrow($result))
+		{
+			if (empty($rowset[$row['smile_url']]))
+			{
+				$rowset[$row['smile_url']]['code'] = str_replace("'", "\\'", str_replace('\\', '\\\\', $row['code']));
+				$rowset[$row['smile_url']]['emoticon'] = $row['emoticon'];
+				$num_smilies++;
+			}
+		}
+*/
+//-- add
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//					'U_MORE_SMILIES' => append_sid("posting.$phpEx?mode=smilies"))
+//				);
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+					'U_MORE_SMILIES' => append_sid("posting.$phpEx?mode=smilies"))
+				);
+*/
+//-- add
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/functions_selects.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+<?php
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$style_select = '<select name="' . $select_name . '">';
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+	if ( !defined('IN_ADMIN') || defined('IN_PROFILE') )
+	{
+		global $user;
+		$selected = empty($default_style) ? ' selected="selected"' : '';
+		$style_select .= '<option value="0"' . $selected . '>' . $user->lang('Default') . '</option>';
+	}
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/page_header.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+$nav_link_proto = '<link rel="%s" href="%s" title="%s" />' . "\n";
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+*/
+//-- add
+$nav_link_proto = '<link rel="%s" href="%s" title="%s">' . "\n";
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+if ( !empty($config->data['site_fav_icon']) )
+{
+	$nav_links_html .= '<link rel="SHORTCUT ICON" href="' . $user->img($config->data['site_fav_icon']) . '">';
+}
+$nav_links_html .= "\n" . '<link rel="copyright" href="http://phpBB.com" title="phpBB.com" />';
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+// Format Timezone. We are unable to use array_pop here, because of PHP3 compatibility
+$l_timezone = explode('.', $board_config['board_timezone']);
+$l_timezone = (count($l_timezone) > 1 && $l_timezone[count($l_timezone)-1] != 0) ? $lang[sprintf('%.1f', $board_config['board_timezone'])] : $lang[number_format($board_config['board_timezone'])];
+*/
+//-- add
+$l_timezone = $user->get_timezone();
+
+if ( !empty($config->data['site_fav_icon']) )
+{
+	$nav_links_html .= '<link rel="SHORTCUT ICON" href="' . $user->img($config->data['site_fav_icon']) . '">';
+}
+$nav_links_html .= "\n" . '<link rel="copyright" href="http://phpBB.com" title="phpBB.com">';
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- fin mod : categories hierarchy --------------------------------------------
+
+// Format Timezone. We are unable to use array_pop here, because of PHP3 compatibility
+$l_timezone = explode('.', $board_config['board_timezone']);
+$l_timezone = (count($l_timezone) > 1 && $l_timezone[count($l_timezone)-1] != 0) ? $lang[sprintf('%.1f', $board_config['board_timezone'])] : $lang[number_format($board_config['board_timezone'])];
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+	'CURRENT_TIME' => sprintf($lang['Current_time'], create_date($board_config['default_dateformat'], time(), $board_config['board_timezone'])),
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+*/
+//-- add
+	'CURRENT_TIME' => sprintf($user->lang('Current_time'), $user->date(time(), '', false)),
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/page_tail.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+
+$template->pparse('overall_footer');
+
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+// send run stat (page generation, sql time, requests dump...)
+$stat_run = new stat_run_class(microtime());
+if ( empty($gen_simple_header) && defined('DEBUG') )
+{
+	$stat_run->display();
+}
+
+// send messages
+if ( defined('CH_message_queue') && empty($gen_simple_header) && !empty($message_queue->data) )
+{
+	$message_queue->send();
+}
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+if ( empty($gen_simple_header) && defined('DEBUG') )
+{
+	// send run stat (page generation, sql time, requests dump...)
+	include($config->url('includes/class_run_stats'));
+	$stat_run = new stat_run_class(microtime());
+	$stat_run->display();
+}
+//-- fin mod : categories hierarchy --------------------------------------------
+
+$template->pparse('overall_footer');
+
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+// send messages
+if ( defined('CH_message_queue') && empty($gen_simple_header) && !empty($message_queue->data) )
+{
+	$message_queue->send();
+}
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/sessions.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$sql = 'SELECT u.*, g.*
+				FROM ' . USERS_TABLE . ' u
+					LEFT JOIN ' . GROUPS_TABLE . ' g
+						ON g.group_user_id = u.user_id
+				WHERE u.user_id = ' . ANONYMOUS;
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	$sql = 'SELECT u.*, g.*
+				FROM ' . USERS_TABLE . ' u, ' . GROUPS_TABLE . ' g
+				WHERE u.user_id = ' . ANONYMOUS . '
+					AND g.group_user_id = u.user_id';
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+//	$sql = "SELECT * 
+//		FROM " . USERS_TABLE . " 
+//		WHERE user_id = $user_id";
+//-- add
+	$sql = 'SELECT u.*, g.*
+				FROM ' . USERS_TABLE . ' u
+					LEFT JOIN ' . GROUPS_TABLE . ' g
+						ON g.group_user_id = u.user_id
+				WHERE u.user_id = ' . intval($user_id);
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+	$sql = "SELECT * 
+		FROM " . USERS_TABLE . " 
+		WHERE user_id = $user_id";
+*/
+//-- add
+	$sql = 'SELECT u.*, g.*
+				FROM ' . USERS_TABLE . ' u, ' . GROUPS_TABLE . ' g
+				WHERE u.user_id = ' . intval($user_id) . '
+					AND g.group_user_id = u.user_id';
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+//					$sql = 'SELECT * FROM ' . USERS_TABLE . ' WHERE user_id = ' . ANONYMOUS;
+//					$result = $db->sql_query($sql);
+//					$userdata = $db->sql_fetchrow($result);
+//					$db->sql_freeresult($result);
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+					$sql = 'SELECT * FROM ' . USERS_TABLE . ' WHERE user_id = ' . ANONYMOUS;
+					$result = $db->sql_query($sql);
+					$userdata = $db->sql_fetchrow($result);
+					$db->sql_freeresult($result);
+*/
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+//				$sql = 'SELECT * FROM ' . USERS_TABLE . ' WHERE user_id = ' . ANONYMOUS;
+//				$result = $db->sql_query($sql);
+//				$userdata = $db->sql_fetchrow($result);
+//				$db->sql_freeresult($result);
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+				$sql = 'SELECT * FROM ' . USERS_TABLE . ' WHERE user_id = ' . ANONYMOUS;
+				$result = $db->sql_query($sql);
+				$userdata = $db->sql_fetchrow($result);
+				$db->sql_freeresult($result);
+*/
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+//		$sql = "SELECT u.*, s.*
+//			FROM " . SESSIONS_TABLE . " s, " . USERS_TABLE . " u
+//			WHERE s.session_id = '$session_id'
+//				AND u.user_id = s.session_user_id";
+//-- add
+		$sql = 'SELECT u.*, s.*, g.*
+			FROM ' . SESSIONS_TABLE . ' s, ' . USERS_TABLE . ' u
+				LEFT JOIN ' . GROUPS_TABLE . ' g
+					ON g.group_user_id = u.user_id
+			WHERE s.session_id = \'' . $session_id . '\'
+				AND u.user_id = s.session_user_id';
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+		$sql = "SELECT u.*, s.*
+			FROM " . SESSIONS_TABLE . " s, " . USERS_TABLE . " u
+			WHERE s.session_id = '$session_id'
+				AND u.user_id = s.session_user_id";
+*/
+//-- add
+		$sql = 'SELECT u.*, s.*, g.*
+			FROM ' . SESSIONS_TABLE . ' s, ' . USERS_TABLE . ' u, ' . GROUPS_TABLE . ' g
+			WHERE s.session_id = \'' . $session_id . '\'
+				AND u.user_id = s.session_user_id
+				AND g.group_user_id = s.session_user_id';
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/topic_review.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- delete
+//		$is_auth = auth(AUTH_ALL, $forum_id, $userdata, $forum_row);
+//-- add
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- delete
+/*
+		$is_auth = auth(AUTH_ALL, $forum_id, $userdata, $forum_row);
+*/
+//-- add
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/usercp_viewprofile.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+<?php
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- fix : wrong username recog ------------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+$profiledata = get_userdata($HTTP_GET_VARS[POST_USERS_URL]);
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+//-- fix : wrong username recog ------------------------------------------------
+//-- delete
+/*
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+*/
+//-- add
+$profiledata = get_userdata(intval($HTTP_GET_VARS[POST_USERS_URL]));
+//-- fin fix : wrong username recog --------------------------------------------
+# ________________________________________________________________________________
+#
+#
+#
+#=============================================================
+#
+#	Second part : language changelog
+#
+#=============================================================
+#
+#-----[ COPY ]------------------------------------------------
+#
+COPY root/language/lang_english/lang_CH_install.php TO language/lang_english/lang_CH_install.php
+#
+#
+#-----[ OPEN ]------------------------------------------------
+#
+# There are only typo fixed in this file
+#
+language/lang_english/lang_extend_auth_center.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	version				: 0.0.7 - 02/04/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	version				: 0.0.8 - 21/08/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$lang['Board_founder_explain'] = 'Note : the Main administrators group doesn\'t require any permissions to be sat : it has already all authorised.';
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	$lang['Board_founder_explain'] = 'Note : the Main administrators group doesn\'t require any permissions to be set : it has already all authorised.';
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$lang['auth_announce'] = 'Create announces';
+	$lang['auth_global_announce'] = 'Create global announces';
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	$lang['auth_announce'] = 'Create announcements';
+	$lang['auth_global_announce'] = 'Create global announcement';
+#
+#-----[ OPEN ]------------------------------------------------
+#
+# Take care of the "AFTER, ADD" : there stand the new additions
+# Other modifications are typo fixes
+#
+language/lang_english/lang_extend_cat_hierarchy.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	version				: 0.0.11 - 02/04/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	version				: 0.0.12 - 21/08/2005
+#
+#      ______
+#-----[ FIND ]------------------------------------------------
+#
+	$lang['Forum_link_hit_count'] =
+#
+#      ____________
+#-----[ AFTER, ADD ]------------------------------------------
+#
+	$lang['Forum_subs_hidden'] = 'Hide sub-forums list';
+	$lang['Forum_subs_hidden_explain'] = 'Allow to hide the sub-forums list appearing under the forum name in the forum cell of the index page.';
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$lang['Topics_split_global'] =
+	$lang['Topics_split_announces'] =
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	$lang['Topics_split_global'] = 'Split global announcements from regular announcements';
+	$lang['Topics_split_announces'] = 'Split Announcements from regular et sticky topics';
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$lang['Board_box_content'] =
+	$lang['Board_box_content_explain'] =
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	$lang['Board_box_content'] = 'Board announcements setup';
+	$lang['Board_box_content_explain'] = 'Choose what kind of announcements you want to display in the board announcements box.';
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$lang['Global_Parent_announces'] =
+	$lang['Global_Childs_announces'] =
+	$lang['Global_Branch_announces'] =
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	$lang['Global_Parent_announces'] = 'Global and parent-forums announcements';
+	$lang['Global_Childs_announces'] = 'Global and sub-forums announcements';
+	$lang['Global_Branch_announces'] = 'Global and whole-section announcements';
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$lang['Default_duration'] =
+	$lang['Default_duration_explain'] =
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	$lang['Default_duration'] = 'Announcements default duration';
+	$lang['Default_duration_explain'] = 'Default duration proposed while writing an announcement.';
+#
+#-----[ FIND ]------------------------------------------------
+#
+$lang['Board_announces'] =
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+$lang['Board_announces'] = 'Board Announcements';
+#
+#-----[ FIND ]------------------------------------------------
+#
+$lang['Global_Announces'] =
+$lang['Announces'] =
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+$lang['Global_Announces'] = 'Global Announcements';
+$lang['Announces'] = 'Announcements';
+#
+#-----[ FIND ]------------------------------------------------
+#
+$lang['Announce_ends'] =
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+$lang['Announce_ends'] = 'Announcement end: %s';
+#
+#-----[ FIND ]------------------------------------------------
+#
+$lang['Topic_duration_explain'] =
+$lang['Topic_duration_special'] =
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+$lang['Topic_duration_explain'] = 'This is the date an announcement will stop to appear in other forums as a global announcement or a board announcement.';
+$lang['Topic_duration_special'] = 'Choose "Never displayed" to never show this announcement elsewhere than in its own forum, <br />choose "Always displayed" to display it forever.';
+#
+#-----[ FIND ]------------------------------------------------
+#
+$lang['Board_box_display'] =
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+$lang['Board_box_display'] = 'Display Board announcements box';
+#
+#-----[ FIND ]------------------------------------------------
+#
+$lang['Index_pack_explain'] =
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+$lang['Index_pack_explain'] = 'If set, categories will appear with a forum layer.';
+#
+#-----[ FIND ]------------------------------------------------
+#
+$lang['Index_split_explain'] =
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+$lang['Index_split_explain'] = 'If set, categories will be splited from each other. This setup is ignored if "Pack sub-categories" is On.';
+#
+#      ______
+#-----[ FIND ]------------------------------------------------
+#
+// calendar
+$lang['Topic_calendar'] =
+#
+#      ____________
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+// access key commands (keyboard shortcuts)
+$lang['cmd_submit'] = 's';
+$lang['cmd_select'] = 's';
+$lang['cmd_delete'] = 'x';
+$lang['cmd_edit'] = 'e';
+$lang['cmd_create'] = 'c';
+$lang['cmd_cancel'] = 'a';
+$lang['cmd_synchro'] = 'y';
+$lang['cmd_add_group'] = 'g';
+$lang['cmd_regen'] = 'r';
+$lang['cmd_preview'] = 'p';
+$lang['cmd_up'] = '-';
+$lang['cmd_down'] = '+';
+$lang['cmd_export'] = 'o';
+
+// timezone
+$lang['UTC_DST'] = 'UTC %s %s (DST in action)';
+$lang['UTC'] = 'UTC %s %s';
+$lang['dst'] = 'Summertime';
+$lang['dst_explain'] = 'Adjust the time for summer (add 1 hour in summer)';
+$lang['tz_suggest'] = 'Synchronise';
+$lang['tz_suggest_explain'] = 'Try to find your closest timezone';
+# ________________________________________________________________________________
+#
+#
+#
+#=============================================================
+#
+#	Third part : template (.tpl) modifications
+#
+#=============================================================
+#
+# Most of the modifications are : pack onto one line the conditioned lines (those with <!-- BEGIN/END -->)
+# that were onto many lines. This implies the use of the BEGINELSE statement in most of cases, and the 
+# add of &nbsp; sometimes.
+#
+# Though, previous tpls should still work, except the ones coming with CH using previously pic buttons 
+# to validate a form, as this buttons part has now been reviewed to be standardize.
+#
+# Note about posting_body.tpl : the bbcode javascript part has been moved to posting_bbcode.tpl, and is now
+# included (<!-- INCLUDE posting_bbcode.tpl -->) at top of the file : this will allow to use the tpl as a
+# field that can be managed by the automatic form process, like in users preferences menu.
+#
+# --------
+#
+# If you don't plan to use subSilver but ptifo template, you can jump over this part, as ptifo is ready to be
+# used, and uninstall subSilver.
+# You can also get all the files from the "installed" pack (check at http://ptifo.clanmckeen.com , download forum).
+#
+#
+#-----[ DIY INSTRUCTIONS ]------------------------------------
+#
+DELETE templates/subSilver/admin/caches_body.tpl
+DELETE templates/subSilver/admin/forum_details_body.tpl
+DELETE templates/subSilver/admin/icons_details_body.tpl
+DELETE templates/subSilver/admin/topics_attr_details_body.tpl
+#
+#-----[ DIY INSTRUCTIONS ]------------------------------------
+#
+RENAME templates/subSilver/profile_add_body.tpl INTO templates/subSilver/_sav_profile_add_body.tpl
+#
+#-----[ COPY ]------------------------------------------------
+#
+COPY root/templates/subSilver/cp_generic.tpl TO templates/subSilver/cp_generic.tpl
+COPY root/templates/subSilver/cp_menus_box.tpl TO templates/subSilver/cp_menus_box.tpl
+COPY root/templates/subSilver/form_body.tpl TO templates/subSilver/form_body.tpl
+COPY root/templates/subSilver/form_fields.tpl TO templates/subSilver/form_fields.tpl
+COPY root/templates/subSilver/profile_add_body.tpl TO templates/subSilver/profile_add_body.tpl
+COPY root/templates/subSilver/posting_bbcode.tpl TO templates/subSilver/posting_bbcode.tpl
+COPY root/templates/subSilver/stat_run_body.tpl TO templates/subSilver/stat_run_body.tpl
+COPY root/templates/subSilver/subSilver.ini TO templates/subSilver/subSilver.ini
+#
+#-----[ COPY ]------------------------------------------------
+#
+COPY root/templates/subSilver/admin/auth_overview_body.tpl TO templates/subSilver/admin/auth_overview_body.tpl
+COPY root/templates/subSilver/admin/auth_overview_group_body.tpl TO templates/subSilver/admin/auth_overview_group_body.tpl
+COPY root/templates/subSilver/admin/auths_def_body.tpl TO templates/subSilver/admin/auths_def_body.tpl
+COPY root/templates/subSilver/admin/forum_flat_body.tpl TO templates/subSilver/admin/forum_flat_body.tpl
+COPY root/templates/subSilver/admin/forum_fprune_body.tpl TO templates/subSilver/admin/forum_fprune_body.tpl
+COPY root/templates/subSilver/admin/forum_index_body.tpl TO templates/subSilver/admin/forum_index_body.tpl
+COPY root/templates/subSilver/admin/icons_list_body.tpl TO templates/subSilver/admin/icons_list_body.tpl
+COPY root/templates/subSilver/admin/topics_attr_list_body.tpl TO templates/subSilver/admin/topics_attr_list_body.tpl
+#
+#-----[ COPY ]------------------------------------------------
+#
+COPY root/templates/subSilver/images/lang_english/*.* TO templates/subSilver/images/lang_english/*.*
+#
+#-----[ COPY ]------------------------------------------------
+#
+COPY root/templates/subSilver/images/earth.gif TO templates/subSilver/images/earth.gif
+COPY root/templates/subSilver/images/bs_arrow_down.gif TO templates/subSilver/images/bs_arrow_down.gif
+COPY root/templates/subSilver/images/bs_arrow_up.gif TO templates/subSilver/images/bs_arrow_up.gif
+COPY root/templates/subSilver/images/bs_command_details.gif TO templates/subSilver/images/bs_command_details.gif
+COPY root/templates/subSilver/images/bs_command_mini_copy.gif TO templates/subSilver/images/bs_command_mini_copy.gif
+COPY root/templates/subSilver/images/bs_command_mini_create.gif TO templates/subSilver/images/bs_command_mini_create.gif
+COPY root/templates/subSilver/images/bs_command_mini_delete.gif TO templates/subSilver/images/bs_command_mini_delete.gif
+COPY root/templates/subSilver/images/bs_command_mini_edit.gif TO templates/subSilver/images/bs_command_mini_edit.gif
+COPY root/templates/subSilver/images/bs_command_mini_synchro.gif TO templates/subSilver/images/bs_command_mini_synchro.gif
+COPY root/templates/subSilver/images/icon_unmark_read.gif TO templates/subSilver/images/icon_unmark_read.gif
+#
+#-----[ COPY ]------------------------------------------------
+#
+# topic calendar images
+#
+COPY root/templates/subSilver/images/folder_calendar.gif TO templates/subSilver/images/folder_calendar.gif
+COPY root/templates/subSilver/images/icon_calendar.gif TO templates/subSilver/images/icon_calendar.gif
+COPY root/templates/subSilver/images/icon_mini_calendar.gif TO templates/subSilver/images/icon_mini_calendar.gif
+COPY root/templates/subSilver/images/icon_tiny_topic.gif TO templates/subSilver/images/icon_tiny_topic.gif
+COPY root/templates/subSilver/images/icon_tiny_profile.gif TO templates/subSilver/images/icon_tiny_profile.gif
+COPY root/templates/subSilver/images/icon_up_arrow.gif TO templates/subSilver/images/icon_up_arrow.gif
+COPY root/templates/subSilver/images/icon_down_arrow.gif TO templates/subSilver/images/icon_down_arrow.gif
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/admin/index_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<td class="row2"><b>{DB_SIZE}</b></td>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<td class="row2"><b>&nbsp;{DB_SIZE}&nbsp;</b></td>
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<td class="row2"><b>{GZIP_COMPRESSION}</b></td>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<td class="row2"><b>&nbsp;{GZIP_COMPRESSION}&nbsp;</b></td>
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/admin/page_footer.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+</body>
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+<!-- INCLUDE stat_run_body.tpl -->
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/admin/page_header.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+<style type="text/css">
+<!--
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+.absbottom {
+	vertical-align: text-bottom;
+}
+.dom_overview_abshidden { position: absolute; visibility: hidden; width: 300px; }
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/groupcp_info_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this is a partial search : the full line is longer
+#
+<span class="gen"><span class="gen">
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+<span class="gen"><span class="gen">
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+<span class="gen">
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<!-- BEGIN switch_mod_option -->
+	<tr>
+		<td class="catBottom" colspan="8" align="right"><span class="cattitle">
+			<input type="submit" name="remove" value="{L_REMOVE_SELECTED}" class="mainoption" />
+		</td>
+	</tr>
+	<!-- END switch_mod_option -->
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+</td>
+#
+#----------[ IN-LINE BEFORE, ADD ]----------------------------
+#
+</span>
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/index_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+{BOARD_TOPICS}
+<!-- BEGIN board_topics_spacing -->
+<br class="nav" />
+<!-- END board_topics_spacing -->
+
+{NAVIGATION_BOX}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+{BOARD_TOPICS}
+<!-- BEGIN board_topics_spacing --><br class="nav" /><!-- END board_topics_spacing -->
+
+<form method="post" action="{S_ACTION}">
+{NAVIGATION_BOX}
+#
+#-----[ FIND ]------------------------------------------------
+#
+			<b>{L_MODERATORS}:&nbsp;</b>
+			<!-- BEGIN mod -->
+			<a href="{indexrow.forum.row.moderators.mod.U_MOD}" title="{indexrow.forum.row.moderators.mod.L_MOD_TITLE}" class="gensmall">{indexrow.forum.row.moderators.mod.L_MOD}</a>{indexrow.forum.row.moderators.mod.L_SEP}
+			<!-- END mod -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			<b>{L_MODERATORS}:&nbsp;</b><!-- BEGIN mod --><a href="{indexrow.forum.row.moderators.mod.U_MOD}" title="{indexrow.forum.row.moderators.mod.L_MOD_TITLE}" class="gensmall">{indexrow.forum.row.moderators.mod.L_MOD}</a><!-- BEGIN sep -->, <!-- END sep --><!-- END mod -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+			<b>{L_SUBFORUMS}:&nbsp;</b>
+			<!-- BEGIN sub -->
+			<img src="{indexrow.forum.row.subforums.sub.I_SUB}" border="0" align="middle" alt="{indexrow.forum.row.subforums.sub.L_SUB_ALT}" title="{indexrow.forum.row.subforums.sub.L_SUB_ALT}" /><a href="{indexrow.forum.row.subforums.sub.U_SUB}" title="{indexrow.forum.row.subforums.sub.L_SUB_DESC}" class="gensmall">{indexrow.forum.row.subforums.sub.L_SUB}</a>{indexrow.forum.row.subforums.sub.L_SEP}
+			<!-- END sub -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			<b>{L_SUBFORUMS}:</b>&nbsp;<!-- BEGIN sub --><img src="{indexrow.forum.row.subforums.sub.I_SUB}" border="0" align="middle" alt="{indexrow.forum.row.subforums.sub.L_SUB_ALT}" title="{indexrow.forum.row.subforums.sub.L_SUB_ALT}" hspace="2" /><a href="{indexrow.forum.row.subforums.sub.U_SUB}" title="{indexrow.forum.row.subforums.sub.L_SUB_DESC}" class="gensmall">{indexrow.forum.row.subforums.sub.L_SUB}</a><!-- BEGIN sep -->, <!-- END sep --><!-- END sub -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this is a partial search : the full line is longer
+#
+	<td class="row3right"
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+row3right
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+row3Right
+#
+#-----[ FIND ]------------------------------------------------
+#
+		<!-- BEGIN userlink -->
+		<a href="{indexrow.forum.U_LAST_POSTER}" class="gensmall" title="{L_LAST_POSTER}">{indexrow.forum.LAST_POSTER}</a>
+		<!-- END userlink -->
+		<!-- BEGIN userlink_ELSE -->
+		{indexrow.forum.LAST_POSTER}
+		<!-- END userlink_ELSE -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		<!-- BEGIN userlink --><a href="{indexrow.forum.U_LAST_POSTER}" class="gensmall" title="{L_LAST_POSTER}"><!-- END userlink -->{indexrow.forum.LAST_POSTER}<!-- BEGIN userlink --></a><!-- END userlink -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+		<!-- END last_post -->
+		<!-- BEGIN last_post_ELSE -->
+		{L_NO_POSTS}
+		<!-- END last_post_ELSE -->
+		</span>
+	</td>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		<!-- BEGINELSE last_post -->
+		{L_NO_POSTS}
+		<!-- END last_post -->
+	</span></td>
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<!-- END auth_read -->
+	<!-- BEGIN auth_read_ELSE -->
+	<td class="row3right" colspan="3" align="center"><span class="gensmall">
+		{L_AUTH_REQ}
+	</span></td>
+	<!-- END auth_read_ELSE -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<!-- BEGINELSE auth_read -->
+	<td class="row3Right" colspan="3" align="center"><span class="gensmall">
+		{L_AUTH_REQ}
+	</span></td>
+	<!-- END auth_read -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+			<b>{L_SUBFORUMS}:&nbsp;</b>
+			<!-- BEGIN sub -->
+			<img src="{indexrow.link.row.subforums.sub.I_SUB}" border="0" align="middle" alt="{indexrow.link.row.subforums.sub.L_SUB_ALT}" title="{indexrow.link.row.subforums.sub.L_SUB_ALT}" /><a href="{indexrow.link.row.subforums.sub.U_SUB}" title="{indexrow.link.row.subforums.sub.L_SUB_DESC}" class="gensmall">{indexrow.link.row.subforums.sub.L_SUB}</a>{indexrow.link.row.subforums.sub.L_SEP}
+			<!-- END sub -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			<b>{L_SUBFORUMS}:</b>&nbsp;<!-- BEGIN sub --><img src="{indexrow.link.row.subforums.sub.I_SUB}" border="0" align="middle" alt="{indexrow.link.row.subforums.sub.L_SUB_ALT}" title="{indexrow.link.row.subforums.sub.L_SUB_ALT}" hspace="2" /><a href="{indexrow.link.row.subforums.sub.U_SUB}" title="{indexrow.link.row.subforums.sub.L_SUB_DESC}" class="gensmall">{indexrow.link.row.subforums.sub.L_SUB}</a><!-- BEGIN sep -->, <!-- END sep --><!-- END sub -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<td class="row3right" align="center" valign="middle" height="50" colspan="3" width="340"><span class="gensmall">{indexrow.link.HITS}</span></td>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<td class="row3Right" align="center" valign="middle" height="50" colspan="3" width="340"><span class="gensmall">
+		{indexrow.link.HITS}
+	</span></td>
+#
+#-----[ FIND ]------------------------------------------------
+#
+<!-- BEGIN spacing -->
+<br class="nav" />
+<!-- END spacing -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+<!-- BEGIN spacing --><br class="nav" /><!-- END spacing -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+<!-- BEGIN forums_spacing -->
+<br class="nav" />
+<!-- END forums_spacing -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+<!-- BEGIN forums_spacing --><br class="nav" /><!-- END forums_spacing -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+{NAVIGATION_ONLY_BOX}
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+</form>
+#
+#-----[ FIND ]------------------------------------------------
+#
+<table cellspacing="0" cellpadding="0" border="0" width="100%">
+<tr>
+	<td nowrap="nowrap" align="right"><span class="gensmall">{JUMPBOX}</span></td>
+</tr>
+</table>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+<table cellspacing="0" cellpadding="0" border="0" width="100%">
+<tr>
+	<td nowrap="nowrap" align="right">{JUMPBOX}</td>
+</tr>
+</table>
+<br />
+#
+#-----[ FIND ]------------------------------------------------
+#
+<table width="100%" cellpadding="3" cellspacing="1" border="0" class="forumline"><form method="post" action="{S_LOGIN_ACTION}">
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+<form method="post" action="{S_LOGIN_ACTION}"><table width="100%" cellpadding="3" cellspacing="1" border="0" class="forumline">
+#
+#-----[ FIND ]------------------------------------------------
+#
+</tr></form>
+</table>
+<!-- END switch_user_logged_out -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+</tr>
+</table></form>
+<!-- END switch_user_logged_out -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<td width="20" align="center"><img src="{FORUM_NEW_IMG}" alt="{L_NEW_POSTS}"/></td>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<td width="20" align="center"><img src="{FORUM_NEW_IMG}" alt="{L_NEW_POSTS}" /></td>
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/index_stats_box.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<!-- BEGIN extended -->
+	<td class="row1" width="50" align="center" valign="middle" rowspan="4">
+	<!-- END extended -->
+	<!-- BEGIN extended_ELSE -->
+	<td class="row1" width="50" align="center" valign="middle" rowspan="3">
+	<!-- END extended_ELSE -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<td class="row1" width="50" align="center" valign="middle" rowspan="<!-- BEGIN extended -->4<!-- BEGINELSE extended -->3<!-- END extended -->">
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<!-- BEGIN root_ELSE -->
+	<td class="row1" width="50" align="center" valign="middle" rowspan="2"><img src="{I_VIEWONLINE}" alt="{L_VIEWONLINE}" border="0" /></td>
+	<!-- END root_ELSE -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<!-- BEGIN root_ELSE -->
+	<td class="row1" width="50" align="center" valign="middle" rowspan="2"><img src="{I_VIEWONLINE}" alt="{L_VIEWONLINE}" border="0" />
+	</td>
+	<!-- END root_ELSE -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<td class="row1"><span class="gensmall">
+		<!-- BEGIN root -->
+		{L_TOTAL_ONLINE}{TOTAL_USERS_ONLINE}<hr />
+		<!-- END root -->
+		{L_ONLINE_USERS}
+		<!-- BEGIN root_ELSE -->
+		{TOTAL_USERS_ONLINE}<br />
+		<!-- END root_ELSE -->
+		<!-- BEGIN online -->
+		{stats.online.L_SEP}<a href="{stats.online.U_VIEW_PROFILE}" title="{L_VIEW_PROFILE}" class="gensmall" {stats.online.STYLE}>{stats.online.USERNAME}</a>
+		<!-- END online -->
+		<!-- BEGIN none -->
+		{NO_USERS_ONLINE}
+		<!-- END none -->
+	</span></td>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<td class="row1">
+		<!-- BEGIN root --><span class="gensmall">{L_TOTAL_ONLINE}{TOTAL_USERS_ONLINE}</span><hr /><!-- END root -->
+		<span class="gensmall">{L_ONLINE_USERS}&nbsp;<!-- BEGIN root_ELSE -->{TOTAL_USERS_ONLINE}<br /><!-- END root_ELSE --><!-- BEGIN online --><!-- BEGIN sep -->, <!-- END sep --><a href="{stats.online.U_VIEW_PROFILE}" title="{L_VIEW_PROFILE}" class="gensmall" {stats.online.STYLE}>{stats.online.USERNAME}</a><!-- END online --><!-- BEGIN none -->{NO_USERS_ONLINE}<!-- END none -->
+	</span></td>
+#
+#-----[ FIND ]------------------------------------------------
+#
+		<b>{L_LEGEND}:</b>&nbsp;
+		<!-- BEGIN legend -->
+		<!-- BEGIN link -->
+		[&nbsp;<b><a href="{stats.legend.U_LEVEL}" class="gensmall" {stats.legend.STYLE}>{stats.legend.LEVEL_NAME}</a></b>&nbsp;]
+		<!-- END link -->
+		<!-- BEGIN link_ELSE -->
+		[&nbsp;<b><span {stats.legend.STYLE}>{stats.legend.LEVEL_NAME}</span></b>&nbsp;]
+		<!-- END link_ELSE -->
+		<!-- END legend -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		<b>{L_LEGEND}:</b>&nbsp;<!-- BEGIN legend -->[&nbsp;<!-- BEGIN link --><a href="{stats.legend.U_LEVEL}" class="gensmall" {stats.legend.STYLE}><!-- BEGINELSE link --><span {stats.legend.STYLE}><!-- END link --><b>{stats.legend.LEVEL_NAME}</b><!-- BEGIN link --></a><!-- BEGINELSE link --></span><!-- END link -->&nbsp;]<!-- END legend -->
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/jumpbox.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this is a partial search : the full line is longer
+#
+onSubmit="if(document.jumpbox.f.value == -1)
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+== -1
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+< 0
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/modcp_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<td width="100%" valign="bottom"><span class="gensmall">
+		<!-- BEGIN pagination -->
+		<b>{forum_header.pagination.L_PAGE_OF}</b>&nbsp;{forum_header.pagination.L_COUNT}
+		<!-- END pagination -->
+	</span></td>
+	<td align="right" valign="bottom" nowrap="nowrap"><span class="gensmall">
+		<b>
+		<!-- BEGIN pagination -->
+		<!-- BEGIN unique_ELSE -->
+		{forum_header.pagination.L_GOTO}:&nbsp;
+		<!-- END unique_ELSE -->
+		<!-- BEGIN previous -->
+		<a href="{forum_header.pagination.U_PREVIOUS}" class="gensmall">{forum_header.pagination.L_PREVIOUS}</a>&nbsp;
+		<!-- END previous -->
+
+		<!-- BEGIN page_number -->
+		<!-- BEGIN number -->
+		<!-- BEGIN current -->
+		{forum_header.pagination.page_number.PAGE}{forum_header.pagination.page_number.L_SEP}
+		<!-- END current -->
+		<!-- BEGIN current_ELSE -->
+		<a href="{forum_header.pagination.page_number.U_PAGE}" class="gensmall">{forum_header.pagination.page_number.PAGE}</a>{forum_header.pagination.page_number.L_SEP}
+		<!-- END current_ELSE -->
+		<!-- END number -->
+		<!-- BEGIN number_ELSE -->
+		...,
+		<!-- END number_ELSE -->
+		<!-- END page_number -->
+
+		<!-- BEGIN next -->
+		<a href="{forum_header.pagination.U_NEXT}" class="gensmall">{forum_header.pagination.L_NEXT}</a>
+		<!-- END next -->
+		<!-- END pagination -->
+	</b></span></td>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<td width="100%" valign="bottom"><span class="gensmall">
+		<!-- BEGIN pagination --><b>{forum_header.pagination.L_PAGE_OF}</b>&nbsp;{forum_header.pagination.L_COUNT}<!-- END pagination -->
+	</span></td>
+	<td align="right" valign="bottom" nowrap="nowrap"><span class="gensmall">&nbsp;
+<!-- BEGIN pagination -->
+		<!-- BEGIN unique_ELSE --><b>{forum_header.pagination.L_GOTO}:&nbsp;</b><!-- END unique_ELSE -->
+		<!-- BEGIN previous --><b><a href="{forum_header.pagination.U_PREVIOUS}" class="gensmall">{forum_header.pagination.L_PREVIOUS}</a>&nbsp;</b><!-- END previous -->
+		<!-- BEGIN page_number --><b><!-- BEGIN number --><!-- BEGIN current_ELSE --><a href="{forum_header.pagination.page_number.U_PAGE}" class="gensmall"><!-- END current_ELSE -->{forum_header.pagination.page_number.PAGE}<!-- BEGIN current_ELSE --></a><!-- END current_ELSE --><!-- BEGIN sep -->, <!-- END sep --><!-- BEGINELSE number -->..., <!-- END number --></b><!-- END page_number -->
+		<!-- BEGIN next --><b>&nbsp;<a href="{forum_header.pagination.U_NEXT}" class="gensmall">{forum_header.pagination.L_NEXT}</a></b><!-- END next -->
+<!-- END pagination -->
+	</span></td>
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<td width="100%" valign="bottom"><span class="gensmall">
+		<!-- BEGIN pagination -->
+		<b>{forum_header.pagination.L_PAGE_OF}</b>&nbsp;{forum_header.pagination.L_COUNT}
+		<!-- END pagination -->
+	</span></td>
+	<td align="right" valign="bottom" nowrap="nowrap"><span class="gensmall">
+		<b>
+		<!-- BEGIN pagination -->
+		<!-- BEGIN unique_ELSE -->
+		{forum_header.pagination.L_GOTO}:&nbsp;
+		<!-- END unique_ELSE -->
+		<!-- BEGIN previous -->
+		<a href="{forum_header.pagination.U_PREVIOUS}" class="gensmall">{forum_header.pagination.L_PREVIOUS}</a>&nbsp;
+		<!-- END previous -->
+
+		<!-- BEGIN page_number -->
+		<!-- BEGIN number -->
+		<!-- BEGIN current -->
+		{forum_header.pagination.page_number.PAGE}{forum_header.pagination.page_number.L_SEP}
+		<!-- END current -->
+		<!-- BEGIN current_ELSE -->
+		<a href="{forum_header.pagination.page_number.U_PAGE}" class="gensmall">{forum_header.pagination.page_number.PAGE}</a>{forum_header.pagination.page_number.L_SEP}
+		<!-- END current_ELSE -->
+		<!-- END number -->
+		<!-- BEGIN number_ELSE -->
+		...,
+		<!-- END number_ELSE -->
+		<!-- END page_number -->
+
+		<!-- BEGIN next -->
+		<a href="{forum_header.pagination.U_NEXT}" class="gensmall">{forum_header.pagination.L_NEXT}</a>
+		<!-- END next -->
+		<!-- END pagination -->
+	</b></span></td>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<td width="100%" valign="bottom"><span class="gensmall">
+		<!-- BEGIN pagination --><b>{forum_header.pagination.L_PAGE_OF}</b>&nbsp;{forum_header.pagination.L_COUNT}<!-- END pagination -->
+	</span></td>
+	<td align="right" valign="bottom" nowrap="nowrap"><span class="gensmall">&nbsp;
+<!-- BEGIN pagination -->
+		<!-- BEGIN unique_ELSE --><b>{forum_header.pagination.L_GOTO}:&nbsp;</b><!-- END unique_ELSE -->
+		<!-- BEGIN previous --><b><a href="{forum_header.pagination.U_PREVIOUS}" class="gensmall">{forum_header.pagination.L_PREVIOUS}</a>&nbsp;</b><!-- END previous -->
+		<!-- BEGIN page_number --><b><!-- BEGIN number --><!-- BEGIN current_ELSE --><a href="{forum_header.pagination.page_number.U_PAGE}" class="gensmall"><!-- END current_ELSE -->{forum_header.pagination.page_number.PAGE}<!-- BEGIN current_ELSE --></a><!-- END current_ELSE --><!-- BEGIN sep -->, <!-- END sep --><!-- BEGINELSE number -->..., <!-- END number --></b><!-- END page_number -->
+		<!-- BEGIN next --><b>&nbsp;<a href="{forum_header.pagination.U_NEXT}" class="gensmall">{forum_header.pagination.L_NEXT}</a></b><!-- END next -->
+<!-- END pagination -->
+	</span></td>
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/navigation_box.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<!-- BEGIN nav -->
+	<!-- BEGIN img -->
+	<img src="{nav.I_NAV}" border="0" align="absbottom" />
+	<!-- END img -->
+	<a href="{nav.U_NAV}" title="{nav.L_NAV_DESC}" class="nav">{nav.L_NAV}</a>
+	<!-- BEGIN sep -->
+	&raquo;
+	<!-- END sep -->
+	<!-- END nav -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		<!-- BEGIN nav --><!-- BEGIN img --><img src="{nav.I_NAV}" border="0" class="absbottom" alt="" />&nbsp;<!-- END img --><a href="{nav.U_NAV}" title="{nav.L_NAV_DESC}" class="nav">{nav.L_NAV}</a><!-- BEGIN sep --> &raquo;&nbsp;<!-- END sep --><!-- END nav -->
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/navigation_only_box.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<!-- BEGIN nav -->
+	<!-- BEGIN img -->
+	<img src="{nav.I_NAV}" border="0" align="absbottom" />
+	<!-- END img -->
+	<a href="{nav.U_NAV}" title="{nav.L_NAV_DESC}" class="nav">{nav.L_NAV}</a>
+	<!-- BEGIN sep -->
+	&raquo;
+	<!-- END sep -->
+	<!-- END nav -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		<!-- BEGIN nav --><!-- BEGIN img --><img src="{nav.I_NAV}" border="0" class="absbottom" alt="" />&nbsp;<!-- END img --><a href="{nav.U_NAV}" title="{nav.L_NAV_DESC}" class="nav">{nav.L_NAV}</a><!-- BEGIN sep --> &raquo;&nbsp;<!-- END sep --><!-- END nav -->
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/overall_footer.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+</body>
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+<!-- INCLUDE stat_run_body.tpl -->
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/overall_header.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+<style type="text/css">
+<!--
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+.absbottom {
+	vertical-align: text-bottom;
+}
+.dom_overview_abshidden { position: absolute; visibility: hidden; width: 300px; }
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this is a partial search : the full line is longer
+#
+&nbsp;<a href="{U_FAQ}"
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+&nbsp;<a href="{U_FAQ}"
+#
+#----------[ IN-LINE BEFORE, ADD ]----------------------------
+#
+<!-- BEGIN topic_calendar -->&nbsp;<a href="{U_CALENDAR}" class="mainmenu"><img src="{I_CALENDAR}" width="12" height="13" border="0" alt="{L_CALENDAR}" hspace="3" />{L_CALENDAR}</a>&nbsp; <!-- END topic_calendar -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this is a partial search : the full line is longer
+#
+{L_REGISTER}</a></span>&nbsp;
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+{L_REGISTER}</a></span>&nbsp;
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+{L_REGISTER}</a>&nbsp;
+#
+#-----[ FIND ]------------------------------------------------
+#
+						<!-- END switch_user_logged_out -->
+						</td>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+						<!-- END switch_user_logged_out -->
+						</span></td>
+#
+#-----[ FIND ]------------------------------------------------
+#
+		</table>
+
+		<br />
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+		{CALENDAR_BOX}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/posting_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+# move the whole javascript to a seperate file : posting_bbcode.tpl
+#
+<script language="JavaScript" type="text/javascript">
+<!--
+// bbCode control by
+// subBlue design
+// www.subBlue.com
+
+// Startup variables
+var imageTag = false;
+var theSelection = false;
+
+// Check for Browser & Platform for PC & IE specific bits
+// More details from: http://www.mozilla.org/docs/web-developer/sniffer/browser_type.html
+var clientPC = navigator.userAgent.toLowerCase(); // Get client info
+var clientVer = parseInt(navigator.appVersion); // Get browser version
+
+var is_ie = ((clientPC.indexOf("msie") != -1) && (clientPC.indexOf("opera") == -1));
+var is_nav = ((clientPC.indexOf('mozilla')!=-1) && (clientPC.indexOf('spoofer')==-1)
+                && (clientPC.indexOf('compatible') == -1) && (clientPC.indexOf('opera')==-1)
+                && (clientPC.indexOf('webtv')==-1) && (clientPC.indexOf('hotjava')==-1));
+var is_moz = 0;
+
+var is_win = ((clientPC.indexOf("win")!=-1) || (clientPC.indexOf("16bit") != -1));
+var is_mac = (clientPC.indexOf("mac")!=-1);
+
+// Helpline messages
+b_help = "{L_BBCODE_B_HELP}";
+i_help = "{L_BBCODE_I_HELP}";
+u_help = "{L_BBCODE_U_HELP}";
+q_help = "{L_BBCODE_Q_HELP}";
+c_help = "{L_BBCODE_C_HELP}";
+l_help = "{L_BBCODE_L_HELP}";
+o_help = "{L_BBCODE_O_HELP}";
+p_help = "{L_BBCODE_P_HELP}";
+w_help = "{L_BBCODE_W_HELP}";
+a_help = "{L_BBCODE_A_HELP}";
+s_help = "{L_BBCODE_S_HELP}";
+f_help = "{L_BBCODE_F_HELP}";
+
+// Define the bbCode tags
+bbcode = new Array();
+bbtags = new Array('[b]','[/b]','[i]','[/i]','[u]','[/u]','[quote]','[/quote]','[code]','[/code]','[list]','[/list]','[list=]','[/list]','[img]','[/img]','[url]','[/url]');
+imageTag = false;
+
+// Shows the help messages in the helpline window
+function helpline(help) {
+	document.post.helpbox.value = eval(help + "_help");
+}
+
+
+// Replacement for arrayname.length property
+function getarraysize(thearray) {
+	for (i = 0; i < thearray.length; i++) {
+		if ((thearray[i] == "undefined") || (thearray[i] == "") || (thearray[i] == null))
+			return i;
+		}
+	return thearray.length;
+}
+
+// Replacement for arrayname.push(value) not implemented in IE until version 5.5
+// Appends element to the array
+function arraypush(thearray,value) {
+	thearray[ getarraysize(thearray) ] = value;
+}
+
+// Replacement for arrayname.pop() not implemented in IE until version 5.5
+// Removes and returns the last element of an array
+function arraypop(thearray) {
+	thearraysize = getarraysize(thearray);
+	retval = thearray[thearraysize - 1];
+	delete thearray[thearraysize - 1];
+	return retval;
+}
+
+
+function checkForm() {
+
+	formErrors = false;    
+
+	if (document.post.message.value.length < 2) {
+		formErrors = "{L_EMPTY_MESSAGE}";
+	}
+
+	if (formErrors) {
+		alert(formErrors);
+		return false;
+	} else {
+		bbstyle(-1);
+		//formObj.preview.disabled = true;
+		//formObj.submit.disabled = true;
+		return true;
+	}
+}
+
+function emoticon(text) {
+	var txtarea = document.post.message;
+	text = ' ' + text + ' ';
+	if (txtarea.createTextRange && txtarea.caretPos) {
+		var caretPos = txtarea.caretPos;
+		caretPos.text = caretPos.text.charAt(caretPos.text.length - 1) == ' ' ? caretPos.text + text + ' ' : caretPos.text + text;
+		txtarea.focus();
+	} else {
+		txtarea.value  += text;
+		txtarea.focus();
+	}
+}
+
+function bbfontstyle(bbopen, bbclose) {
+	var txtarea = document.post.message;
+
+	if ((clientVer >= 4) && is_ie && is_win) {
+		theSelection = document.selection.createRange().text;
+		if (!theSelection) {
+			txtarea.value += bbopen + bbclose;
+			txtarea.focus();
+			return;
+		}
+		document.selection.createRange().text = bbopen + theSelection + bbclose;
+		txtarea.focus();
+		return;
+	}
+	else if (txtarea.selectionEnd && (txtarea.selectionEnd - txtarea.selectionStart > 0))
+	{
+		mozWrap(txtarea, bbopen, bbclose);
+		return;
+	}
+	else
+	{
+		txtarea.value += bbopen + bbclose;
+		txtarea.focus();
+	}
+	storeCaret(txtarea);
+}
+
+
+function bbstyle(bbnumber) {
+	var txtarea = document.post.message;
+
+	txtarea.focus();
+	donotinsert = false;
+	theSelection = false;
+	bblast = 0;
+
+	if (bbnumber == -1) { // Close all open tags & default button names
+		while (bbcode[0]) {
+			butnumber = arraypop(bbcode) - 1;
+			txtarea.value += bbtags[butnumber + 1];
+			buttext = eval('document.post.addbbcode' + butnumber + '.value');
+			eval('document.post.addbbcode' + butnumber + '.value ="' + buttext.substr(0,(buttext.length - 1)) + '"');
+		}
+		imageTag = false; // All tags are closed including image tags :D
+		txtarea.focus();
+		return;
+	}
+
+	if ((clientVer >= 4) && is_ie && is_win)
+	{
+		theSelection = document.selection.createRange().text; // Get text selection
+		if (theSelection) {
+			// Add tags around selection
+			document.selection.createRange().text = bbtags[bbnumber] + theSelection + bbtags[bbnumber+1];
+			txtarea.focus();
+			theSelection = '';
+			return;
+		}
+	}
+	else if (txtarea.selectionEnd && (txtarea.selectionEnd - txtarea.selectionStart > 0))
+	{
+		mozWrap(txtarea, bbtags[bbnumber], bbtags[bbnumber+1]);
+		return;
+	}
+	
+	// Find last occurance of an open tag the same as the one just clicked
+	for (i = 0; i < bbcode.length; i++) {
+		if (bbcode[i] == bbnumber+1) {
+			bblast = i;
+			donotinsert = true;
+		}
+	}
+
+	if (donotinsert) {		// Close all open tags up to the one just clicked & default button names
+		while (bbcode[bblast]) {
+				butnumber = arraypop(bbcode) - 1;
+				txtarea.value += bbtags[butnumber + 1];
+				buttext = eval('document.post.addbbcode' + butnumber + '.value');
+				eval('document.post.addbbcode' + butnumber + '.value ="' + buttext.substr(0,(buttext.length - 1)) + '"');
+				imageTag = false;
+			}
+			txtarea.focus();
+			return;
+	} else { // Open tags
+	
+		if (imageTag && (bbnumber != 14)) {		// Close image tag before adding another
+			txtarea.value += bbtags[15];
+			lastValue = arraypop(bbcode) - 1;	// Remove the close image tag from the list
+			document.post.addbbcode14.value = "Img";	// Return button back to normal state
+			imageTag = false;
+		}
+		
+		// Open tag
+		txtarea.value += bbtags[bbnumber];
+		if ((bbnumber == 14) && (imageTag == false)) imageTag = 1; // Check to stop additional tags after an unclosed image tag
+		arraypush(bbcode,bbnumber+1);
+		eval('document.post.addbbcode'+bbnumber+'.value += "*"');
+		txtarea.focus();
+		return;
+	}
+	storeCaret(txtarea);
+}
+
+// From http://www.massless.org/mozedit/
+function mozWrap(txtarea, open, close)
+{
+	var selLength = txtarea.textLength;
+	var selStart = txtarea.selectionStart;
+	var selEnd = txtarea.selectionEnd;
+	if (selEnd == 1 || selEnd == 2) 
+		selEnd = selLength;
+
+	var s1 = (txtarea.value).substring(0,selStart);
+	var s2 = (txtarea.value).substring(selStart, selEnd)
+	var s3 = (txtarea.value).substring(selEnd, selLength);
+	txtarea.value = s1 + open + s2 + close + s3;
+	return;
+}
+
+// Insert at Claret position. Code from
+// http://www.faqts.com/knowledge_base/view.phtml/aid/1052/fid/130
+function storeCaret(textEl) {
+	if (textEl.createTextRange) textEl.caretPos = document.selection.createRange().duplicate();
+}
+
+//-->
+</script>
+
+<!-- BEGIN privmsg_extensions -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+# * snip *
+#
+<!-- BEGIN privmsg_extensions -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this is a partial search : the full line is longer
+#
+<form action="{S_POST_ACTION}"
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+<!-- INCLUDE posting_bbcode.tpl -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+	  <td class="row2" valign="top"><span class="gen"> <span class="genmed"> </span>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	  <td class="row2" valign="top">
+#
+#-----[ FIND ]------------------------------------------------
+#
+		</span></td>
+	</tr>
+	<tr> 
+	  <td class="row1" valign="top"><span class="gen"><b>{L_OPTIONS}</b></span><br /><span class="gensmall">{HTML_STATUS}<br />{BBCODE_STATUS}<br />{SMILIES_STATUS}</span></td>
+	  <td class="row2"><span class="gen"> </span>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		</td>
+	</tr>
+	<tr> 
+	  <td class="row1" valign="top"><span class="gen"><b>{L_OPTIONS}</b></span><br /><span class="gensmall">{HTML_STATUS}<br />{BBCODE_STATUS}<br />{SMILIES_STATUS}</span></td>
+	  <td class="row2">
+#
+#-----[ FIND ]------------------------------------------------
+#
+{JUMPBOX}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+<table width="100%" cellspacing="2" border="0" align="center">
+  <tr> 
+	<td nowrap="nowrap" align="right">{JUMPBOX}</td>
+  </tr>
+</table>
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/posting_icon_box.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+			<!-- BEGIN selected -->
+			<input type="radio" name="icon_id" value="{icons.row.cell.ICON_ID}" checked="checked" />
+			<!-- END selected -->
+			<!-- BEGIN selected_ELSE -->
+			<input type="radio" name="icon_id" value="{icons.row.cell.ICON_ID}" />
+			<!-- END selected_ELSE -->
+			<!-- BEGIN img -->
+			<img src="{icons.row.cell.I_ICON}" border="0" title="{icons.row.cell.L_ICON}" />
+			<!-- END img -->
+			<!-- BEGIN img_ELSE -->
+			{icons.row.cell.L_ICON}
+			<!-- END img_ELSE -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			<input type="radio" name="icon_id" value="{icons.row.cell.ICON_ID}" <!-- BEGIN selected -->checked="checked"<!-- END selected --> />
+			<!-- BEGIN img --><img src="{icons.row.cell.I_ICON}" border="0" title="{icons.row.cell.L_ICON}" /><!-- BEGINELSE img -->{icons.row.cell.L_ICON}<!-- END img -->
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/posting_preview.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+			<!-- BEGIN msg_icon -->
+			<img src="{msg_icon.I_ICON}" border="0" title="{msg_icon.L_ICON}" align="absbottom" />
+			<!-- END msg_icon -->
+			<!-- BEGIN sub_type -->
+			<!-- BEGIN img -->
+			<img src="{sub_type.I_SUB_TYPE}" border="0" alt="{sub_type.L_SUB_TYPE}" title="{sub_type.L_SUB_TYPE}" align="absbottom" />
+			<!-- END img -->
+			<!-- BEGIN txt -->
+			<b>[{sub_type.L_SUB_TYPE}]</b>
+			<!-- END txt -->
+			<!-- END sub_type -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			<!-- BEGIN msg_icon --><img src="{msg_icon.I_ICON}" border="0" title="{msg_icon.L_ICON}" class="absbottom" />&nbsp;<!-- END msg_icon -->
+			<!-- BEGIN sub_type --><!-- BEGIN img --><img src="{sub_type.I_SUB_TYPE}" border="0" alt="{sub_type.L_SUB_TYPE}" title="{sub_type.L_SUB_TYPE}" class="absbottom" />&nbsp;<!-- END img --><!-- BEGIN txt --><b>[{sub_type.L_SUB_TYPE}]</b>&nbsp;<!-- END txt --><!-- END sub_type -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+			<!-- BEGIN sub_title -->
+			<br />{L_SUB_TITLE}: {sub_title.SUB_TITLE}
+			<!-- END sub_title -->
+			<!-- BEGIN announce -->
+			<br />{announce.S_ANNOUNCE}
+			<!-- END announce -->
+			<!-- BEGIN calendar_event -->
+			<br />{calendar_event.S_CALENDAR_EVENT}
+			<!-- END calendar_event -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			<!-- BEGIN sub_title --><br />{L_SUB_TITLE}: {sub_title.SUB_TITLE}<!-- END sub_title -->
+			<!-- BEGIN announce --><br />{announce.S_ANNOUNCE}<!-- END announce -->
+			<!-- BEGIN calendar_event --><br />{calendar_event.S_CALENDAR_EVENT}<!-- END calendar_event -->
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/posting_topic_review.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+<table width="100%" cellspacing="2" cellpadding="2" border="0">
+<tr>
+	<td width="100%" align="left"><span class="gensmall">
+		<!-- BEGIN pagination -->
+		<b>{pagination.L_PAGE_OF}</b>&nbsp;{pagination.L_COUNT}
+		<!-- END pagination -->
+	</span></td>
+	<td align="right" nowrap="nowrap"><span class="gensmall"><b>
+		<!-- BEGIN pagination -->
+		<!-- BEGIN unique_ELSE -->
+		{pagination.L_GOTO}:&nbsp;
+		<!-- END unique_ELSE -->
+		<!-- BEGIN previous -->
+		<a href="{pagination.U_PREVIOUS}" class="gensmall">{pagination.L_PREVIOUS}</a>&nbsp;
+		<!-- END previous -->
+
+		<!-- BEGIN page_number -->
+		<!-- BEGIN number -->
+		<!-- BEGIN current -->
+		{pagination.page_number.PAGE}{pagination.page_number.L_SEP}
+		<!-- END current -->
+		<!-- BEGIN current_ELSE -->
+		<a href="{pagination.page_number.U_PAGE}" class="gensmall">{pagination.page_number.PAGE}</a>{pagination.page_number.L_SEP}
+		<!-- END current_ELSE -->
+		<!-- END number -->
+		<!-- BEGIN number_ELSE -->
+		...,
+		<!-- END number_ELSE -->
+		<!-- END page_number -->
+
+		<!-- BEGIN next -->
+		<a href="{pagination.U_NEXT}" class="gensmall">{pagination.L_NEXT}</a>
+		<!-- END next -->
+		<!-- END pagination -->
+	</b></span></td>
+</tr>
+</table>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+<!-- BEGIN pagination -->
+<table border="0" cellpadding="2" cellspacing="0" width="100%">
+<tr>
+	<td width="100%" valign="bottom"><span class="gensmall">
+		<b>{pagination.L_PAGE_OF}</b>&nbsp;{pagination.L_COUNT}
+	</span></td>
+	<td align="right" valign="bottom" nowrap="nowrap"><span class="gensmall">&nbsp;
+		<!-- BEGIN unique_ELSE --><b>{pagination.L_GOTO}:&nbsp;</b><!-- END unique_ELSE -->
+		<!-- BEGIN previous --><b><a href="{pagination.U_PREVIOUS}" class="gensmall">{pagination.L_PREVIOUS}</a>&nbsp;</b><!-- END previous -->
+		<!-- BEGIN page_number --><b><!-- BEGIN number --><!-- BEGIN current_ELSE --><a href="{pagination.page_number.U_PAGE}" class="gensmall"><!-- END current_ELSE -->{pagination.page_number.PAGE}<!-- BEGIN current_ELSE --></a><!-- END current_ELSE --><!-- BEGIN sep -->, <!-- END sep --><!-- BEGINELSE number -->..., <!-- END number --></b><!-- END page_number -->
+		<!-- BEGIN next --><b>&nbsp;<a href="{pagination.U_NEXT}" class="gensmall">{pagination.L_NEXT}</a></b><!-- END next -->
+	</span></td>
+</tr>
+</table>
+<!-- END pagination -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this is a partial search : the full line is longer
+#
+<a name="{postrow.U_POST_ID}"></a><
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+<a name="{postrow.U_POST_ID}"></a><
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+<
+#
+#-----[ FIND ]------------------------------------------------
+#
+					<!-- BEGIN msg_icon -->
+					<img src="{postrow.msg_icon.I_ICON}" border="0" title="{postrow.msg_icon.L_ICON}" align="absbottom" />
+					<!-- END msg_icon -->
+					<!-- BEGIN sub_type -->
+					<!-- BEGIN img -->
+					<img src="{postrow.sub_type.I_SUB_TYPE}" border="0" alt="{postrow.sub_type.L_SUB_TYPE}" title="{postrow.sub_type.L_SUB_TYPE}" align="absbottom" />
+					<!-- END img -->
+					<!-- BEGIN txt -->
+					<b>[{postrow.sub_type.L_SUB_TYPE}]</b>
+					<!-- END txt -->
+					<!-- END sub_type -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+					<!-- BEGIN msg_icon --><img src="{postrow.msg_icon.I_ICON}" border="0" title="{postrow.msg_icon.L_ICON}" class="absbottom" />&nbsp;<!-- END msg_icon -->
+					<!-- BEGIN sub_type --><!-- BEGIN img --><img src="{postrow.sub_type.I_SUB_TYPE}" border="0" alt="{postrow.sub_type.L_SUB_TYPE}" title="{postrow.sub_type.L_SUB_TYPE}" class="absbottom" />&nbsp;<!-- END img --><!-- BEGIN txt --><b>[{postrow.sub_type.L_SUB_TYPE}]</b>&nbsp;<!-- END txt --><!-- END sub_type -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+					<!-- BEGIN sub_title -->
+					<br />{L_SUB_TITLE}: {postrow.sub_title.SUB_TITLE}
+					<!-- END sub_title -->
+					<!-- BEGIN announce -->
+					<br />{postrow.announce.S_ANNOUNCE}
+					<!-- END announce -->
+					<!-- BEGIN calendar_event -->
+					<br />{postrow.calendar_event.S_CALENDAR_EVENT}
+					<!-- END calendar_event -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+					<!-- BEGIN sub_title --><br />{L_SUB_TITLE}: {postrow.sub_title.SUB_TITLE}<!-- END sub_title -->
+					<!-- BEGIN announce --><br />{postrow.announce.S_ANNOUNCE}<!-- END announce -->
+					<!-- BEGIN calendar_event --><br />{postrow.calendar_event.S_CALENDAR_EVENT}<!-- END calendar_event -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+<table width="100%" cellspacing="2" cellpadding="2" border="0">
+<tr>
+	<td width="100%" align="left"><span class="gensmall">
+		<!-- BEGIN pagination -->
+		<b>{pagination.L_PAGE_OF}</b>&nbsp;{pagination.L_COUNT}
+		<!-- END pagination -->
+	</span></td>
+	<td align="right" nowrap="nowrap"><span class="gensmall"><b>
+		<!-- BEGIN pagination -->
+		<!-- BEGIN unique_ELSE -->
+		{pagination.L_GOTO}:&nbsp;
+		<!-- END unique_ELSE -->
+		<!-- BEGIN previous -->
+		<a href="{pagination.U_PREVIOUS}" class="gensmall">{pagination.L_PREVIOUS}</a>&nbsp;
+		<!-- END previous -->
+
+		<!-- BEGIN page_number -->
+		<!-- BEGIN number -->
+		<!-- BEGIN current -->
+		{pagination.page_number.PAGE}{pagination.page_number.L_SEP}
+		<!-- END current -->
+		<!-- BEGIN current_ELSE -->
+		<a href="{pagination.page_number.U_PAGE}" class="gensmall">{pagination.page_number.PAGE}</a>{pagination.page_number.L_SEP}
+		<!-- END current_ELSE -->
+		<!-- END number -->
+		<!-- BEGIN number_ELSE -->
+		...,
+		<!-- END number_ELSE -->
+		<!-- END page_number -->
+
+		<!-- BEGIN next -->
+		<a href="{pagination.U_NEXT}" class="gensmall">{pagination.L_NEXT}</a>
+		<!-- END next -->
+		<!-- END pagination -->
+	</b></span></td>
+</tr>
+</table>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+<!-- BEGIN pagination -->
+<table border="0" cellpadding="2" cellspacing="0" width="100%">
+<tr>
+	<td width="100%" valign="top"><span class="gensmall">
+		<b>{pagination.L_PAGE_OF}</b>&nbsp;{pagination.L_COUNT}
+	</span></td>
+	<td align="right" valign="top" nowrap="nowrap"><span class="gensmall">&nbsp;
+		<!-- BEGIN unique_ELSE --><b>{pagination.L_GOTO}:&nbsp;</b><!-- END unique_ELSE -->
+		<!-- BEGIN previous --><b><a href="{pagination.U_PREVIOUS}" class="gensmall">{pagination.L_PREVIOUS}</a>&nbsp;</b><!-- END previous -->
+		<!-- BEGIN page_number --><b><!-- BEGIN number --><!-- BEGIN current_ELSE --><a href="{pagination.page_number.U_PAGE}" class="gensmall"><!-- END current_ELSE -->{pagination.page_number.PAGE}<!-- BEGIN current_ELSE --></a><!-- END current_ELSE --><!-- BEGIN sep -->, <!-- END sep --><!-- BEGINELSE number -->..., <!-- END number --></b><!-- END page_number -->
+		<!-- BEGIN next --><b>&nbsp;<a href="{pagination.U_NEXT}" class="gensmall">{pagination.L_NEXT}</a></b><!-- END next -->
+	</span></td>
+</tr>
+</table>
+<!-- END pagination -->
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/search_results_posts.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+<table border="0" cellpadding="2" cellspacing="0" width="100%">
+<tr>
+	<td width="100%" valign="bottom"><span class="gensmall">
+		<!-- BEGIN pagination -->
+		<b>{pagination.L_PAGE_OF}</b>&nbsp;{pagination.L_COUNT}
+		<!-- END pagination -->
+	</span></td>
+	<td align="right" valign="bottom" nowrap="nowrap"><span class="gensmall">
+		<b>
+		<!-- BEGIN pagination -->
+		<!-- BEGIN unique_ELSE -->
+		{pagination.L_GOTO}:&nbsp;
+		<!-- END unique_ELSE -->
+		<!-- BEGIN previous -->
+		<a href="{pagination.U_PREVIOUS}" class="gensmall">{pagination.L_PREVIOUS}</a>&nbsp;
+		<!-- END previous -->
+
+		<!-- BEGIN page_number -->
+		<!-- BEGIN number -->
+		<!-- BEGIN current -->
+		{pagination.page_number.PAGE}{pagination.page_number.L_SEP}
+		<!-- END current -->
+		<!-- BEGIN current_ELSE -->
+		<a href="{pagination.page_number.U_PAGE}" class="gensmall">{pagination.page_number.PAGE}</a>{pagination.page_number.L_SEP}
+		<!-- END current_ELSE -->
+		<!-- END number -->
+		<!-- BEGIN number_ELSE -->
+		...,
+		<!-- END number_ELSE -->
+		<!-- END page_number -->
+
+		<!-- BEGIN next -->
+		<a href="{pagination.U_NEXT}" class="gensmall">{pagination.L_NEXT}</a>
+		<!-- END next -->
+		<!-- END pagination -->
+	</b></span></td>
+</tr>
+</table>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+<!-- BEGIN pagination -->
+<table border="0" cellpadding="2" cellspacing="0" width="100%">
+<tr>
+	<td width="100%" valign="bottom"><span class="gensmall">
+		<b>{pagination.L_PAGE_OF}</b>&nbsp;{pagination.L_COUNT}
+	</span></td>
+	<td align="right" valign="bottom" nowrap="nowrap"><span class="gensmall">&nbsp;
+		<!-- BEGIN unique_ELSE --><b>{pagination.L_GOTO}:&nbsp;</b><!-- END unique_ELSE -->
+		<!-- BEGIN previous --><b><a href="{pagination.U_PREVIOUS}" class="gensmall">{pagination.L_PREVIOUS}</a>&nbsp;</b><!-- END previous -->
+		<!-- BEGIN page_number --><b><!-- BEGIN number --><!-- BEGIN current_ELSE --><a href="{pagination.page_number.U_PAGE}" class="gensmall"><!-- END current_ELSE -->{pagination.page_number.PAGE}<!-- BEGIN current_ELSE --></a><!-- END current_ELSE --><!-- BEGIN sep -->, <!-- END sep --><!-- BEGINELSE number -->..., <!-- END number --></b><!-- END page_number -->
+		<!-- BEGIN next --><b>&nbsp;<a href="{pagination.U_NEXT}" class="gensmall">{pagination.L_NEXT}</a></b><!-- END next -->
+	</span></td>
+</tr>
+</table>
+<!-- END pagination -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this is a partial search : the full line is longer
+#
+<img src="{I_TOPIC}" align="absmiddle">
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+<img src="{I_TOPIC}" align="absmiddle">
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+<img src="{I_TOPIC}" alt="" align="middle">
+#
+#-----[ FIND ]------------------------------------------------
+#
+		<!-- BEGIN msg_icon -->
+		<img src="{searchresults.msg_icon.I_ICON}" border="0" title="{searchresults.msg_icon.L_ICON}" align="absbottom" />
+		<!-- END msg_icon -->
+		<!-- BEGIN sub_type -->
+		<!-- BEGIN img -->
+		<img src="{searchresults.sub_type.I_SUB_TYPE}" border="0" alt="{searchresults.sub_type.L_SUB_TYPE}" title="{searchresults.sub_type.L_SUB_TYPE}" align="absbottom" />
+		<!-- END img -->
+		<!-- BEGIN txt -->
+		<b>[{searchresults.sub_type.L_SUB_TYPE}]</b>
+		<!-- END txt -->
+		<!-- END sub_type -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		<!-- BEGIN msg_icon --><img src="{searchresults.msg_icon.I_ICON}" border="0" title="{searchresults.msg_icon.L_ICON}" class="absbottom" />&nbsp;<!-- END msg_icon -->
+		<!-- BEGIN sub_type --><!-- BEGIN img --><img src="{searchresults.sub_type.I_SUB_TYPE}" border="0" alt="{searchresults.sub_type.L_SUB_TYPE}" title="{searchresults.sub_type.L_SUB_TYPE}" class="absbottom" />&nbsp;<!-- END img --><!-- BEGIN txt --><b>[{searchresults.sub_type.L_SUB_TYPE}]</b>&nbsp;<!-- END txt --><!-- END sub_type -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+		<!-- BEGIN sub_title -->
+		<br />{L_SUB_TITLE}: {searchresults.sub_title.SUB_TITLE}
+		<!-- END sub_title -->
+		<!-- BEGIN announce -->
+		<br />{searchresults.announce.S_ANNOUNCE}
+		<!-- END announce -->
+		<!-- BEGIN calendar_event -->
+		<br />{searchresults.calendar_event.S_CALENDAR_EVENT}
+		<!-- END calendar_event -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		<!-- BEGIN sub_title --><br />{L_SUB_TITLE}: {searchresults.sub_title.SUB_TITLE}<!-- END sub_title -->
+		<!-- BEGIN announce --><br />{searchresults.announce.S_ANNOUNCE}<!-- END announce -->
+		<!-- BEGIN calendar_event --><br />{searchresults.calendar_event.S_CALENDAR_EVENT}<!-- END calendar_event -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+		<!-- BEGIN nav -->
+		<a href="{searchresults.nav.U_NAV}" title="{searchresults.nav.L_NAV_DESC}" class="postdetails">{searchresults.nav.L_NAV}</a>
+		<!-- BEGIN sep -->
+		&raquo;
+		<!-- END sep -->
+		<!-- END nav -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		<!-- BEGIN nav --><a href="{searchresults.nav.U_NAV}" title="{searchresults.nav.L_NAV_DESC}" class="postdetails">{searchresults.nav.L_NAV}</a><!-- BEGIN sep --> &raquo;&nbsp;<!-- END sep --><!-- END nav -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+<table border="0" cellpadding="2" cellspacing="0" width="100%">
+<tr>
+	<td width="100%" valign="top"><span class="gensmall">
+		<!-- BEGIN pagination -->
+		<b>{pagination.L_PAGE_OF}</b>&nbsp;{pagination.L_COUNT}
+		<!-- END pagination -->
+	</span></td>
+	<td align="right" valign="top" nowrap="nowrap"><span class="gensmall">
+		<b>
+		<!-- BEGIN pagination -->
+		<!-- BEGIN unique_ELSE -->
+		{pagination.L_GOTO}:&nbsp;
+		<!-- END unique_ELSE -->
+		<!-- BEGIN previous -->
+		<a href="{pagination.U_PREVIOUS}" class="gensmall">{pagination.L_PREVIOUS}</a>&nbsp;
+		<!-- END previous -->
+
+		<!-- BEGIN page_number -->
+		<!-- BEGIN number -->
+		<!-- BEGIN current -->
+		{pagination.page_number.PAGE}{pagination.page_number.L_SEP}
+		<!-- END current -->
+		<!-- BEGIN current_ELSE -->
+		<a href="{pagination.page_number.U_PAGE}" class="gensmall">{pagination.page_number.PAGE}</a>{pagination.page_number.L_SEP}
+		<!-- END current_ELSE -->
+		<!-- END number -->
+		<!-- BEGIN number_ELSE -->
+		...,
+		<!-- END number_ELSE -->
+		<!-- END page_number -->
+
+		<!-- BEGIN next -->
+		<a href="{pagination.U_NEXT}" class="gensmall">{pagination.L_NEXT}</a>
+		<!-- END next -->
+		<!-- END pagination -->
+	</b></span></td>
+</tr>
+</table>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+<!-- BEGIN pagination -->
+<table border="0" cellpadding="2" cellspacing="0" width="100%">
+<tr>
+	<td width="100%" valign="top"><span class="gensmall">
+		<b>{pagination.L_PAGE_OF}</b>&nbsp;{pagination.L_COUNT}
+	</span></td>
+	<td align="right" valign="top" nowrap="nowrap"><span class="gensmall">&nbsp;
+		<!-- BEGIN unique_ELSE --><b>{pagination.L_GOTO}:&nbsp;</b><!-- END unique_ELSE -->
+		<!-- BEGIN previous --><b><a href="{pagination.U_PREVIOUS}" class="gensmall">{pagination.L_PREVIOUS}</a>&nbsp;</b><!-- END previous -->
+		<!-- BEGIN page_number --><b><!-- BEGIN number --><!-- BEGIN current_ELSE --><a href="{pagination.page_number.U_PAGE}" class="gensmall"><!-- END current_ELSE -->{pagination.page_number.PAGE}<!-- BEGIN current_ELSE --></a><!-- END current_ELSE --><!-- BEGIN sep -->, <!-- END sep --><!-- BEGINELSE number -->..., <!-- END number --></b><!-- END page_number -->
+		<!-- BEGIN next --><b>&nbsp;<a href="{pagination.U_NEXT}" class="gensmall">{pagination.L_NEXT}</a></b><!-- END next -->
+	</span></td>
+</tr>
+</table>
+<!-- END pagination -->
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/search_results_topics.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<td width="100%" valign="bottom"><span class="gensmall">
+		<!-- BEGIN pagination -->
+		<b>{forum_header.pagination.L_PAGE_OF}</b>&nbsp;{forum_header.pagination.L_COUNT}
+		<!-- END pagination -->
+	</span></td>
+	<td align="right" valign="bottom" nowrap="nowrap"><span class="gensmall">
+		<b>
+		<!-- BEGIN pagination -->
+		<!-- BEGIN unique_ELSE -->
+		{forum_header.pagination.L_GOTO}:&nbsp;
+		<!-- END unique_ELSE -->
+		<!-- BEGIN previous -->
+		<a href="{forum_header.pagination.U_PREVIOUS}" class="gensmall">{forum_header.pagination.L_PREVIOUS}</a>&nbsp;
+		<!-- END previous -->
+
+		<!-- BEGIN page_number -->
+		<!-- BEGIN number -->
+		<!-- BEGIN current -->
+		{forum_header.pagination.page_number.PAGE}{forum_header.pagination.page_number.L_SEP}
+		<!-- END current -->
+		<!-- BEGIN current_ELSE -->
+		<a href="{forum_header.pagination.page_number.U_PAGE}" class="gensmall">{forum_header.pagination.page_number.PAGE}</a>{forum_header.pagination.page_number.L_SEP}
+		<!-- END current_ELSE -->
+		<!-- END number -->
+		<!-- BEGIN number_ELSE -->
+		...,
+		<!-- END number_ELSE -->
+		<!-- END page_number -->
+
+		<!-- BEGIN next -->
+		<a href="{forum_header.pagination.U_NEXT}" class="gensmall">{forum_header.pagination.L_NEXT}</a>
+		<!-- END next -->
+		<!-- END pagination -->
+	</b></span></td>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<td width="100%" valign="bottom"><span class="gensmall">
+		<!-- BEGIN pagination --><b>{forum_header.pagination.L_PAGE_OF}</b>&nbsp;{forum_header.pagination.L_COUNT}<!-- END pagination -->
+	</span></td>
+	<td align="right" valign="bottom" nowrap="nowrap"><span class="gensmall">&nbsp;
+<!-- BEGIN pagination -->
+		<!-- BEGIN unique_ELSE --><b>{forum_header.pagination.L_GOTO}:&nbsp;</b><!-- END unique_ELSE -->
+		<!-- BEGIN previous --><b><a href="{forum_header.pagination.U_PREVIOUS}" class="gensmall">{forum_header.pagination.L_PREVIOUS}</a>&nbsp;</b><!-- END previous -->
+		<!-- BEGIN page_number --><b><!-- BEGIN number --><!-- BEGIN current_ELSE --><a href="{forum_header.pagination.page_number.U_PAGE}" class="gensmall"><!-- END current_ELSE -->{forum_header.pagination.page_number.PAGE}<!-- BEGIN current_ELSE --></a><!-- END current_ELSE --><!-- BEGIN sep -->, <!-- END sep --><!-- BEGINELSE number -->..., <!-- END number --></b><!-- END page_number -->
+		<!-- BEGIN next --><b>&nbsp;<a href="{forum_header.pagination.U_NEXT}" class="gensmall">{forum_header.pagination.L_NEXT}</a></b><!-- END next -->
+<!-- END pagination -->
+	</span></td>
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<td width="100%" valign="bottom"><span class="gensmall">
+		<!-- BEGIN pagination -->
+		<b>{forum_header.pagination.L_PAGE_OF}</b>&nbsp;{forum_header.pagination.L_COUNT}
+		<!-- END pagination -->
+	</span></td>
+	<td align="right" valign="bottom" nowrap="nowrap"><span class="gensmall">
+		<b>
+		<!-- BEGIN pagination -->
+		<!-- BEGIN unique_ELSE -->
+		{forum_header.pagination.L_GOTO}:&nbsp;
+		<!-- END unique_ELSE -->
+		<!-- BEGIN previous -->
+		<a href="{forum_header.pagination.U_PREVIOUS}" class="gensmall">{forum_header.pagination.L_PREVIOUS}</a>&nbsp;
+		<!-- END previous -->
+
+		<!-- BEGIN page_number -->
+		<!-- BEGIN number -->
+		<!-- BEGIN current -->
+		{forum_header.pagination.page_number.PAGE}{forum_header.pagination.page_number.L_SEP}
+		<!-- END current -->
+		<!-- BEGIN current_ELSE -->
+		<a href="{forum_header.pagination.page_number.U_PAGE}" class="gensmall">{forum_header.pagination.page_number.PAGE}</a>{forum_header.pagination.page_number.L_SEP}
+		<!-- END current_ELSE -->
+		<!-- END number -->
+		<!-- BEGIN number_ELSE -->
+		...,
+		<!-- END number_ELSE -->
+		<!-- END page_number -->
+
+		<!-- BEGIN next -->
+		<a href="{forum_header.pagination.U_NEXT}" class="gensmall">{forum_header.pagination.L_NEXT}</a>
+		<!-- END next -->
+		<!-- END pagination -->
+	</b></span></td>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<td width="100%" valign="bottom"><span class="gensmall">
+		<!-- BEGIN pagination --><b>{forum_header.pagination.L_PAGE_OF}</b>&nbsp;{forum_header.pagination.L_COUNT}<!-- END pagination -->
+	</span></td>
+	<td align="right" valign="bottom" nowrap="nowrap"><span class="gensmall">&nbsp;
+<!-- BEGIN pagination -->
+		<!-- BEGIN unique_ELSE --><b>{forum_header.pagination.L_GOTO}:&nbsp;</b><!-- END unique_ELSE -->
+		<!-- BEGIN previous --><b><a href="{forum_header.pagination.U_PREVIOUS}" class="gensmall">{forum_header.pagination.L_PREVIOUS}</a>&nbsp;</b><!-- END previous -->
+		<!-- BEGIN page_number --><b><!-- BEGIN number --><!-- BEGIN current_ELSE --><a href="{forum_header.pagination.page_number.U_PAGE}" class="gensmall"><!-- END current_ELSE -->{forum_header.pagination.page_number.PAGE}<!-- BEGIN current_ELSE --></a><!-- END current_ELSE --><!-- BEGIN sep -->, <!-- END sep --><!-- BEGINELSE number -->..., <!-- END number --></b><!-- END page_number -->
+		<!-- BEGIN next --><b>&nbsp;<a href="{forum_header.pagination.U_NEXT}" class="gensmall">{forum_header.pagination.L_NEXT}</a></b><!-- END next -->
+<!-- END pagination -->
+	</span></td>
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/simple_footer.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+		</td>
+	</tr>
+</table>
+
+</body>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+
+</body>
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/simple_header.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+<style type="text/css">
+<!--
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+.absbottom {
+	vertical-align: text-bottom;
+}
+.dom_overview_abshidden { position: absolute; visibility: hidden; width: 300px; }
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/subSilver.cfg
+#
+#-----[ FIND ]------------------------------------------------
+#
+$images['logo_small'] = "$current_template_images/logo_phpBB_med.gif";
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+$images['earth'] = $current_template_images . '/earth.gif';
+#
+#-----[ FIND ]------------------------------------------------
+#
+$images['spacer'] = "$current_template_images/spacer.gif";
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+// calendar
+$images['folder_birthday'] = "$current_template_images/folder_calendar.gif";
+
+$images['icon_calendar'] = "$current_template_images/icon_calendar.gif";
+$images['menu_calendar'] = "$current_template_images/icon_mini_calendar.gif";
+$images['icon_tiny_topic'] = "$current_template_images/icon_tiny_topic.gif";
+$images['icon_tiny_profile'] = "$current_template_images/icon_tiny_profile.gif";
+$images['up_arrow'] = "$current_template_images/icon_up_arrow.gif";
+$images['down_arrow'] = "$current_template_images/icon_down_arrow.gif";
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/subSilver.css
+#
+#-----[ FIND ]------------------------------------------------
+#
+/*
+  The original subSilver Theme for phpBB version 2+
+  Created by subBlue design
+  http://www.subBlue.com
+*/
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+
+.absbottom {
+	vertical-align: text-bottom;
+}
+.dom_overview_abshidden { position: absolute; visibility: hidden; width: 300px; }
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/topics_bottom_forum.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+<tr><form method="post" action="{S_ACTION}">
+	<!-- BEGIN no_topics -->
+	<td class="catBottom" align="center" valign="middle" colspan="5" height="28"><span class="genmed">
+	<!-- END no_topics -->
+	<!-- BEGIN no_topics_ELSE -->
+	<td class="catBottom" align="center" valign="middle" colspan="7" height="28"><span class="genmed">
+	<!-- END no_topics_ELSE -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+<tr>
+	<td class="catBottom" align="center" valign="middle" colspan="<!-- BEGIN no_topics -->5<!-- BEGINELSE no_topics -->7<!-- END no_topics -->" height="28"><span class="genmed">&nbsp;
+#
+#-----[ FIND ]------------------------------------------------
+#
+		<input type="submit" class="liteoption" value="{L_GO}" name="submit" />
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+/>
+#
+#----------[ IN-LINE AFTER, ADD ]-----------------------------
+#
+&nbsp;
+#
+#-----[ FIND ]------------------------------------------------
+#
+</form></tr>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+</tr>
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/topics_bottom_modcp.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<!-- BEGIN no_topics -->
+	<td class="catBottom" colspan="6" height="29" align="right" nowrap="nowrap"><span class="gensmall">
+	<!-- END no_topics -->
+	<!-- BEGIN no_topics_ELSE -->
+	<td class="catBottom" colspan="8" height="29" align="right" nowrap="nowrap"><span class="gensmall">
+	<!-- END no_topics_ELSE -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<td class="catBottom" colspan="<!-- BEGIN no_topics -->6<!-- BEGINELSE no_topics -->8<!-- END no_topics -->" height="29" align="right" nowrap="nowrap"><span class="gensmall">&nbsp;
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/topics_bottom_search.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<!-- BEGIN no_topics -->
+	<td class="catBottom" align="center" valign="middle" colspan="5" height="28"><span class="genmed">
+	<!-- END no_topics -->
+	<!-- BEGIN no_topics_ELSE -->
+	<td class="catBottom" align="center" valign="middle" colspan="7" height="28"><span class="genmed">
+	<!-- END no_topics_ELSE -->
+		&nbsp;
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<td class="catBottom" align="center" valign="middle" colspan="<!-- BEGIN no_topics -->5<!-- BEGINELSE no_topics -->7<!-- END no_topics -->" height="28"><span class="genmed">&nbsp;
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/topics_box.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+		<!-- BEGIN moderators -->
+		<b>{L_MODERATORS}:&nbsp;</b>
+		<!-- BEGIN mod -->
+		<a href="{forum_header.moderators.mod.U_MOD}" title="{forum_header.moderators.mod.L_MOD_TITLE}" class="gensmall">{forum_header.moderators.mod.L_MOD}</a>{forum_header.moderators.mod.L_SEP}
+		<!-- END mod -->
+		<!-- END moderators -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		<!-- BEGIN moderators --><b>{L_MODERATORS}:&nbsp;</b><!-- BEGIN mod --><a href="{forum_header.moderators.mod.U_MOD}" title="{forum_header.moderators.mod.L_MOD_TITLE}" class="gensmall">{forum_header.moderators.mod.L_MOD}</a><!-- BEGIN sep -->, <!-- END sep --><!-- END mod --><!-- END moderators -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<td><a href="{U_POST_NEW_TOPIC}" title="{L_POST_NEW_TOPIC}"><img src="{I_POST_NEW_TOPIC}" border="0" alt="{L_POST_NEW_TOPIC}" /></a></td>
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+<td>
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+<td valign="bottom" nowrap="nowrap">
+#
+#-----[ FIND ]------------------------------------------------
+#
+		<!-- BEGIN pagination -->
+		<b>{forum_header.pagination.L_PAGE_OF}</b>&nbsp;{forum_header.pagination.L_COUNT}
+		<!-- END pagination -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		<!-- BEGIN pagination --><b>{forum_header.pagination.L_PAGE_OF}</b>&nbsp;{forum_header.pagination.L_COUNT}<!-- END pagination -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<td align="right" valign="bottom" nowrap="nowrap"><span class="gensmall">
+		<!-- BEGIN mark -->
+		<a href="{forum_header.U_MARK_READ}" class="gensmall">{forum_header.L_MARK_READ}</a><br />
+		<!-- END mark -->
+		<b>
+		<!-- BEGIN pagination -->
+		<!-- BEGIN unique_ELSE -->
+		{forum_header.pagination.L_GOTO}:&nbsp;
+		<!-- END unique_ELSE -->
+		<!-- BEGIN previous -->
+		<a href="{forum_header.pagination.U_PREVIOUS}" class="gensmall">{forum_header.pagination.L_PREVIOUS}</a>&nbsp;
+		<!-- END previous -->
+
+		<!-- BEGIN page_number -->
+		<!-- BEGIN number -->
+		<!-- BEGIN current -->
+		{forum_header.pagination.page_number.PAGE}{forum_header.pagination.page_number.L_SEP}
+		<!-- END current -->
+		<!-- BEGIN current_ELSE -->
+		<a href="{forum_header.pagination.page_number.U_PAGE}" class="gensmall">{forum_header.pagination.page_number.PAGE}</a>{forum_header.pagination.page_number.L_SEP}
+		<!-- END current_ELSE -->
+		<!-- END number -->
+		<!-- BEGIN number_ELSE -->
+		...,
+		<!-- END number_ELSE -->
+		<!-- END page_number -->
+
+		<!-- BEGIN next -->
+		<a href="{forum_header.pagination.U_NEXT}" class="gensmall">{forum_header.pagination.L_NEXT}</a>
+		<!-- END next -->
+		<!-- END pagination -->
+	</b></span></td>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<td align="right" valign="bottom" nowrap="nowrap"><span class="gensmall">
+		<!-- BEGIN mark --><a href="{forum_header.U_MARK_READ}" class="gensmall">{forum_header.L_MARK_READ}</a><br /><!-- END mark -->
+<!-- BEGIN pagination -->
+		<!-- BEGIN unique_ELSE --><b>{forum_header.pagination.L_GOTO}:&nbsp;</b><!-- END unique_ELSE -->
+		<!-- BEGIN previous --><b><a href="{forum_header.pagination.U_PREVIOUS}" class="gensmall">{forum_header.pagination.L_PREVIOUS}</a>&nbsp;</b><!-- END previous -->
+		<!-- BEGIN page_number --><b><!-- BEGIN number --><!-- BEGIN current_ELSE --><a href="{forum_header.pagination.page_number.U_PAGE}" class="gensmall"><!-- END current_ELSE -->{forum_header.pagination.page_number.PAGE}<!-- BEGIN current_ELSE --></a><!-- END current_ELSE --><!-- BEGIN sep -->, <!-- END sep --><!-- BEGINELSE number -->..., <!-- END number --></b><!-- END page_number -->
+		<!-- BEGIN next --><b>&nbsp;<a href="{forum_header.pagination.U_NEXT}" class="gensmall">{forum_header.pagination.L_NEXT}</a></b><!-- END next -->
+<!-- END pagination -->
+	</span></td>
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<td><a href="{U_POST_NEW_TOPIC}" title="{L_POST_NEW_TOPIC}"><img src="{I_POST_NEW_TOPIC}" border="0" alt="{L_POST_NEW_TOPIC}" /></a></td>
+#
+#----------[ IN-LINE FIND ]-----------------------------------
+#
+<td>
+#
+#----------[ IN-LINE REPLACE WITH ]---------------------------
+#
+<td valign="top" nowrap="nowrap">
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<td width="100%" valign="top">
+		<!-- BEGIN pagination -->
+		<span class="gensmall">
+			<b>{forum_header.pagination.L_PAGE_OF}</b>
+		</span><span class="gensmall">
+			{forum_header.pagination.L_COUNT}
+		</span>
+		<!-- END pagination -->
+	</td>
+	<td align="right" valign="top" nowrap="nowrap"><span class="gensmall"><b>
+		<!-- BEGIN pagination -->
+		<!-- BEGIN unique_ELSE -->
+		{forum_header.pagination.L_GOTO}:&nbsp;
+		<!-- END unique_ELSE -->
+		<!-- BEGIN previous -->
+		<a href="{forum_header.pagination.U_PREVIOUS}" class="gensmall">{forum_header.pagination.L_PREVIOUS}</a>&nbsp;
+		<!-- END previous -->
+
+		<!-- BEGIN page_number -->
+		<!-- BEGIN number -->
+		<!-- BEGIN current -->
+		{forum_header.pagination.page_number.PAGE}{forum_header.pagination.page_number.L_SEP}
+		<!-- END current -->
+		<!-- BEGIN current_ELSE -->
+		<a href="{forum_header.pagination.page_number.U_PAGE}" class="gensmall">{forum_header.pagination.page_number.PAGE}</a>{forum_header.pagination.page_number.L_SEP}
+		<!-- END current_ELSE -->
+		<!-- END number -->
+		<!-- BEGIN number_ELSE -->
+		...,
+		<!-- END number_ELSE -->
+		<!-- END page_number -->
+
+		<!-- BEGIN next -->
+		<a href="{forum_header.pagination.U_NEXT}" class="gensmall">{forum_header.pagination.L_NEXT}</a>
+		<!-- END next -->
+		<!-- BEGIN unique_ELSE -->
+		<br />
+		<!-- END unique_ELSE -->
+		<!-- END pagination -->
+		</b>
+		<!-- BEGIN mark -->
+		<a href="{forum_header.U_MARK_READ}" class="gensmall">{forum_header.L_MARK_READ}</a>
+		<!-- END mark -->
+	</span></td>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<td width="100%" valign="top"><span class="gensmall">
+		<!-- BEGIN pagination --><b>{forum_header.pagination.L_PAGE_OF}</b>&nbsp;{forum_header.pagination.L_COUNT}<!-- END pagination -->
+	</span></td>
+	<td align="right" valign="top" nowrap="nowrap"><span class="gensmall">
+<!-- BEGIN pagination -->
+		<!-- BEGIN unique_ELSE --><b>{forum_header.pagination.L_GOTO}:&nbsp;</b><!-- END unique_ELSE -->
+		<!-- BEGIN previous --><b><a href="{forum_header.pagination.U_PREVIOUS}" class="gensmall">{forum_header.pagination.L_PREVIOUS}</a>&nbsp;</b><!-- END previous -->
+		<!-- BEGIN page_number --><b><!-- BEGIN number --><!-- BEGIN current_ELSE --><a href="{forum_header.pagination.page_number.U_PAGE}" class="gensmall"><!-- END current_ELSE -->{forum_header.pagination.page_number.PAGE}<!-- BEGIN current_ELSE --></a><!-- END current_ELSE --><!-- BEGIN sep -->, <!-- END sep --><!-- BEGINELSE number -->..., <!-- END number --></b><!-- END page_number -->
+		<!-- BEGIN next --><b>&nbsp;<a href="{forum_header.pagination.U_NEXT}" class="gensmall">{forum_header.pagination.L_NEXT}</a></b><!-- END next -->
+		<!-- BEGIN unique_ELSE --><br /><!-- END unique_ELSE -->
+<!-- END pagination -->
+		<!-- BEGIN mark --><a href="{forum_header.U_MARK_READ}" class="gensmall">{forum_header.L_MARK_READ}</a><!-- END mark -->
+	</span></td>
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/topics_row_box.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+<!-- BEGIN spacing -->
+<br class="nav" />
+<!-- END spacing -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+<!-- BEGIN spacing --><br class="nav" /><!-- END spacing -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<!-- BEGIN no_topics -->
+	<th align="center" height="25" class="thCornerL" nowrap="nowrap" width="100%">
+	<!-- END no_topics -->
+	<!-- BEGIN no_topics_ELSE -->
+	<th colspan="3" align="center" height="25" class="thCornerL" nowrap="nowrap" width="100%">
+	<!-- END no_topics_ELSE -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<th align="center" height="25" class="thCornerL" nowrap="nowrap" width="100%" <!-- BEGIN no_topics_ELSE -->colspan="3"<!-- END no_topics_ELSE -->>
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<!-- BEGIN select -->
+	<th width="200" align="center" class="thTop" nowrap="nowrap">
+	<!-- END select -->
+	<!-- BEGIN select_ELSE -->
+	<th width="200" align="center" class="thCornerR" nowrap="nowrap">
+	<!-- END select_ELSE -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<th width="200" align="center" class="<!-- BEGIN select -->thTop<!-- BEGINELSE select -->thCornerR<!-- END select -->" nowrap="nowrap">
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<!-- BEGIN select -->
+	<th align="center" class="thTop" nowrap="nowrap">&nbsp;{L_SELECT}&nbsp;</th>
+	<!-- END select -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<!-- BEGIN select --><th align="center" class="thTop" nowrap="nowrap">&nbsp;{L_SELECT}&nbsp;</th><!-- END select -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<!-- BEGIN select -->
+	<td class="row2" colspan="8"><span class="gensmall">
+	<!-- END select -->
+	<!-- BEGIN select_ELSE -->
+	<td class="row2" colspan="7"><span class="gensmall">
+	<!-- END select_ELSE -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<td class="row2" colspan="<!-- BEGIN select -->8<!-- BEGINELSE select -->7<!-- END select -->"><span class="gensmall">
+#
+#-----[ FIND ]------------------------------------------------
+#
+		<!-- BEGIN msg_icon -->
+		<img src="{topicrow.topic.msg_icon.I_ICON}" border="0" title="{topicrow.topic.msg_icon.L_ICON}" />
+		<!-- END msg_icon -->
+		<!-- BEGIN msg_icon_ELSE -->
+		<img src="{I_SPACER}" width="19" border="0" />
+		<!-- END msg_icon_ELSE -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		<!-- BEGIN msg_icon --><img src="{topicrow.topic.msg_icon.I_ICON}" alt="{topicrow.topic.msg_icon.L_ICON}" border="0" title="{topicrow.topic.msg_icon.L_ICON}" /><!-- BEGINELSE msg_icon --><img src="{I_SPACER}" width="19" border="0" alt="" /><!-- END msg_icon -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+		<!-- BEGIN newest_post -->
+		<a href="{topicrow.U_NEWEST_POST}" alt="{topicrow.L_NEWEST_POST}"><img src="{topicrow.I_NEWEST_POST}" border="0" alt="{topicrow.L_NEWEST_POST}" title="{topicrow.L_NEWEST_POST}" /></a>
+		<!-- END newest_post -->
+		<!-- BEGIN type -->
+		<!-- BEGIN img -->
+		<img src="{topicrow.topic.type.I_TOPIC_TYPE}" border="0" alt="{topicrow.topic.type.L_TOPIC_TYPE}" title="{topicrow.topic.type.L_TOPIC_TYPE}" />
+		<!-- END img -->
+		<!-- BEGIN txt -->
+		<b>[{topicrow.topic.type.L_TOPIC_TYPE}]</b>
+		<!-- END txt -->
+		<!-- END type -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		<!-- BEGIN newest_post --><a href="{topicrow.U_NEWEST_POST}" title="{topicrow.L_NEWEST_POST}"><img src="{topicrow.I_NEWEST_POST}" border="0" alt="{topicrow.L_NEWEST_POST}" title="{topicrow.L_NEWEST_POST}" /></a>&nbsp;<!-- END newest_post -->
+		<!-- BEGIN type --><!-- BEGIN img --><img src="{topicrow.topic.type.I_TOPIC_TYPE}" border="0" alt="{topicrow.topic.type.L_TOPIC_TYPE}" title="{topicrow.topic.type.L_TOPIC_TYPE}" /><!-- END img --><!-- BEGIN txt --><b>[{topicrow.topic.type.L_TOPIC_TYPE}]</b><!-- END txt -->&nbsp;<!-- END type -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+		<!-- BEGIN sub_title -->
+		<br />{topicrow.topic.sub_title.SUB_TITLE}
+		<!-- END sub_title -->
+		<!-- BEGIN calendar_event -->
+		<br />{topicrow.topic.calendar_event.S_CALENDAR_EVENT}
+		<!-- END calendar_event -->
+		<!-- BEGIN announce -->
+		<br />{topicrow.topic.announce.S_ANNOUNCE}
+		<!-- END announce -->
+		<!-- BEGIN pagination_OR_nav -->
+		<br />
+		<!-- END pagination_OR_nav -->
+		<!-- BEGIN pagination -->
+		[&nbsp;<img src="{topicrow.topic.pagination.I_GOTO}" border="0" align="middle" alt="{topicrow.topic.pagination.L_GOTO}" title="{topicrow.topic.pagination.L_GOTO}" />{topicrow.topic.pagination.L_GOTO}:
+		<!-- BEGIN page_number -->
+		<!-- BEGIN number -->
+		<a href="{topicrow.topic.pagination.page_number.U_PAGE}" class="gensmall">{topicrow.topic.pagination.page_number.PAGE}</a>{topicrow.topic.pagination.page_number.L_SEP}
+		<!-- END number -->
+		<!-- BEGIN number_ELSE -->
+		...,
+		<!-- END number_ELSE -->
+		<!-- END page_number -->
+		]
+		<!-- END pagination -->
+
+		<!-- BEGIN navigation -->
+		[
+		<!-- BEGIN nav -->
+		<a href="{topicrow.topic.navigation.nav.U_NAV}" title="{topicrow.topic.navigation.nav.L_NAV_DESC}" class="gensmall">{topicrow.topic.navigation.nav.L_NAV}</a>
+		<!-- BEGIN sep -->
+		&raquo;
+		<!-- END sep -->
+		<!-- END nav -->
+		]
+		<!-- END navigation -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		<!-- BEGIN sub_title --><br />{topicrow.topic.sub_title.SUB_TITLE}<!-- END sub_title -->
+		<!-- BEGIN calendar_event --><br />{topicrow.topic.calendar_event.S_CALENDAR_EVENT}<!-- END calendar_event -->
+		<!-- BEGIN announce --><br />{topicrow.topic.announce.S_ANNOUNCE}<!-- END announce -->
+		<!-- BEGIN pagination_OR_nav --><br /><!-- END pagination_OR_nav -->
+		<!-- BEGIN pagination -->[&nbsp;<img src="{topicrow.topic.pagination.I_GOTO}" border="0" align="middle" alt="{topicrow.topic.pagination.L_GOTO}" title="{topicrow.topic.pagination.L_GOTO}" hspace="2" />{topicrow.topic.pagination.L_GOTO}:&nbsp;<!-- BEGIN page_number --><!-- BEGIN number --><a href="{topicrow.topic.pagination.page_number.U_PAGE}" class="gensmall">{topicrow.topic.pagination.page_number.PAGE}</a><!-- BEGIN sep -->, <!-- END sep --><!-- BEGINELSE number -->..., <!-- END number --><!-- END page_number -->&nbsp;]<!-- END pagination -->
+		<!-- BEGIN navigation -->[&nbsp;<!-- BEGIN nav --><a href="{topicrow.topic.navigation.nav.U_NAV}" title="{topicrow.topic.navigation.nav.L_NAV_DESC}" class="gensmall">{topicrow.topic.navigation.nav.L_NAV}</a><!-- BEGIN sep -->&nbsp;&raquo;&nbsp;<!-- END sep --><!-- END nav -->&nbsp;]<!-- END navigation -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<td class="row1" align="center" valign="middle"><span class="name">
+		<!-- BEGIN author_userlink -->
+		<a href="{topicrow.U_TOPIC_AUTHOR}" title="{L_VIEW_PROFILE}" class="name">{topicrow.TOPIC_AUTHOR}</a>
+		<!-- END author_userlink -->
+		<!-- BEGIN author_userlink_ELSE -->
+		{topicrow.TOPIC_AUTHOR}
+		<!-- END author_userlink_ELSE -->
+	</span></td>
+	<td class="row2" align="center" valign="middle"><span class="postdetails">
+		{topicrow.REPLIES}
+	</span></td>
+	<td class="row2" align="center" valign="middle"><span class="postdetails">
+		{topicrow.VIEWS}
+	</span></td>
+	<!-- BEGIN select -->
+	<td class="row1" align="center" valign="middle" nowrap="nowrap"><span class="postdetails">
+	<!-- END select -->
+	<!-- BEGIN select_ELSE -->
+	<td class="row3Right" align="center" valign="middle" nowrap="nowrap"><span class="postdetails">
+	<!-- END select_ELSE -->
+		{topicrow.LAST_POST_TIME}<br />
+		<!-- BEGIN last_post_userlink -->
+		<a href="{topicrow.U_LAST_POST_AUTHOR}" title="{L_VIEW_PROFILE}" class="gensmall">{topicrow.LAST_POST_AUTHOR}</a>
+		<!-- END last_post_userlink -->
+		<!-- BEGIN last_post_userlink_ELSE -->
+		{topicrow.LAST_POST_AUTHOR}
+		<!-- END last_post_userlink_ELSE -->
+		<!-- BEGIN last_post_link -->
+		<a href="{topicrow.U_LAST_POST}" title="{L_LAST_POST}"><img src="{I_LAST_POST}" alt="{L_LAST_POST}" border="0" /></a>
+		<!-- END last_post_link -->
+	</span></td>
+	<!-- BEGIN select -->
+	<td class="row3Right" align="center" valign="middle" nowrap="nowrap"><span class="gen">
+		<input type="checkbox" name="topic_id_list[]" value="{topicrow.TOPIC_ID}" />
+	</span></td>
+	<!-- END select -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<td class="row1" align="center" valign="middle"><span class="name">&nbsp;
+		<!-- BEGIN author_userlink --><a href="{topicrow.U_TOPIC_AUTHOR}" title="{L_VIEW_PROFILE}" class="name"><!-- END author_userlink -->{topicrow.TOPIC_AUTHOR}<!-- BEGIN author_userlink --></a><!-- END author_userlink -->&nbsp;
+	</span></td>
+	<td class="row2" align="center" valign="middle"><span class="postdetails">&nbsp;
+		{topicrow.REPLIES}&nbsp;
+	</span></td>
+	<td class="row2" align="center" valign="middle"><span class="postdetails">&nbsp;
+		{topicrow.VIEWS}&nbsp;
+	</span></td>
+	<td class="<!-- BEGIN select -->row1<!-- BEGINELSE select -->row3Right<!-- END select -->" align="center" valign="middle" nowrap="nowrap"><span class="postdetails">&nbsp;
+		{topicrow.LAST_POST_TIME}&nbsp;<br />
+		<!-- BEGIN last_post_userlink --><a href="{topicrow.U_LAST_POST_AUTHOR}" title="{L_VIEW_PROFILE}" class="gensmall"><!-- END last_post_userlink -->{topicrow.LAST_POST_AUTHOR}<!-- BEGIN last_post_userlink --></a><!-- END last_post_userlink -->&nbsp;
+		<!-- BEGIN last_post_link --><a href="{topicrow.U_LAST_POST}" title="{L_LAST_POST}"><img src="{I_LAST_POST}" alt="{L_LAST_POST}" border="0" /></a><!-- END last_post_link -->
+	</span></td>
+	<!-- BEGIN select -->
+	<td class="row3Right" align="center" valign="middle" nowrap="nowrap"><span class="gen">&nbsp;
+		<input type="checkbox" name="topic_id_list[]" value="{topicrow.TOPIC_ID}" />&nbsp;
+	</span></td>
+	<!-- END select -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<!-- BEGIN select -->
+	<td class="row1" colspan="6" height="30" align="center" valign="middle"><span class="gen">
+	<!-- END select -->
+	<!-- BEGIN select_ELSE -->
+	<td class="row1" colspan="5" height="30" align="center" valign="middle"><span class="gen">
+	<!-- END select_ELSE -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<td class="row1" colspan="<!-- BEGIN select -->6<!-- BEGINELSE select -->5<!-- END select -->" height="30" align="center" valign="middle"><span class="gen">
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/viewtopic_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+<table width="100%" cellspacing="0" cellpadding="2" border="0" align="center">
+  <tr> 
+	<td align="left" valign="bottom"><span class="gensmall">
+	<!-- BEGIN switch_user_logged_in -->
+	{LAST_VISIT_DATE}<br />
+	<!-- END switch_user_logged_in -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+<table width="100%" cellspacing="0" cellpadding="2" border="0" align="center">
+  <tr> 
+	<td align="left" valign="bottom"><span class="gensmall">
+	<!-- BEGIN switch_user_logged_in -->{LAST_VISIT_DATE}<br /><!-- END switch_user_logged_in -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+		<!-- BEGIN moderators -->
+		<b>{L_MODERATORS}:&nbsp;</b>
+		<!-- BEGIN mod -->
+		<a href="{moderators.mod.U_MOD}" title="{moderators.mod.L_MOD_TITLE}" class="gensmall">{moderators.mod.L_MOD}</a>{moderators.mod.L_SEP}
+		<!-- END mod -->
+		<!-- END moderators -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		<!-- BEGIN moderators --><b>{L_MODERATORS}:&nbsp;</b><!-- BEGIN mod --><a href="{moderators.mod.U_MOD}" title="{moderators.mod.L_MOD_TITLE}" class="gensmall">{moderators.mod.L_MOD}</a><!-- BEGIN sep -->, <!-- END sep --><!-- END mod --><!-- END moderators -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<td align="left" nowrap="nowrap"><span class="nav"><a href="{U_POST_NEW_TOPIC}"><img src="{POST_IMG}" border="0" alt="{L_POST_NEW_TOPIC}" align="middle" /></a>&nbsp;&nbsp;&nbsp;<a href="{U_POST_REPLY_TOPIC}"><img src="{REPLY_IMG}" border="0" alt="{L_POST_REPLY_TOPIC}" align="middle" /></a></span></td>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<td align="left" valign="bottom" nowrap="nowrap"><span class="nav">
+		<a href="{U_POST_NEW_TOPIC}"><img src="{POST_IMG}" border="0" alt="{L_POST_NEW_TOPIC}" align="middle" /></a>&nbsp;&nbsp;&nbsp;<a href="{U_POST_REPLY_TOPIC}"><img src="{REPLY_IMG}" border="0" alt="{L_POST_REPLY_TOPIC}" align="middle" /></a>
+	</span></td>
+#
+#-----[ FIND ]------------------------------------------------
+#
+		<!-- BEGIN pagination -->
+		<b>{pagination.L_PAGE_OF}</b>&nbsp;{pagination.L_COUNT}
+		<!-- END pagination -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		<!-- BEGIN pagination --><b>{pagination.L_PAGE_OF}</b>&nbsp;{pagination.L_COUNT}<!-- END pagination -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<td align="right" valign="bottom" nowrap="nowrap"><span class="gensmall">
+		<!-- BEGIN watch -->
+		<!-- BEGIN image -->
+		<a href="{U_WATCH_TOPIC}" class="gensmall"><img src="{I_WATCH_TOPIC}" border="0" title="{L_WATCH_TOPIC}" alt="{L_WATCH_TOPIC}" /></a>
+		<!-- END image -->
+		<!-- BEGIN image_ELSE -->
+		<a href="{U_WATCH_TOPIC}" class="gensmall">{L_WATCH_TOPIC}</a>
+		<!-- END image_ELSE -->
+		<br />
+		<!-- END watch -->
+		<!-- BEGIN unmark_read -->
+		<a href="{U_UNREAD_TOPIC}" class="gensmall">{L_UNREAD_TOPIC}</a> ::
+		<!-- END unmark_read -->
+		<a href="{U_VIEW_OLDER_TOPIC}" class="gensmall">{L_VIEW_PREVIOUS_TOPIC}</a> :: <a href="{U_VIEW_NEWER_TOPIC}" class="gensmall">{L_VIEW_NEXT_TOPIC}</a><br/>
+		<b>
+		<!-- BEGIN pagination -->
+		<!-- BEGIN unique_ELSE -->
+		{pagination.L_GOTO}:&nbsp;
+		<!-- END unique_ELSE -->
+		<!-- BEGIN previous -->
+		<a href="{pagination.U_PREVIOUS}" class="gensmall">{pagination.L_PREVIOUS}</a>&nbsp;
+		<!-- END previous -->
+
+		<!-- BEGIN page_number -->
+		<!-- BEGIN number -->
+		<!-- BEGIN current -->
+		{pagination.page_number.PAGE}{pagination.page_number.L_SEP}
+		<!-- END current -->
+		<!-- BEGIN current_ELSE -->
+		<a href="{pagination.page_number.U_PAGE}" class="gensmall">{pagination.page_number.PAGE}</a>{pagination.page_number.L_SEP}
+		<!-- END current_ELSE -->
+		<!-- END number -->
+		<!-- BEGIN number_ELSE -->
+		...,
+		<!-- END number_ELSE -->
+		<!-- END page_number -->
+
+		<!-- BEGIN next -->
+		<a href="{pagination.U_NEXT}" class="gensmall">{pagination.L_NEXT}</a>
+		<!-- END next -->
+		<!-- END pagination -->
+	</b></span></td>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<td align="right" valign="bottom" nowrap="nowrap"><span class="gensmall">
+		<!-- BEGIN watch --><a href="{U_WATCH_TOPIC}" class="gensmall"><!-- BEGIN image --><img src="{I_WATCH_TOPIC}" border="0" title="{L_WATCH_TOPIC}" alt="{L_WATCH_TOPIC}" /><!-- BEGINELSE image -->{L_WATCH_TOPIC}<!-- END image --></a><br /><!-- END watch -->
+		<!-- BEGIN unmark_read --><a href="{U_UNREAD_TOPIC}" class="gensmall">{L_UNREAD_TOPIC}</a>&nbsp;::&nbsp;<!-- END unmark_read -->
+		<a href="{U_VIEW_OLDER_TOPIC}" class="gensmall">{L_VIEW_PREVIOUS_TOPIC}</a> :: <a href="{U_VIEW_NEWER_TOPIC}" class="gensmall">{L_VIEW_NEXT_TOPIC}</a><br />
+<!-- BEGIN pagination -->
+		<!-- BEGIN unique_ELSE --><b>{pagination.L_GOTO}:&nbsp;</b><!-- END unique_ELSE -->
+		<!-- BEGIN previous --><b><a href="{pagination.U_PREVIOUS}" class="gensmall">{pagination.L_PREVIOUS}</a>&nbsp;</b><!-- END previous -->
+		<!-- BEGIN page_number --><b><!-- BEGIN number --><!-- BEGIN current_ELSE --><a href="{pagination.page_number.U_PAGE}" class="gensmall"><!-- END current_ELSE -->{pagination.page_number.PAGE}<!-- BEGIN current_ELSE --></a><!-- END current_ELSE --><!-- BEGIN sep -->, <!-- END sep --><!-- BEGINELSE number -->..., <!-- END number --></b><!-- END page_number -->
+		<!-- BEGIN next --><b>&nbsp;<a href="{pagination.U_NEXT}" class="gensmall">{pagination.L_NEXT}</a></b><!-- END next -->
+<!-- END pagination -->
+	</span></td>
+#
+#-----[ FIND ]------------------------------------------------
+#
+		<!-- BEGIN light -->
+		<td width="150" align="left" valign="top" class="row1">
+		<!-- END light -->
+		<!-- BEGIN light_ELSE -->
+		<td width="150" align="left" valign="top" class="row2">
+		<!-- END light_ELSE -->
+			<span class="name"><a name="{postrow.U_POST_ID}"></a><b>{postrow.POSTER_NAME}</b></span><br /><span class="postdetails">{postrow.POSTER_RANK}<br />{postrow.RANK_IMAGE}{postrow.POSTER_AVATAR}<br /><br />{postrow.POSTER_JOINED}<br />{postrow.POSTER_POSTS}<br />{postrow.POSTER_FROM}</span><br /></td>
+		<!-- BEGIN light -->
+		<td class="row1" width="100%" height="28" valign="top">
+		<!-- END light -->
+		<!-- BEGIN light_ELSE -->
+		<td class="row2" width="100%" height="28" valign="top">
+		<!-- END light_ELSE -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		<td width="150" align="left" valign="top" class="<!-- BEGIN light -->row1<!-- BEGINELSE light -->row2<!-- END light -->"><span class="name">
+			<a name="{postrow.U_POST_ID}"></a><b>{postrow.POSTER_NAME}</b>
+		</span><br /><span class="postdetails">
+			{postrow.POSTER_RANK}<br />{postrow.RANK_IMAGE}{postrow.POSTER_AVATAR}<br /><br />{postrow.POSTER_JOINED}<br />{postrow.POSTER_POSTS}<br />{postrow.POSTER_FROM}
+		</span><br /></td>
+		<td class="<!-- BEGIN light -->row1<!-- BEGINELSE light -->row2<!-- END light -->" width="100%" height="28" valign="top">
+#
+#-----[ FIND ]------------------------------------------------
+#
+					<!-- BEGIN msg_icon -->
+					<img src="{postrow.msg_icon.I_ICON}" border="0" title="{postrow.msg_icon.L_ICON}" align="absbottom" />
+					<!-- END msg_icon -->
+					<!-- BEGIN sub_type -->
+					<!-- BEGIN img -->
+					<img src="{postrow.sub_type.I_SUB_TYPE}" border="0" alt="{postrow.sub_type.L_SUB_TYPE}" title="{postrow.sub_type.L_SUB_TYPE}" align="absbottom" />
+					<!-- END img -->
+					<!-- BEGIN txt -->
+					<b>[{postrow.sub_type.L_SUB_TYPE}]</b>
+					<!-- END txt -->
+					<!-- END sub_type -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+					<!-- BEGIN msg_icon --><img src="{postrow.msg_icon.I_ICON}" border="0" title="{postrow.msg_icon.L_ICON}" class="absbottom" />&nbsp;<!-- END msg_icon -->
+					<!-- BEGIN sub_type --><!-- BEGIN img --><img src="{postrow.sub_type.I_SUB_TYPE}" border="0" alt="{postrow.sub_type.L_SUB_TYPE}" title="{postrow.sub_type.L_SUB_TYPE}" class="absbottom" /><!-- END img --><!-- BEGIN txt --><b>[{postrow.sub_type.L_SUB_TYPE}]</b><!-- END txt -->&nbsp;<!-- END sub_type -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+					<!-- BEGIN sub_title -->
+					<br />{L_SUB_TITLE}: {postrow.sub_title.SUB_TITLE}
+					<!-- END sub_title -->
+					<!-- BEGIN announce -->
+					<br />{postrow.announce.S_ANNOUNCE}
+					<!-- END announce -->
+					<!-- BEGIN calendar_event -->
+					<br />{postrow.calendar_event.S_CALENDAR_EVENT}
+					<!-- END calendar_event -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+					<!-- BEGIN sub_title --><br />{L_SUB_TITLE}: {postrow.sub_title.SUB_TITLE}<!-- END sub_title -->
+					<!-- BEGIN announce --><br />{postrow.announce.S_ANNOUNCE}<!-- END announce -->
+					<!-- BEGIN calendar_event --><br />{postrow.calendar_event.S_CALENDAR_EVENT}<!-- END calendar_event -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+				<td valign="top" nowrap="nowrap">{postrow.QUOTE_IMG} {postrow.EDIT_IMG} {postrow.DELETE_IMG} {postrow.IP_IMG}
+				<!-- BEGIN unmark_read -->
+				<a href="{postrow.U_UNREAD_POST}" class="gensmall"><img src="{I_UNREAD}" border="0" alt="{L_UNREAD_POST}" title="{L_UNREAD_POST}" /></a>
+				<!-- END unmark_read -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+				<td valign="top" nowrap="nowrap">{postrow.QUOTE_IMG} {postrow.EDIT_IMG} {postrow.DELETE_IMG} {postrow.IP_IMG}<!-- BEGIN unmark_read -->&nbsp;<a href="{postrow.U_UNREAD_POST}" class="gensmall"><img src="{I_UNREAD}" border="0" alt="{L_UNREAD_POST}" title="{L_UNREAD_POST}" /></a><!-- END unmark_read -->
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<tr> 
+		<!-- BEGIN light -->
+		<td class="row1" width="150" align="left" valign="middle">
+		<!-- END light -->
+		<!-- BEGIN light_ELSE -->
+		<td class="row2" width="150" align="left" valign="middle">
+		<!-- END light_ELSE -->
+			<span class="nav"><a href="#top" class="nav">{L_BACK_TO_TOP}</a></span></td>
+		<!-- BEGIN light -->
+		<td class="row1" width="100%" height="28" valign="bottom" nowrap="nowrap">
+		<!-- END light -->
+		<!-- BEGIN light_ELSE -->
+		<td class="row2" width="100%" height="28" valign="bottom" nowrap="nowrap">
+		<!-- END light_ELSE -->
+			<table cellspacing="0" cellpadding="0" border="0" height="18" width="18">
+			<tr> 
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<tr>
+		<td class="<!-- BEGIN light -->row1<!-- BEGINELSE light -->row2<!-- END light -->" width="150" align="left" valign="middle"><span class="nav">
+			<a href="#top" class="nav">{L_BACK_TO_TOP}</a>
+		</span></td>
+		<td class="<!-- BEGIN light -->row1<!-- BEGINELSE light -->row2<!-- END light -->" width="100%" height="28" valign="bottom" nowrap="nowrap">
+			<table cellspacing="0" cellpadding="0" border="0" style="height: 18px" width="18">
+			<tr>
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<tr> 
+		<td class="spaceRow" colspan="2" height="1"><img src="{I_SPACER}" alt="" width="1" height="1" /></td>
+	</tr>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<tr> 
+		<td class="spaceRow" colspan="2" height="1"><img src="{I_SPACER}" alt="" width="1" height="1" />
+		</td>
+	</tr>
+#
+#-----[ FIND ]------------------------------------------------
+#
+			<tr><form method="post" action="{S_POST_DAYS_ACTION}">
+				<td align="center"><span class="gensmall">{L_DISPLAY_POSTS}: {S_SELECT_POST_DAYS}&nbsp;{S_SELECT_POST_ORDER}&nbsp;<input type="submit" value="{L_GO}" class="liteoption" name="submit" /></span></td>
+			</form></tr>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			<tr>
+				<td align="center"><form method="post" action="{S_POST_DAYS_ACTION}"><span class="gensmall">{L_DISPLAY_POSTS}: {S_SELECT_POST_DAYS}&nbsp;{S_SELECT_POST_ORDER}&nbsp;<input type="submit" value="{L_GO}" class="liteoption" name="submit" /></span></form></td>
+			</tr>
+#
+#-----[ FIND ]------------------------------------------------
+#
+<table width="100%" cellspacing="2" cellpadding="2" border="0">
+<tr>
+	<td align="left" nowrap="nowrap"><span class="nav"><a href="{U_POST_NEW_TOPIC}"><img src="{POST_IMG}" border="0" alt="{L_POST_NEW_TOPIC}" align="middle" /></a>&nbsp;&nbsp;&nbsp;<a href="{U_POST_REPLY_TOPIC}"><img src="{REPLY_IMG}" border="0" alt="{L_POST_REPLY_TOPIC}" align="middle" /></a></span></td>
+	<td width="100%" valign="top"><span class="gensmall">
+		<!-- BEGIN pagination -->
+		<b>{pagination.L_PAGE_OF}</b>&nbsp;{pagination.L_COUNT}
+		<!-- END pagination -->
+	</span></td>
+	<td align="right" valign="top" nowrap="nowrap"><span class="gensmall"><b>
+		<!-- BEGIN pagination -->
+		<!-- BEGIN unique_ELSE -->
+		{pagination.L_GOTO}:&nbsp;
+		<!-- END unique_ELSE -->
+		<!-- BEGIN previous -->
+		<a href="{pagination.U_PREVIOUS}" class="gensmall">{pagination.L_PREVIOUS}</a>&nbsp;
+		<!-- END previous -->
+
+		<!-- BEGIN page_number -->
+		<!-- BEGIN number -->
+		<!-- BEGIN current -->
+		{pagination.page_number.PAGE}{pagination.page_number.L_SEP}
+		<!-- END current -->
+		<!-- BEGIN current_ELSE -->
+		<a href="{pagination.page_number.U_PAGE}" class="gensmall">{pagination.page_number.PAGE}</a>{pagination.page_number.L_SEP}
+		<!-- END current_ELSE -->
+		<!-- END number -->
+		<!-- BEGIN number_ELSE -->
+		...,
+		<!-- END number_ELSE -->
+		<!-- END page_number -->
+
+		<!-- BEGIN next -->
+		<a href="{pagination.U_NEXT}" class="gensmall">{pagination.L_NEXT}</a>
+		<!-- END next -->
+		<!-- BEGIN unique_ELSE -->
+		<br />
+		<!-- END unique_ELSE -->
+		<!-- END pagination -->
+		</b>
+		<!-- BEGIN unmark_read -->
+		<a href="{U_UNREAD_TOPIC}" class="gensmall">{L_UNREAD_TOPIC}</a> ::
+		<!-- END unmark_read -->
+		<a href="{U_VIEW_OLDER_TOPIC}" class="gensmall">{L_VIEW_PREVIOUS_TOPIC}</a> :: <a href="{U_VIEW_NEWER_TOPIC}" class="gensmall">{L_VIEW_NEXT_TOPIC}</a><br/>
+		<!-- BEGIN watch -->
+		<!-- BEGIN image -->
+		<a href="{U_WATCH_TOPIC}" class="gensmall"><img src="{I_WATCH_TOPIC}" border="0" title="{L_WATCH_TOPIC}" alt="{L_WATCH_TOPIC}" /></a>
+		<!-- END image -->
+		<!-- BEGIN image_ELSE -->
+		<a href="{U_WATCH_TOPIC}" class="gensmall">{L_WATCH_TOPIC}</a>
+		<!-- END image_ELSE -->
+		<!-- END watch -->
+	</span></td>
+</tr>
+</table>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+<table width="100%" cellspacing="2" cellpadding="2" border="0">
+<tr>
+	<td align="left" valign="top" nowrap="nowrap"><span class="nav">
+		<a href="{U_POST_NEW_TOPIC}"><img src="{POST_IMG}" border="0" alt="{L_POST_NEW_TOPIC}" align="middle" /></a>&nbsp;&nbsp;&nbsp;<a href="{U_POST_REPLY_TOPIC}"><img src="{REPLY_IMG}" border="0" alt="{L_POST_REPLY_TOPIC}" align="middle" /></a>
+	</span></td>
+	<td width="100%" valign="top"><span class="gensmall">
+		<!-- BEGIN pagination --><b>{pagination.L_PAGE_OF}</b>&nbsp;{pagination.L_COUNT}<!-- END pagination -->
+	</span></td>
+	<td align="right" valign="top" nowrap="nowrap"><span class="gensmall">
+<!-- BEGIN pagination -->
+		<!-- BEGIN unique_ELSE --><b>{pagination.L_GOTO}:&nbsp;</b><!-- END unique_ELSE -->
+		<!-- BEGIN previous --><b><a href="{pagination.U_PREVIOUS}" class="gensmall">{pagination.L_PREVIOUS}</a>&nbsp;</b><!-- END previous -->
+		<!-- BEGIN page_number --><b><!-- BEGIN number --><!-- BEGIN current_ELSE --><a href="{pagination.page_number.U_PAGE}" class="gensmall"><!-- END current_ELSE -->{pagination.page_number.PAGE}<!-- BEGIN current_ELSE --></a><!-- END current_ELSE --><!-- BEGIN sep -->, <!-- END sep --><!-- BEGINELSE number -->..., <!-- END number --></b><!-- END page_number -->
+		<!-- BEGIN next --><b>&nbsp;<a href="{pagination.U_NEXT}" class="gensmall">{pagination.L_NEXT}</a></b><!-- END next -->
+		<!-- BEGIN unique_ELSE --><br /><!-- END unique_ELSE -->
+<!-- END pagination -->
+		<!-- BEGIN unmark_read --><a href="{U_UNREAD_TOPIC}" class="gensmall">{L_UNREAD_TOPIC}</a>&nbsp;::&nbsp;<!-- END unmark_read -->
+		<a href="{U_VIEW_OLDER_TOPIC}" class="gensmall">{L_VIEW_PREVIOUS_TOPIC}</a> :: <a href="{U_VIEW_NEWER_TOPIC}" class="gensmall">{L_VIEW_NEXT_TOPIC}</a><br />
+		<!-- BEGIN watch --><a href="{U_WATCH_TOPIC}" class="gensmall"><!-- BEGIN image --><img src="{I_WATCH_TOPIC}" border="0" title="{L_WATCH_TOPIC}" alt="{L_WATCH_TOPIC}" /><!-- BEGINELSE image -->{L_WATCH_TOPIC}<!-- END image --></a><!-- END watch -->
+	</span></td>
+</tr>
+</table>
+#
+#-----[ FIND ]------------------------------------------------
+#
+			<td nowrap="nowrap" align="right"><span class="gensmall">{JUMPBOX}</span></td>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			<td nowrap="nowrap" align="right">{JUMPBOX}</td>
+#
+#-----[ SAVE/CLOSE ALL FILES ]--------------------------------
+#
+# EoM

@@ -1,0 +1,122 @@
+________________________________________________________________________________
+
+#=============================================================
+#	Change between 2.1.1 RC 2 & 2.1.1 RC 3
+#=============================================================
+Since 2005/04/10 :
+
+=========
+Caution :
+=========
+First upgrade your phpBB to 2.0.14, using the topic "phpBB 2.0.13 to 2.0.14 Code Changes" foundable here : http://www.phpbb.com/phpBB/viewtopic.php?t=281953
+(nb. : at the time I'm writting, the login_body.tpl modifications are missing. Not much however : just add class="post" to the input statement)
+
+- install_cat/schemas/postgres_schema.sql : a little more modifications for postgresql v7 (thanks to Kama)
+- includes/class_template.php : fix a bug when using eXtreme Style,
+- includes/sessions.php :
+	o prefer CH fix than phpBB one regarding the guest forcing,
+	o fix a typo in the "installed" pack (was ok and working, but prefer another place for the modifications)
+
+
+#
+#-----[ COPY ]------------------------------------------------
+#
+COPY root/includes/class_template.php TO includes/class_template.php
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/sessions.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$userdata['user_id'] = ANONYMOUS;
+	return $userdata;
+}
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+	$db->sql_freeresult($result);
+#
+#-----[ FIND ]------------------------------------------------
+#
+# This FIND statement may differ depending the pack you used to install the mod
+# So replace the whole part whatever it is : use the comments for your search
+#
+					// No match; don't login, set as anonymous user
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+					$userdata = session_force_guest();
+//-- fin mod : categories hierarchy --------------------------------------------
+					$login = 0; 
+					$enable_autologin = 0; 
+					$user_id = $userdata['user_id'] = ANONYMOUS;
+				
+					$sql = 'SELECT * FROM ' . USERS_TABLE . ' WHERE user_id = ' . ANONYMOUS;
+					$result = $db->sql_query($sql);
+					$userdata = $db->sql_fetchrow($result);
+					$db->sql_freeresult($result);
+				}
+			}
+			else
+			{
+				// Autologin is not set. Don't login, set as anonymous user
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+				$userdata = session_force_guest();
+//-- fin mod : categories hierarchy --------------------------------------------
+				$login = 0;
+				$enable_autologin = 0;
+				$user_id = $userdata['user_id'] = ANONYMOUS;
+				
+				$sql = 'SELECT * FROM ' . USERS_TABLE . ' WHERE user_id = ' . ANONYMOUS;
+				$result = $db->sql_query($sql);
+				$userdata = $db->sql_fetchrow($result);
+				$db->sql_freeresult($result);
+			}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+					// No match; don't login, set as anonymous user
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+					$userdata = session_force_guest();
+//-- fin mod : categories hierarchy --------------------------------------------
+					$login = 0; 
+					$enable_autologin = 0; 
+					$user_id = $userdata['user_id'] = ANONYMOUS;
+				
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+//					$sql = 'SELECT * FROM ' . USERS_TABLE . ' WHERE user_id = ' . ANONYMOUS;
+//					$result = $db->sql_query($sql);
+//					$userdata = $db->sql_fetchrow($result);
+//					$db->sql_freeresult($result);
+//-- fin mod : categories hierarchy --------------------------------------------
+				}
+			}
+			else
+			{
+				// Autologin is not set. Don't login, set as anonymous user
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+				$userdata = session_force_guest();
+//-- fin mod : categories hierarchy --------------------------------------------
+				$login = 0;
+				$enable_autologin = 0;
+				$user_id = $userdata['user_id'] = ANONYMOUS;
+				
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+//				$sql = 'SELECT * FROM ' . USERS_TABLE . ' WHERE user_id = ' . ANONYMOUS;
+//				$result = $db->sql_query($sql);
+//				$userdata = $db->sql_fetchrow($result);
+//				$db->sql_freeresult($result);
+//-- fin mod : categories hierarchy --------------------------------------------
+			}
+#
+#-----[ SAVE/CLOSE ALL FILES ]--------------------------------
+#
+# EoM
+
+________________________________________________________________________________

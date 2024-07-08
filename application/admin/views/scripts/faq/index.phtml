@@ -1,0 +1,23 @@
+<div style="width: 810px; margin-left: auto; margin-right: auto;">
+    <div class="racenet_headrow">
+        FAQ-Admin
+    </div>
+    <ol class="faq admin">
+    <? foreach ($this->help->getFaqItems() as $item): ?>
+        <li id="faq_<?= $item->id ?>" class="faq_item_admin">
+            <div class="faq_view" rel="<?= $item->id ?>"><?= $item->question ?></div>
+            <div class="faq_edit" style="display: none;">
+                <input style="width: 500px;" type="text" class="faq_question" value="<?= $item->question ?>" rel="<?= $item->id ?>" /><br/>
+                <textarea style="width: 500px; height: 200px;" class="faq_answer"  rel="<?= $item->id ?>"><?= $item->answer ?></textarea><br/>
+                <input class="faq_save" type="button" value="save" rel="<?= $item->id ?>" />
+                <input class="faq_cancel" type="button" value="cancel" rel="<?= $item->id ?>" />
+                <input class="faq_del" type="button" value="delete" rel="<?= $item->id ?>" />
+            </div>
+        </li>
+    <? endforeach; ?>
+    </ol>
+    
+    <br/>
+    <input type="button" id="faq_saveorder" value="save order" disabled="disabled" />
+    <input type="button" id="faq_add" value="add item" />
+</div>

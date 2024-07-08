@@ -1,0 +1,531 @@
+##############################################################
+##
+## Upgrade path from 2.1.4c to 2.1.4d
+##
+##############################################################
+#
+#-----[ COPY ]------------------------------------------------
+#
+# Use the files coming with the "installed" pack
+#
+COPY root/install_cat/*.* TO install_cat/*.*
+COPY root/includes/class_db.php TO includes/class_db.php
+COPY root/includes/class_install.php TO includes/class_install.php
+#
+#-----[ OPEN ]------------------------------------------------
+#
+search.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+				$topic_last_read = intval($user->cookies['unreads'][ $search_set[$i]['topic_id'] ]);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+				$topic_last_read = intval($user->cookies['unreads'][ $searchset[$i]['topic_id'] ]);
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_auth.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.6 - 04/12/2004
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.7 - 18/05/2006
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   (at your option) any later version.
+ *
+ ***************************************************************************/
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+if ( !defined('IN_PHPBB') )
+{
+	die('Hacking attempt');
+}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_config.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.24 - 06/11/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.25 - 18/05/2006
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   (at your option) any later version.
+ *
+ ***************************************************************************/
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+if ( !defined('IN_PHPBB') )
+{
+	die('Hacking attempt');
+}
+#
+#-----[ FIND ]------------------------------------------------
+#
+define('CH_CURRENT_VERSION', '2.1.4c');
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+define('CH_CURRENT_VERSION', '2.1.4d');
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_cp.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.11 - 23/10/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.12 - 18/05/2006
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   (at your option) any later version.
+ *
+ ***************************************************************************/
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+if ( !defined('IN_PHPBB') )
+{
+	die('Hacking attempt');
+}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_form.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.12 - 23/10/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.13 - 18/05/2006
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   (at your option) any later version.
+ *
+ ***************************************************************************/
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+if ( !defined('IN_PHPBB') )
+{
+	die('Hacking attempt');
+}
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this occurs two times in the file : do the same for each
+# first time:
+#
+			$this->order['m'] = (strpos(' ' . strtolower($user->data['user_dateformat']), 'm')-1 >= 0) ? strpos(' ' . strtolower($user->data['user_dateformat']), 'm')-1 : strpos(' ' . $user->data['user_dateformat'], 'n')-1;
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			$this->order['m'] = (strpos(' ' . strtolower($user->data['user_dateformat']), 'm')-1 >= 0) ? strpos(' ' . strtolower($user->data['user_dateformat']), 'm')-1 : ((strpos(' ' . strtolower($user->data['user_dateformat']), 'f')-1 >= 0) ? strpos(' ' . $user->data['user_dateformat'], 'f')-1 : strpos(' ' . $user->data['user_dateformat'], 'n')-1);
+#
+#-----[ FIND ]------------------------------------------------
+#
+# second time:
+#
+			$this->order['m'] = (strpos(' ' . strtolower($user->data['user_dateformat']), 'm')-1 >= 0) ? strpos(' ' . strtolower($user->data['user_dateformat']), 'm')-1 : strpos(' ' . $user->data['user_dateformat'], 'n')-1;
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			$this->order['m'] = (strpos(' ' . strtolower($user->data['user_dateformat']), 'm')-1 >= 0) ? strpos(' ' . strtolower($user->data['user_dateformat']), 'm')-1 : ((strpos(' ' . strtolower($user->data['user_dateformat']), 'f')-1 >= 0) ? strpos(' ' . $user->data['user_dateformat'], 'f')-1 : strpos(' ' . $user->data['user_dateformat'], 'n')-1);
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_forums.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.13 - 31/10/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.14 - 18/05/2006
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   (at your option) any later version.
+ *
+ ***************************************************************************/
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+if ( !defined('IN_PHPBB') )
+{
+	die('Hacking attempt');
+}
+#
+#-----[ FIND ]------------------------------------------------
+#
+# the whole function
+#
+	function set_users_status()
+	{
+		global $db, $config;
+
+		// note : this one could be lighter, but fixes also remaining unjustified user status (phpBB bug)
+		// we don't consider as moderators the system groups (registered & anonymous)
+
+		// remove mod and admin level from users table
+		$sql = 'UPDATE ' . USERS_TABLE . '
+					SET user_level = ' . USER . '
+					WHERE user_level <> ' . USER;
+		$db->sql_query($sql, false, __LINE__, __FILE__);
+
+		// search for all admins and founder and set admin status
+		$sql = 'SELECT DISTINCT user_id
+					FROM ' . USER_GROUP_TABLE . '
+					WHERE group_id IN(' . intval($config->data['group_founder']) . ', ' . intval($config->data['group_admin']) . ')
+					GROUP BY user_id';
+		$result = $db->sql_query($sql, false, __LINE__, __FILE__);
+		$user_ids = array();
+		while ( $row = $db->sql_fetchrow($result) )
+		{
+			$user_ids[ intval($row['user_id']) ] = true;
+		}
+		$db->sql_freeresult($result);
+
+		// set admin level
+		if ( !empty($user_ids) )
+		{
+			$sql = 'UPDATE ' . USERS_TABLE . '
+						SET user_level = ' . ADMIN . '
+						WHERE user_id IN (' . implode(', ', array_keys($user_ids)) . ')
+							AND user_active = ' . true;
+			$db->sql_query($sql, false, __LINE__, __FILE__);
+		}
+
+		// search for all moderators and set the status
+		$sql = 'SELECT ug.user_id, a.obj_id, MAX(a.auth_value) AS auth_solved
+					FROM ' . AUTHS_TABLE . ' a, ' . USER_GROUP_TABLE . ' ug
+					WHERE a.obj_type = \'' . POST_FORUM_URL . '\'
+						AND a.auth_name = \'auth_mod_display\'
+						AND ug.user_pending <> ' . true . '
+						AND ug.group_id = a.group_id
+						AND ug.user_id NOT IN (0, ' . ANONYMOUS . ')
+					GROUP BY ug.user_id, a.obj_id';
+		$result = $db->sql_query($sql, false, __LINE__, __FILE__);
+		$user_ids = array();
+		while ( $row = $db->sql_fetchrow($result) )
+		{
+			if ( in_array($row['auth_solved'], array(1, FORCE)) )
+			{
+				$user_ids[ intval($row['user_id']) ] = true;
+			}
+		}
+		$db->sql_freeresult($result);
+
+		// set mod level
+		if ( !empty($user_ids) )
+		{
+			$sql = 'UPDATE ' . USERS_TABLE . '
+						SET user_level = ' . MOD . '
+						WHERE user_level <> ' . ADMIN . '
+							AND user_id IN(' . implode(', ', array_keys($user_ids)) . ')';
+			$db->sql_query($sql, false, __LINE__, __FILE__);
+		}
+	}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	function set_users_status()
+	{
+		global $db, $config;
+
+		// note : this one could be lighter, but fixes also remaining unjustified user status (phpBB bug)
+		// we don't consider as moderators the system groups (registered & anonymous)
+
+		// remove mod and admin level from users table
+		$sql = 'UPDATE ' . USERS_TABLE . '
+					SET user_level = ' . USER . '
+					WHERE user_level <> ' . USER;
+		$db->sql_query($sql, false, __LINE__, __FILE__);
+
+		// set admin level
+		$sql = 'UPDATE ' . USERS_TABLE . '
+					SET user_level = ' . ADMIN . '
+					WHERE user_active = 1
+						AND user_id <> ' . ANONYMOUS . '
+						AND user_id IN(' . $db->sql_subquery('user_id', '
+							SELECT DISTINCT user_id
+								FROM ' . USER_GROUP_TABLE . '
+								WHERE group_id IN(' . intval($config->data['group_founder']) . ', ' . intval($config->data['group_admin']) . ')
+									AND user_pending <> 1
+						', __LINE__, __FILE__) . ')';
+		$db->sql_query($sql, false, __LINE__, __FILE__);
+
+		// search moderator groups
+		$sql = 'SELECT group_id, obj_id, MAX(auth_value) AS max_auth_value
+					FROM ' . AUTHS_TABLE . '
+					WHERE obj_type = \'' . POST_FORUM_URL . '\'
+						AND auth_name = \'auth_mod_display\'
+					GROUP BY group_id, obj_id';
+		$result = $db->sql_query($sql, false, __LINE__, __FILE__);
+		$group_ids = array();
+		while ( $row = $db->sql_fetchrow($result) )
+		{
+			if ( in_array($row['max_auth_value'], array(1, FORCE)) && intval($row['group_id']) )
+			{
+				$group_ids[ intval($row['group_id']) ] = true;
+			}
+		}
+		$db->sql_freeresult($result);
+
+		// set moderator level
+		if ( !empty($group_ids) )
+		{
+			$sql = 'UPDATE ' . USERS_TABLE . '
+						SET user_level = ' . MOD . '
+						WHERE user_active = 1
+							AND user_level = ' . USER . '
+							AND user_id <> ' . ANONYMOUS . '
+							AND user_id IN(' . $db->sql_subquery('user_id', '
+								SELECT DISTINCT user_id
+									FROM ' . USER_GROUP_TABLE . '
+									WHERE group_id IN(' . implode(', ', array_keys($group_ids)) . ')
+										AND user_pending <> 1
+							', __LINE__, __FILE__) . ')';
+			unset($group_ids);
+			$db->sql_query($sql, false, __LINE__, __FILE__);
+		}
+	}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_groups.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.6 - 21/08/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.7 - 18/05/2006
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   (at your option) any later version.
+ *
+ ***************************************************************************/
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+if ( !defined('IN_PHPBB') )
+{
+	die('Hacking attempt');
+}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_groups_select.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.9 - 21/08/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.10 - 18/05/2006
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   (at your option) any later version.
+ *
+ ***************************************************************************/
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+if ( !defined('IN_PHPBB') )
+{
+	die('Hacking attempt');
+}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_presets.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.2 - 02/01/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.3 - 18/05/2006
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   (at your option) any later version.
+ *
+ ***************************************************************************/
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+if ( !defined('IN_PHPBB') )
+{
+	die('Hacking attempt');
+}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_run_stats.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.2 - 05/10/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.3 - 18/05/2006
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   (at your option) any later version.
+ *
+ ***************************************************************************/
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+if ( !defined('IN_PHPBB') )
+{
+	die('Hacking attempt');
+}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_stats.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.11 - 31/10/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.12 - 18/05/2006
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   (at your option) any later version.
+ *
+ ***************************************************************************/
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+if ( !defined('IN_PHPBB') )
+{
+	die('Hacking attempt');
+}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_template.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.6 - 21/08/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.7 - 18/05/2006
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   (at your option) any later version.
+ *
+ ***************************************************************************/
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+if ( !defined('IN_PHPBB') )
+{
+	die('Hacking attempt');
+}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_topics.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.16 - 08/04/2006
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.17 - 18/05/2006
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   (at your option) any later version.
+ *
+ ***************************************************************************/
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+if ( !defined('IN_PHPBB') )
+{
+	die('Hacking attempt');
+}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_user.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.18 - 19/04/2006
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.19 - 18/05/2006
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *   (at your option) any later version.
+ *
+ ***************************************************************************/
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+if ( !defined('IN_PHPBB') )
+{
+	die('Hacking attempt');
+}
+#
+#-----[ SAVE/CLOSE ALL FILES ]--------------------------------
+#
+# EoM

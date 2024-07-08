@@ -1,0 +1,181 @@
+<html>
+    <head>
+    <?
+    
+    $request = Zend_Controller_Front::getInstance()->getRequest();
+             
+    $this->headMeta()
+         ->appendHttpEquiv('Content-Type', 'text/html;charset=UTF-8')
+         ->appendName('Author', 'Andreas Linden, soh-zolex')
+         ->appendName('Publisher', 'Andreas Linden, soh-zolex')
+         ->appendName('Revisit', 'After 1 day')
+         ->appendName('keywords', 'Warsow, War§ow, warsow-race, race, raceathon, racesow, racenet, game, gaming, esport, racemaps, strafejump, movement, bunnyhop, free to play, defrag, quake')
+         ->appendName('Description', 'Join the Warsow Racenet and play Racesow. Up- and download maps. Talk in our forums. Have fun!')
+         ->appendName('Abstract', 'Join the race and have a good time!')
+         ->appendName('Robots', 'INDEX,FOLLOW')
+         ->appendName('Language', 'en')
+	;
+
+    // Include additional styles for the forum
+    if ($request->getModuleName() == 'forum') {
+
+        $this->headLink()
+             ->appendStylesheet('/css/andro.css?new');
+             
+        $this->headTitle('Forum');
+    }
+	
+	$this->headTitle('The Warsow Racenet')->setSeparator(' - ');
+	
+    $this->headLink()
+         ->appendStylesheet('/css/layout.css?new')
+         ->appendStylesheet('/css/jquery.rating.css?new')
+         ->headLink(array('rel' => 'favicon', 'href' => '/gfx/icons/wsw.ico'), 'PREPEND');
+       
+ 
+    $this->headScript()
+         //->appendFile('/js/jquery-1.2.6.mod.js', 'text/javascript')
+         ->appendFile('/js/jquery-1.3.2.js', 'text/javascript')
+         ->appendFile('/js/jquery.history.js', 'text/javascript')
+         ->appendFile('/js/jquery-ui-1.5.3.min.js', 'text/javascript') // yet only admin area
+         //->appendFile('/js/jquery.metadata.min.js', 'text/javascript')
+         ->appendFile('/js/jquery.rating.mod.js', 'text/javascript')
+         
+         ->appendFile('/js/Racenet_Main.js', 'text/javascript')
+         
+         ->appendFile('/js/Racenet.js', 'text/javascript')
+         //->appendFile('/js/Racenet.History.js', 'text/javascript')
+         ->appendFile('/js/Racenet.EventHandler.js', 'text/javascript')
+         ->appendFile('/js/Racenet.GfxCheckboxes.js', 'text/javascript')
+         ->appendFile('/js/Racenet.Request.js', 'text/javascript')
+         ->appendFile('/js/Racenet.Tooltip.js', 'text/javascript')
+         //->appendFile('/js/Racenet.Faq.js', 'text/javascript')
+         //->appendFile('/js/Racenet.Facebook.js', 'text/javascript')
+         
+         
+         // THIS FUCKING STAR RATING IS BUGGEG (causes exception "elem.parentNode is null")
+         ->appendFile('/js/Racenet.Rating.js', 'text/javascript')
+    ;
+         
+    // this must be the last include as it requires all other files
+    $this->headScript()->appendFile('/js/bootstrapper.js', 'text/javascript');
+	
+    print $this->headTitle();
+	print $this->headMeta();
+	print $this->headLink();
+	print $this->headScript();
+    ?>
+    
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-2034947-1']);
+      _gaq.push(['_setDomainName', '.warsow-race.net']);
+      _gaq.push(['_trackPageview']);
+    
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    
+    </script>
+    
+    </head>
+    <body>
+		<div id="fb-root"></div>
+		<script>(function(d, s, id) {
+		  var js, fjs = d.getElementsByTagName(s)[0];
+		  if (d.getElementById(id)) {return;}
+		  js = d.createElement(s); js.id = id;
+		  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+		  fjs.parentNode.insertBefore(js, fjs);
+		}(document, 'script', 'facebook-jssdk'));</script>
+        <input type="hidden" id="arr_right" value="/gfx/icons/arr_right.gif" />
+        <input type="hidden" id="arr_down" value="/gfx/icons/arr_down.gif" />
+        
+        <div id="outer_head">
+            <div style="position: absolute; left: 1px; top: 1px; z-index: 1; width: 100%; height: 79px; top: 32px; background-image: url( /gfx/layout/header_inner.gif );"></div>
+            <div id="main_head"style="position: absolute; z-index: 2;">
+				<div id="logo"></div>
+                <? if ($user = RacenetAccount::getInstance()): ?>
+                
+                <? if ($user->hasNotice()): ?>
+		            <div style="background-color: #302843; color: #FF7800; border: 2px solid #FF7800; font-weight: bold; font-size: 11px; width: 155px; padding: 5px; z-index: 999; position: absolute; right: 8px; top: 39px;">
+		                <?= $user->getNotice() ?>
+		            </div>
+		        <? endif ?>
+                
+                <div id="personalbox">
+					<div id="fb-login" style="float: left;"></div>
+                <? if ($user->isLoggedIn()): ?>
+                    welcome
+                    <span class="personalbox">
+                    <? if ($user->hasIngameLinkage()): ?>
+                        <a style="font-size: 12px;" href="/player/index/id/<?= $user->IngameLinkage->Player->id ?>/"><?= new Racenet_IngameColors($user->IngameLinkage->Player->name) ?></a>
+                        <? else: ?>
+                        <a style="font-size: 12px; color: #fff;" href="/forum/profile.php?mode=viewprofile&u=<?= $user->user_id ?>"><?= $user->username ?></a>
+                    <? endif; ?>
+                    <? if ($user->hasWarsowId()): ?>
+                        <span style="font-size:10px;">
+                            (<a title="your warsowID" target="_blank" href="http://www.warsow.net/forum/profile.php?id=<?= $user->getWarsowId() ?>"><?= $user->getWarsowId() ?></a>)
+                        </span>
+                    <? endif ?>
+                    </span>
+                    
+                    <span style="font-size: 9px;">|&nbsp;</span>
+                    <a href="/settings/">settings</a>
+                    <span style="font-size: 9px;">&nbsp;|&nbsp;</span>
+                    <a href="<?= $user->getLogoutUrl() ?>">logout</a>
+                    <span style="font-size: 9px;">&nbsp;|</span>
+                    
+                <? else: ?>
+                    <div style="position: absolute; top: 160px; right: 10px;">
+                        <a href="/forum/profile.php?mode=register&agreed=true">&nbsp;register</a><span style="font-size: 9px;">&nbsp;|&nbsp;</span><a href="/forum/profile.php?mode=sendpassword">lost password?</a>
+                    </div>
+                <? endif ?>
+                
+                <? if ($user->showLoginForm()): ?>
+                
+                    <span style="color: #FF7800; font-size: 10px; font-weight: bold; color: #FF7800;">
+                        <!--span style="cursor: help; color: #fff;" title="warsow.net forum login">warsowID</span-->
+                        <? if ($user->hasWarsowId() || $user->isAnonymous()): ?>
+                            <!--or--> <span style="cursor: help; color: #fff;" title="warsow-race.net forum login">racenetID</span>
+                        <? endif ?>
+                    </span>
+                
+                    <form method="post" action="/forum/login.php" style="display: inline;">
+                        <input tabindex="1" name="username" size="10" type="text"/>
+                        <input tabindex="2" name="password" size="10" type="password"/>
+                        <input tabindex="4" name="login" value="login" type="submit"/>
+                        <input tabindex="3" name="autologin" type="checkbox" title="Login permanently" style="width: auto; vertical-align: -2px; border: none; background-color: transparent;"/>
+                        <input name="redirect" type="hidden" value="<?= $user->getRedirectUri() ?>"/>
+                    </form>
+                <? endif ?>
+                </div>
+            <? endif; ?>
+            </div>
+            
+        </div>
+        
+        <div id="button_menu">
+            <?= $this->partial( 'navigation.phtml', array( 'nav' => $this->navigation ? $this->navigation : $this->layout()->nav ) ) ?>
+        </div>
+		<?/*<div style="float: right; margin-top: -68px; margin-right: 7px; position: relative; z-index: 99;">
+			<a target="_blank" href="http://www.warsownews.net/">
+				<img border="0" src="http://www.warsownews.net/v1/Portals/_default/Skins/warsow5/warsownews-234.gif">
+			</a>
+		</div>*/?>
+        
+        <div style="text-align: center;">
+	        <div class="outer_main">
+	            <div class="main">
+	                <div id="content">
+	                    <?/*<div id="googleads">
+	                        <script type="text/javascript"><!--
+	                            google_ad_client = "pub-5453957708279217"; google_ad_width = 728;   google_ad_height = 90; google_ad_format = "728x90_as"; google_ad_type = "text"; google_ad_channel = "1845243861"; google_color_border = "3E3452"; google_color_bg = "3E3452";google_color_link = "AECCEB"; google_color_text = "737ABC"; google_color_url = "737ABC";
+	                        //--></script>
+	                        <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+	                    </div> */?>
+	                    <div style="height: 10px;"></div>
+	                    <div id="inner_tube">

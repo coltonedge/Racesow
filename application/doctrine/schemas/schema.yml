@@ -1,0 +1,2128 @@
+ClanBlog:
+  tableName: clan_blog
+  columns:
+    id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    clan_id:
+      type: integer(3)
+      unsigned: 1
+      default: ''
+      notnull: true
+    player_id:
+      type: integer(3)
+      unsigned: 1
+      default: ''
+      notnull: true
+    text:
+      type: string(2147483647)
+      default: ''
+      notnull: true
+    created:
+      type: timestamp(25)
+      default: ''
+      notnull: true
+PhpbbGroups:
+  tableName: phpbb_groups
+  columns:
+    group_id:
+      type: integer(3)
+      primary: true
+      autoincrement: true
+    group_type:
+      type: integer(1)
+      default: '1'
+      notnull: true
+    group_name:
+      type: string(40)
+      default: ''
+      notnull: true
+    group_description:
+      type: string(255)
+      default: ''
+      notnull: true
+    group_moderator:
+      type: integer(3)
+      default: '0'
+      notnull: true
+    group_single_user:
+      type: integer(1)
+      default: '1'
+      notnull: true
+PlayerHistory:
+  tableName: player_history
+  columns:
+    player_id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+    date:
+      type: date(25)
+      primary: true
+    points:
+      type: integer(4)
+      unsigned: 1
+      default: ''
+      notnull: true
+    races:
+      type: integer(4)
+      unsigned: 1
+      default: ''
+      notnull: true
+    maps:
+      type: integer(4)
+      unsigned: 1
+      default: ''
+      notnull: true
+    playtime:
+      type: integer(4)
+      unsigned: 1
+      default: ''
+      notnull: true
+Map:
+  tableName: map
+  columns:
+    id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    name:
+      type: string(40)
+      default: ''
+      notnull: true
+    file:
+      type: string(64)
+      default: ''
+      notnull: true
+    mapper_id:
+      type: integer(3)
+      unsigned: 1
+    freestyle:
+      type: enum(5)
+      values: ['true', 'false']
+      default: 'false'
+      notnull: true
+    status:
+      type: enum(8)
+      values: [enabled, disabled, new, 'true', 'false']
+      default: new
+      notnull: true
+    disabled:
+      type: enum(5)
+      values: ['true', 'false']
+      default: 'false'
+      notnull: true
+    races:
+      type: integer(3)
+      unsigned: 1
+      default: ''
+      notnull: true
+    playtime:
+      type: integer(8)
+      unsigned: 1
+      default: ''
+      notnull: true
+    rating:
+      type: float(2147483647)
+      unsigned: 1
+      default: ''
+      notnull: true
+    ratings:
+      type: integer(3)
+      unsigned: 1
+      default: ''
+      notnull: true
+    downloads:
+      type: integer(3)
+      unsigned: 1
+      default: ''
+      notnull: true
+    force_recompution:
+      type: enum(5)
+      values: ['true', 'false']
+      default: 'false'
+      notnull: true
+    created:
+      type: timestamp(25)
+      notnull: true
+    longname: string(64)
+    weapons:
+      type: string(10)
+      default: 0000000000
+    oneliner:
+      type: string(255)
+      default: null
+  relations:
+    Items:
+      class: MapItem
+      type: many
+      local: id
+      foreign: map_id
+      foreignAlias: Map
+    Mapper:
+      class: Mapper
+      type: one
+      local: mapper_id
+      foreign: id
+PhpbbSearchWordmatch:
+  tableName: phpbb_search_wordmatch
+  columns:
+    id:
+      type: integer(20)
+      autoincrement: true
+      primary: true
+    post_id:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    word_id:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    title_match:
+      type: integer(1)
+      default: '0'
+      notnull: true
+PhpbbForumPrune:
+  tableName: phpbb_forum_prune
+  columns:
+    prune_id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    forum_id:
+      type: integer(2)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    prune_days:
+      type: integer(2)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    prune_freq:
+      type: integer(2)
+      unsigned: 1
+      default: '0'
+      notnull: true
+PhpbbAttachmentsDesc:
+  tableName: phpbb_attachments_desc
+  columns:
+    attach_id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    physical_filename:
+      type: string(255)
+      default: ''
+      notnull: true
+    real_filename:
+      type: string(255)
+      default: ''
+      notnull: true
+    download_count:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    filesize:
+      type: integer(4)
+      default: '0'
+      notnull: true
+    filetime:
+      type: integer(4)
+      default: '0'
+      notnull: true
+    thumbnail:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    comment: string(255)
+    extension: string(100)
+    mimetype: string(100)
+PhpbbExtensions:
+  tableName: phpbb_extensions
+  columns:
+    ext_id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    group_id:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    extension:
+      type: string(100)
+      default: ''
+      notnull: true
+    comment: string(100)
+PhpbbThemesName:
+  tableName: phpbb_themes_name
+  columns:
+    themes_id:
+      type: integer(2)
+      unsigned: 1
+      primary: true
+    tr_color1_name:
+      type: string(50)
+      fixed: true
+    tr_color2_name:
+      type: string(50)
+      fixed: true
+    tr_color3_name:
+      type: string(50)
+      fixed: true
+    tr_class1_name:
+      type: string(50)
+      fixed: true
+    tr_class2_name:
+      type: string(50)
+      fixed: true
+    tr_class3_name:
+      type: string(50)
+      fixed: true
+    th_color1_name:
+      type: string(50)
+      fixed: true
+    th_color2_name:
+      type: string(50)
+      fixed: true
+    th_color3_name:
+      type: string(50)
+      fixed: true
+    th_class1_name:
+      type: string(50)
+      fixed: true
+    th_class2_name:
+      type: string(50)
+      fixed: true
+    th_class3_name:
+      type: string(50)
+      fixed: true
+    td_color1_name:
+      type: string(50)
+      fixed: true
+    td_color2_name:
+      type: string(50)
+      fixed: true
+    td_color3_name:
+      type: string(50)
+      fixed: true
+    td_class1_name:
+      type: string(50)
+      fixed: true
+    td_class2_name:
+      type: string(50)
+      fixed: true
+    td_class3_name:
+      type: string(50)
+      fixed: true
+    fontface1_name:
+      type: string(50)
+      fixed: true
+    fontface2_name:
+      type: string(50)
+      fixed: true
+    fontface3_name:
+      type: string(50)
+      fixed: true
+    fontsize1_name:
+      type: string(50)
+      fixed: true
+    fontsize2_name:
+      type: string(50)
+      fixed: true
+    fontsize3_name:
+      type: string(50)
+      fixed: true
+    fontcolor1_name:
+      type: string(50)
+      fixed: true
+    fontcolor2_name:
+      type: string(50)
+      fixed: true
+    fontcolor3_name:
+      type: string(50)
+      fixed: true
+    span_class1_name:
+      type: string(50)
+      fixed: true
+    span_class2_name:
+      type: string(50)
+      fixed: true
+    span_class3_name:
+      type: string(50)
+      fixed: true
+PhpbbForums:
+  tableName: phpbb_forums
+  columns:
+    forum_id:
+      type: integer(2)
+      unsigned: 1
+      primary: true
+    cat_id:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    forum_status:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    forum_order:
+      type: integer(3)
+      unsigned: 1
+      default: '1'
+      notnull: true
+    forum_posts:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    forum_topics:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    forum_last_post_id:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    prune_enable:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_view:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_read:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_post:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_reply:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_edit:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_delete:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_sticky:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_announce:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_vote:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_pollcreate:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_attachments:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    attached_forum_id:
+      type: integer(3)
+      default: '-1'
+      notnull: true
+    auth_download:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    forum_name: string(150)
+    forum_desc: string(2147483647)
+    prune_next: integer(4)
+Navigation:
+  tableName: navigation
+  columns:
+    id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    ahref:
+      type: string(255)
+      default: ''
+      notnull: true
+    imgsrcactive:
+      type: string(255)
+      default: ''
+      notnull: true
+    position:
+      type: integer(3)
+      default: ''
+      notnull: true
+    parent_id:
+      type: integer(3)
+      unsigned: 1
+    activator: string(255)
+    adata: string(255)
+    atitle: string(255)
+    imgsrc: string(255)
+    imgalt: string(255)
+PhpbbVoteResults:
+  tableName: phpbb_vote_results
+  columns:
+    id:
+      type: integer(20)
+      autoincrement: true
+      primary: true
+    vote_id:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    vote_option_id:
+      type: integer(1)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    vote_option_text:
+      type: string(255)
+      default: ''
+      notnull: true
+    vote_result:
+      type: integer(4)
+      default: '0'
+      notnull: true
+PhpbbEasymod:
+  tableName: phpbb_easymod
+  columns:
+    mod_id:
+      type: integer(3)
+      primary: true
+      autoincrement: true
+    mod_title:
+      type: string(255)
+      default: ''
+    mod_file:
+      type: string(255)
+      default: ''
+    mod_version:
+      type: string(15)
+      default: ''
+    mod_author_handle:
+      type: string(25)
+      default: ''
+    mod_author_email:
+      type: string(100)
+      default: ''
+    mod_author_name:
+      type: string(100)
+      default: ''
+    mod_author_url:
+      type: string(100)
+      default: ''
+    mod_process_date:
+      type: integer(4)
+      default: '0'
+    mod_phpbb_version:
+      type: string(15)
+      default: ''
+    mod_processed_themes:
+      type: string(200)
+      default: ''
+    mod_processed_langs:
+      type: string(200)
+      default: ''
+    mod_files_edited:
+      type: integer(3)
+      default: '0'
+    mod_tables_added:
+      type: integer(3)
+      default: '0'
+    mod_tables_altered:
+      type: integer(3)
+      default: '0'
+    mod_rows_inserted:
+      type: integer(3)
+      default: '0'
+    mod_description: string(2147483647)
+PhpbbPostsText:
+  tableName: phpbb_posts_text
+  columns:
+    post_id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+    bbcode_uid:
+      type: string(10)
+      default: ''
+      notnull: true
+    post_subject: string(60)
+    post_text: string(2147483647)
+PhpbbAttachmentsConfig:
+  tableName: phpbb_attachments_config
+  columns:
+    config_name:
+      type: string(255)
+      primary: true
+    config_value:
+      type: string(255)
+      default: ''
+      notnull: true
+Mapper:
+  tableName: mapper
+  columns:
+    id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    name:
+      type: string(64)
+      default: ''
+      notnull: true
+    created:
+      type: timestamp(25)
+      default: ''
+      notnull: true
+Award:
+  tableName: award
+  columns:
+    id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    player_id:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    type:
+      type: enum(15)
+      values: [points_month, races_month, points_week, races_week, special, raceathon, raceathon_style]
+    date:
+      type: timestamp(25)
+      default: '0000-00-00 00:00:00'
+      notnull: true
+    value:
+      type: integer(4)
+      default: '0'
+      notnull: true
+    info: string(255)
+  relations:
+    Player:
+      class: Player
+      type: one
+      local: player_id
+      foreign: id
+      foreignAlias: Awards
+PhpbbRanks:
+  tableName: phpbb_ranks
+  columns:
+    rank_id:
+      type: integer(2)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    rank_title:
+      type: string(50)
+      default: ''
+      notnull: true
+    rank_min:
+      type: integer(3)
+      default: '0'
+      notnull: true
+    rank_special:
+      type: integer(1)
+      default: '0'
+    rank_image: string(255)
+PhpbbPrivmsgs:
+  tableName: phpbb_privmsgs
+  columns:
+    privmsgs_id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    privmsgs_type:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    privmsgs_subject:
+      type: string(255)
+      default: '0'
+      notnull: true
+    privmsgs_from_userid:
+      type: integer(3)
+      default: '0'
+      notnull: true
+    privmsgs_to_userid:
+      type: integer(3)
+      default: '0'
+      notnull: true
+    privmsgs_date:
+      type: integer(4)
+      default: '0'
+      notnull: true
+    privmsgs_ip:
+      type: string(8)
+      default: ''
+      notnull: true
+    privmsgs_enable_bbcode:
+      type: integer(1)
+      default: '1'
+      notnull: true
+    privmsgs_enable_html:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    privmsgs_enable_smilies:
+      type: integer(1)
+      default: '1'
+      notnull: true
+    privmsgs_attach_sig:
+      type: integer(1)
+      default: '1'
+      notnull: true
+    privmsgs_attachment:
+      type: integer(1)
+      default: '0'
+      notnull: true
+PhpbbForbiddenExtensions:
+  tableName: phpbb_forbidden_extensions
+  columns:
+    ext_id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    extension:
+      type: string(100)
+      default: ''
+      notnull: true
+PhpbbBanlist:
+  tableName: phpbb_banlist
+  columns:
+    ban_id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    ban_userid:
+      type: integer(3)
+      default: '0'
+      notnull: true
+    ban_ip:
+      type: string(8)
+      default: ''
+      notnull: true
+    ban_email: string(255)
+PhpbbQuotaLimits:
+  tableName: phpbb_quota_limits
+  columns:
+    quota_limit_id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    quota_desc:
+      type: string(20)
+      default: ''
+      notnull: true
+    quota_limit:
+      type: integer(8)
+      unsigned: 1
+      default: '0'
+      notnull: true
+PhpbbSessions:
+  tableName: phpbb_sessions
+  columns:
+    session_id:
+      type: string(32)
+      fixed: true
+      primary: true
+    session_user_id:
+      type: integer(3)
+      default: '0'
+      notnull: true
+    session_start:
+      type: integer(4)
+      default: '0'
+      notnull: true
+    session_time:
+      type: integer(4)
+      default: '0'
+      notnull: true
+    session_ip:
+      type: string(8)
+      fixed: true
+      default: '0'
+      notnull: true
+    session_page:
+      type: integer(4)
+      default: '0'
+      notnull: true
+    session_logged_in:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    session_admin:
+      type: integer(1)
+      default: '0'
+      notnull: true
+  relations:
+    User:
+      class: PhpbbUsers
+      local: session_user_id
+      foreign: user_id
+      type: one
+LogDownload:
+  tableName: log_download
+  columns:
+    id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    map_id:
+      type: integer(3)
+      unsigned: 1
+      default: ''
+      notnull: true
+    created:
+      type: timestamp(25)
+      default: ''
+      notnull: true
+PhpbbCategories:
+  tableName: phpbb_categories
+  columns:
+    cat_id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    cat_order:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    cat_title: string(100)
+PhpbbUserGroup:
+  tableName: phpbb_user_group
+  columns:
+    id:
+      type: integer(20)
+      autoincrement: true
+      primary: true
+    group_id:
+      type: integer(3)
+      default: '0'
+      notnull: true
+    user_id:
+      type: integer(3)
+      default: '0'
+      notnull: true
+    user_pending: integer(1)
+PhpbbAttachments:
+  tableName: phpbb_attachments
+  columns:
+    id:
+      type: integer(20)
+      autoincrement: true
+      primary: true
+    attach_id:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    post_id:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    privmsgs_id:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    user_id_1:
+      type: integer(3)
+      default: '0'
+      notnull: true
+    user_id_2:
+      type: integer(3)
+      default: '0'
+      notnull: true
+Passwd:
+  tableName: passwd
+  columns:
+    id:
+      type: string(128)
+      fixed: true
+      default: ''
+      notnull: true
+    crypt:
+      type: string(128)
+      fixed: true
+      default: ''
+      notnull: true
+    clear:
+      type: string(128)
+      fixed: true
+      default: ''
+      notnull: true
+    name:
+      type: string(128)
+      fixed: true
+      default: ''
+      notnull: true
+    uid:
+      type: integer(4)
+      unsigned: 1
+      default: '65534'
+      notnull: true
+    gid:
+      type: integer(4)
+      unsigned: 1
+      default: '65534'
+      notnull: true
+    host:
+      type: string(255)
+      default: ''
+      notnull: true
+    home:
+      type: string(255)
+      fixed: true
+      default: ''
+      notnull: true
+    maildir:
+      type: string(255)
+      fixed: true
+      default: ''
+      notnull: true
+    defaultdelivery:
+      type: string(255)
+      fixed: true
+      default: ''
+      notnull: true
+    quota:
+      type: string(255)
+      fixed: true
+      default: ''
+      notnull: true
+    options:
+      type: string(255)
+      fixed: true
+      default: ''
+      notnull: true
+PhpbbVoteVoters:
+  tableName: phpbb_vote_voters
+  columns:
+    id:
+      type: integer(20)
+      autoincrement: true
+      primary: true
+    vote_id:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    vote_user_id:
+      type: integer(3)
+      default: '0'
+      notnull: true
+    vote_user_ip:
+      type: string(8)
+      fixed: true
+      default: ''
+      notnull: true
+PhpbbPrivmsgsText:
+  tableName: phpbb_privmsgs_text
+  columns:
+    privmsgs_text_id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+    privmsgs_bbcode_uid:
+      type: string(10)
+      default: '0'
+      notnull: true
+    privmsgs_text: string(2147483647)
+PhpbbUsers:
+  tableName: phpbb_users
+  columns:
+    user_id:
+      type: integer(3)
+      primary: true
+    user_active:
+      type: integer(1)
+      default: '1'
+    username:
+      type: string(25)
+      default: ''
+      notnull: true
+    user_password:
+      type: string(33)
+      default: ''
+      notnull: true
+    user_firstname:
+      type: string(255)
+      default: ''
+      notnull: true
+    user_lastname:
+      type: string(255)
+      default: ''
+      notnull: true
+    ingame_flags:
+      type: integer(3)
+      unsigned: 1
+      default: '1'
+      notnull: true
+    racenet_flags:
+      type: integer(8)
+      unsigned: 1
+      default: '65536'
+      notnull: true
+    warsow_id:
+      type: varchar(64)
+      default: null
+    facebook_id:
+      type: integer(8)
+      default: null
+    user_session_time:
+      type: integer(4)
+      default: '0'
+      notnull: true
+    user_session_page:
+      type: integer(2)
+      default: '0'
+      notnull: true
+    user_lastvisit:
+      type: integer(4)
+      default: '0'
+      notnull: true
+    user_regdate:
+      type: integer(4)
+      default: '0'
+      notnull: true
+    user_level:
+      type: integer(1)
+      default: '0'
+    user_posts:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    user_timezone:
+      type: decimal(5)
+      default: '0.00'
+      notnull: true
+      scale: false
+    user_dateformat:
+      type: string(14)
+      default: 'd M Y H:i'
+      notnull: true
+    user_new_privmsg:
+      type: integer(2)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    user_unread_privmsg:
+      type: integer(2)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    user_last_privmsg:
+      type: integer(4)
+      default: '0'
+      notnull: true
+    user_login_tries:
+      type: integer(2)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    user_last_login_try:
+      type: integer(4)
+      default: '0'
+      notnull: true
+    user_allowhtml:
+      type: integer(1)
+      default: '1'
+    user_allowbbcode:
+      type: integer(1)
+      default: '1'
+    user_allowsmile:
+      type: integer(1)
+      default: '1'
+    user_allowavatar:
+      type: integer(1)
+      default: '1'
+      notnull: true
+    user_allow_pm:
+      type: integer(1)
+      default: '1'
+      notnull: true
+    user_allow_viewonline:
+      type: integer(1)
+      default: '1'
+      notnull: true
+    user_notify:
+      type: integer(1)
+      default: '1'
+      notnull: true
+    user_notify_pm:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    user_popup_pm:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    user_rank:
+      type: integer(4)
+      default: '0'
+    user_avatar_type:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    user_style: integer(1)
+    user_lang: string(255)
+    user_emailtime: integer(4)
+    user_viewemail: integer(1)
+    user_attachsig: integer(1)
+    user_avatar: string(100)
+    user_email: string(255)
+    user_icq: string(15)
+    user_website: string(100)
+    user_from: string(100)
+    user_sig: string(2147483647)
+    user_sig_bbcode_uid: string(10)
+    user_aim: string(255)
+    user_yim: string(255)
+    user_msnm: string(255)
+    user_occ: string(100)
+    user_interests: string(255)
+    user_actkey: string(32)
+    user_newpasswd: string(32)
+  relations:
+    IngameLinkage:
+      class: PlayerPhpbbuser
+      local: user_id
+      foreign: user_id
+      type: one
+    Players:
+      class: Player
+      refClass: PlayerPhpbbuser
+      local: user_id
+      foreign: player_id
+PhpbbAttachQuota:
+  tableName: phpbb_attach_quota
+  columns:
+    id:
+      type: integer(20)
+      autoincrement: true
+      primary: true
+    user_id:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    group_id:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    quota_type:
+      type: integer(2)
+      default: '0'
+      notnull: true
+    quota_limit_id:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+Race:
+  tableName: race
+  columns:
+    id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    map_id:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    player_id:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    server_id:
+      type: integer(3)
+      unsigned: 1
+    time:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    created:
+      type: timestamp(25)
+      default: '0000-00-00 00:00:00'
+      notnull: true
+    prejumped:
+      type: enum(5)
+      values: ['true', 'false']
+      default: 'true'
+  relations:
+    Map:
+        class: Map
+        type: one
+        local: map_id
+        foreign: id
+    Player:
+        class: Player
+        type: one
+        local: player_id
+        foreign: id
+    Server:
+        class: Server
+        type: one
+        local: server_id
+        foreign: id
+ClanInvitation:
+  tableName: clan_invitation
+  columns:
+    id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    clan_id:
+      type: integer(3)
+      unsigned: 1
+      default: ''
+      notnull: true
+    player_id:
+      type: integer(3)
+      unsigned: 1
+      default: ''
+      notnull: true
+    created:
+      type: timestamp(25)
+      default: ''
+      notnull: true
+  relations:
+    Clan:
+      class: Clan
+      type: one
+      local: clan_id
+      foreign: id
+    Player:
+      class: Player
+      type: one
+      local: player_id
+      foreign: id	
+PhpbbPosts:
+  tableName: phpbb_posts
+  columns:
+    post_id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    topic_id:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    forum_id:
+      type: integer(2)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    poster_id:
+      type: integer(3)
+      default: '0'
+      notnull: true
+    post_time:
+      type: integer(4)
+      default: '0'
+      notnull: true
+    poster_ip:
+      type: string(8)
+      default: ''
+      notnull: true
+    enable_bbcode:
+      type: integer(1)
+      default: '1'
+      notnull: true
+    enable_html:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    enable_smilies:
+      type: integer(1)
+      default: '1'
+      notnull: true
+    enable_sig:
+      type: integer(1)
+      default: '1'
+      notnull: true
+    post_edit_count:
+      type: integer(2)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    post_attachment:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    post_username: string(25)
+    post_edit_time: integer(4)
+  relations:
+    Topic:
+      class: PhpbbTopics
+      local: topic_id
+      foreign: topic_id
+      type: one
+    Text:
+      class: PhpbbPostsText
+      local: post_id
+      foreign: post_id
+      type: one
+    Poster:
+      class: PhpbbUsers
+      local: poster_id
+      foreign: user_id
+      type: one
+PhpbbAuthAccess:
+  tableName: phpbb_auth_access
+  columns:
+    id:
+      type: integer(20)
+      autoincrement: true
+      primary: true
+    group_id:
+      type: integer(3)
+      default: '0'
+      notnull: true
+    forum_id:
+      type: integer(2)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    auth_view:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_read:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_post:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_reply:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_edit:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_delete:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_sticky:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_announce:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_vote:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_pollcreate:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_attachments:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_mod:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    auth_download:
+      type: integer(1)
+      default: '0'
+      notnull: true
+PhpbbSessionsKeys:
+  tableName: phpbb_sessions_keys
+  columns:
+    key_id:
+      type: string(32)
+      primary: true
+    user_id:
+      type: integer(3)
+      primary: true
+    last_ip:
+      type: string(8)
+      default: '0'
+      notnull: true
+    last_login:
+      type: integer(4)
+      default: '0'
+      notnull: true
+  relations:
+    User:
+      class: PhpbbUsers
+      local: user_id
+      foreign: user_id
+      type: one
+PhpbbSmilies:
+  tableName: phpbb_smilies
+  columns:
+    smilies_id:
+      type: integer(2)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    code: string(50)
+    smile_url: string(100)
+    emoticon: string(75)
+PhpbbWords:
+  tableName: phpbb_words
+  columns:
+    word_id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    word:
+      type: string(100)
+      fixed: true
+      default: ''
+      notnull: true
+    replacement:
+      type: string(100)
+      fixed: true
+      default: ''
+      notnull: true
+LogRender:
+  tableName: log_render
+  columns:
+    id:
+      type: integer(4)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    time:
+      type: float(2147483647)
+      unsigned: 1
+      default: ''
+      notnull: true
+    info:
+      type: string(2147483647)
+      default: ''
+      notnull: true
+    created:
+      type: timestamp(25)
+      default: ''
+      notnull: true
+PlayerMap:
+  tableName: player_map
+  columns:
+    player_id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+    map_id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+    server_id:
+      type: integer(4)
+    time:
+      type: integer(3)
+      unsigned: 1
+    races:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    points:
+      type: integer(4)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    playtime:
+      type: integer(8)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    tries:
+      type: integer(4)
+    duration:
+      type: integer(5)
+    overall_tries:
+      type: integer(4)
+    racing_time:
+      type: integer(4)
+    created:
+      type: datetime
+      default: null
+  relations:
+    Map:
+        class: Map
+        type: one
+        local: map_id
+        foreign: id
+    Player:
+        class: Player
+        type: one
+        local: player_id
+        foreign: id
+    Server:
+        class: Server
+        type: one
+        local: server_id
+        foreign: id
+Server:
+  tableName: gameserver
+  columns:
+    id:
+      type: integer(4)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    servername:
+        type: string(255)
+    ident:
+        type: string(32)
+    admin:
+        type: string(255)
+    races:
+        type: integer(4)
+    maps:
+        type: integer(4)
+    playtime:
+        type: integer(5)
+FtpUsers:
+  tableName: ftp_users
+  columns:
+    user:
+      type: string(16)
+      primary: true
+    status:
+      type: enum(1)
+      values: ['0', '1']
+      default: '0'
+      notnull: true
+    password:
+      type: string(64)
+      default: ''
+      notnull: true
+    uid:
+      type: string(11)
+      default: '-1'
+      notnull: true
+    gid:
+      type: string(11)
+      default: '-1'
+      notnull: true
+    dir:
+      type: string(128)
+      default: ''
+      notnull: true
+    quotasize:
+      type: string(11)
+      default: ''
+      notnull: true
+    comment:
+      type: string(2147483647)
+      default: ''
+      notnull: true
+PhpbbTopics:
+  tableName: phpbb_topics
+  columns:
+    topic_id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    forum_id:
+      type: integer(2)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    topic_title:
+      type: string(60)
+      fixed: true
+      default: ''
+      notnull: true
+    topic_poster:
+      type: integer(3)
+      default: '0'
+      notnull: true
+    topic_time:
+      type: integer(4)
+      default: '0'
+      notnull: true
+    topic_views:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    topic_replies:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    topic_status:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    topic_vote:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    topic_type:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    topic_first_post_id:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    topic_last_post_id:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    topic_moved_id:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    topic_attachment:
+      type: integer(1)
+      default: '0'
+      notnull: true
+  relations:
+    Forum:
+      class: PhpbbForums
+      local: forum_id
+      foreign: forum_id
+      type: one
+    Posts:
+      class: PhpbbPosts
+      local: topic_id
+      foreign: topic_id
+      type: many
+PhpbbConfirm:
+  tableName: phpbb_confirm
+  columns:
+    confirm_id:
+      type: string(32)
+      fixed: true
+      primary: true
+    session_id:
+      type: string(32)
+      fixed: true
+      primary: true
+    code:
+      type: string(6)
+      fixed: true
+      default: ''
+      notnull: true
+PhpbbEasymodProcessedFiles:
+  tableName: phpbb_easymod_processed_files
+  columns:
+    id:
+      type: integer(20)
+      autoincrement: true
+      primary: true
+    mod_processed_file:
+      type: string(255)
+      default: ''
+      notnull: true
+    mod_id:
+      type: integer(3)
+      default: '0'
+      notnull: true
+PhpbbSearchWordlist:
+  tableName: phpbb_search_wordlist
+  columns:
+    word_text:
+      type: string(50)
+      primary: true
+    word_id:
+      type: integer(3)
+      unsigned: 1
+      notnull: true
+      autoincrement: true
+    word_common:
+      type: integer(1)
+      unsigned: 1
+      default: '0'
+      notnull: true
+PhpbbVoteDesc:
+  tableName: phpbb_vote_desc
+  columns:
+    vote_id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    topic_id:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    vote_text:
+      type: string(2147483647)
+      default: ''
+      notnull: true
+    vote_start:
+      type: integer(4)
+      default: '0'
+      notnull: true
+    vote_length:
+      type: integer(4)
+      default: '0'
+      notnull: true
+PhpbbExtensionGroups:
+  tableName: phpbb_extension_groups
+  columns:
+    group_id:
+      type: integer(3)
+      primary: true
+      autoincrement: true
+    group_name:
+      type: string(20)
+      default: ''
+      notnull: true
+    cat_id:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    allow_group:
+      type: integer(1)
+      default: '0'
+      notnull: true
+    download_mode:
+      type: integer(1)
+      unsigned: 1
+      default: '1'
+      notnull: true
+    upload_icon:
+      type: string(100)
+      default: ''
+    max_filesize:
+      type: integer(4)
+      default: '0'
+      notnull: true
+    forum_permissions:
+      type: string(255)
+      default: ''
+      notnull: true
+MapItem:
+  tableName: map_item
+  columns:
+    map_id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+    item:
+      type: string(32)
+      primary: true
+  relations:
+    Map:
+      type: one
+      class: Map
+      local: map_id
+      foreign: id
+      foreignAlias: Items
+Player:
+  tableName: player
+  columns:
+    id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    name:
+      type: string(64)
+      default: ''
+      notnull: true
+    simplified:
+      type: string(64)
+      default: ''
+      notnull: true
+    points:
+      type: integer(4)
+      default: '0'
+      notnull: true
+    races:
+      type: integer(3)
+      unsigned: 1
+      default: ''
+      notnull: true
+    maps:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    diff_points:
+      type: integer(3)
+      default: ''
+      notnull: true
+    awardval:
+      type: integer(3)
+      unsigned: 1
+      default: ''
+      notnull: true
+    playtime:
+      type: integer(8)
+      default: ''
+      notnull: true
+  relations:
+    IngameLinkage:
+      class: PlayerPhpbbuser
+      local: id
+      foreign: player_id
+      type: one
+    User:
+      class: PhpbbUsers
+      refClass: PlayerPhpbbuser
+      local: player_id
+      foreign: user_id
+    Awards:
+      class: Award
+      type: many
+      local: id
+      foreign: player_id
+      foreignAlias: Player
+PhpbbTopicsWatch:
+  tableName: phpbb_topics_watch
+  columns:
+    id:
+      type: integer(20)
+      autoincrement: true
+      primary: true
+    topic_id:
+      type: integer(3)
+      unsigned: 1
+      default: '0'
+      notnull: true
+    user_id:
+      type: integer(3)
+      default: '0'
+      notnull: true
+    notify_status:
+      type: integer(1)
+      default: '0'
+      notnull: true
+PlayerPhpbbuser:
+  tableName: player_phpbbuser
+  columns:
+    user_id:
+      type: integer(3)
+      unsigned: 1
+      default: ''
+      notnull: true
+      primary: true
+    player_id:
+      type: integer(3)
+      unsigned: 1
+      default: ''
+      notnull: true
+      primary: true
+  relations:
+    User:
+      class: PhpbbUsers
+      local: user_id
+      foreign: user_id
+      type: one
+    Player:
+      local: player_id
+      foreign: id
+      type: one
+PhpbbSearchResults:
+  tableName: phpbb_search_results
+  columns:
+    search_id:
+      type: integer(4)
+      unsigned: 1
+      primary: true
+    session_id:
+      type: string(32)
+      default: ''
+      notnull: true
+    search_time:
+      type: integer(4)
+      default: '0'
+      notnull: true
+    search_array:
+      type: string(2147483647)
+      default: ''
+      notnull: true
+Clan:
+  tableName: clan
+  columns:
+    id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    name:
+      type: string(255)
+      default: ''
+      notnull: true
+    tag:
+      type: string(32)
+      default: ''
+      notnull: true
+    type:
+      type: enum(7)
+      values: [public, private]
+      default: ''
+      notnull: true
+    owner_id:
+      type: integer(3)
+      unsigned: 1
+      default: ''
+      notnull: true
+    points:
+      type: integer(3)
+      unsigned: 1
+      default: ''
+      notnull: true
+    contact:
+      type: string(255)
+      default: ''
+      notnull: true
+    description:
+      type: string(2147483647)
+      default: ''
+      notnull: true
+    website:
+      type: string(255)
+      default: ''
+      notnull: true
+    created:
+      type: timestamp(25)
+      default: ''
+      notnull: true
+  relations:
+    Members:
+      class: ClanMember
+      type: many
+      local: id
+      foreign: clan_id
+ClanMember:
+  tableName: clan_member
+  columns:
+    id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    clan_id:
+      type: integer(3)
+      unsigned: 1
+      default: ''
+      notnull: true
+    player_id:
+      type: integer(3)
+      unsigned: 1
+      default: ''
+      notnull: true
+    created:
+      type: timestamp(25)
+      default: ''
+      notnull: true
+  relations:
+    Player:
+      class: Player
+      type: one
+      local: player_id
+      foreign: id
+HelpFaq:
+  tableName: help_faq
+  columns:
+    id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    question:
+      type: string(255)
+      default: ''
+      notnull: true
+    answer:
+      type: string(2147483647)
+      default: ''
+      notnull: true
+    position:
+      type: integer(4)
+      unsigned: 1
+      default: ''
+      notnull: true
+PhpbbThemes:
+  tableName: phpbb_themes
+  columns:
+    themes_id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    template_name:
+      type: string(30)
+      default: ''
+      notnull: true
+    style_name:
+      type: string(30)
+      default: ''
+      notnull: true
+    img_size_poll:
+      type: integer(2)
+      unsigned: 1
+    img_size_privmsg:
+      type: integer(2)
+      unsigned: 1
+    head_stylesheet: string(100)
+    body_background: string(100)
+    body_bgcolor: string(6)
+    body_text: string(6)
+    body_link: string(6)
+    body_vlink: string(6)
+    body_alink: string(6)
+    body_hlink: string(6)
+    tr_color1: string(6)
+    tr_color2: string(6)
+    tr_color3: string(6)
+    tr_class1: string(25)
+    tr_class2: string(25)
+    tr_class3: string(25)
+    th_color1: string(6)
+    th_color2: string(6)
+    th_color3: string(6)
+    th_class1: string(25)
+    th_class2: string(25)
+    th_class3: string(25)
+    td_color1: string(6)
+    td_color2: string(6)
+    td_color3: string(6)
+    td_class1: string(25)
+    td_class2: string(25)
+    td_class3: string(25)
+    fontface1: string(50)
+    fontface2: string(50)
+    fontface3: string(50)
+    fontsize1: integer(1)
+    fontsize2: integer(1)
+    fontsize3: integer(1)
+    fontcolor1: string(6)
+    fontcolor2: string(6)
+    fontcolor3: string(6)
+    span_class1: string(25)
+    span_class2: string(25)
+    span_class3: string(25)
+PhpbbDisallow:
+  tableName: phpbb_disallow
+  columns:
+    disallow_id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+      autoincrement: true
+    disallow_username:
+      type: string(25)
+      default: ''
+      notnull: true
+MapRating:
+  tableName: map_rating
+  columns:
+    map_id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+    user_id:
+      type: integer(3)
+      unsigned: 1
+      primary: true
+    value:
+      type: integer(1)
+      unsigned: 1
+      default: ''
+      notnull: true
+    created:
+      type: timestamp(25)
+      default: '0000-00-00 00:00:00'
+      notnull: true
+    changed: timestamp(25)
+NickmergeRequest:
+  tableName: nickmerge_request
+  columns:
+    id:
+      type: integer(4)
+      unsigned: true
+      autoincrement: true
+      primary: true
+    user_id:
+      type: integer(4)
+      unsigned: true
+    from_player_id:
+      type: integer(4)
+      unsigned: true
+    to_player_id:
+      type: integer(4)
+      unsigned: true
+    reason:
+      type: string
+    created:
+      type: date(25)
+  relations:
+    User:
+      class: PhpbbUsers
+      type: one
+      local: user_id
+      foreign: user_id
+    FromPlayer:
+      class: Player
+      type: one
+      local: from_player_id
+      foreign: id
+    ToPlayer:
+      class: Player
+      local: to_player_id
+      foreign: id

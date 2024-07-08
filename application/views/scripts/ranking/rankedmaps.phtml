@@ -1,0 +1,28 @@
+<div style="margin-left: 30px;">
+	<? 
+	$config = Zend_Registry::get('config');
+	foreach( $this->maps as $map ):
+		$img = 'gfx/levelshots/thumbs/'. urlencode( strtolower( $map->name ) ) .'.jpg';
+		if( !is_file( $config->path->htdocs . $img ) )
+			$img = 'gfx/levelshots/thumbs/nolevelshot.jpg';
+	?>
+		<div style="float: left; border 1px solid black; width: 260px; margin: 10px;">
+			<table class="clean" border="0" cellspacing="0" cellpadding="0" width="100%">
+				<tr>
+					<td width="30">
+						<span style="font-weight: bold; font-size: 16px; color: #fff;"><?= $map->position ?>.</span>
+					</td>
+					<td>
+						<a href="/map/<?= $map->id ?>">
+							<img align="left" width="75" height="56" border="0" src="/<?= $img ?>" style="margin-right: 5px;" />
+							<?= $map->name ?>
+						</a><br/>
+						<?= ($map->time/1000) ?> sec<br/>
+						<?= $map->points ?> pts
+					</td>
+				</tr>
+			</table>
+		</div>
+	<? endforeach; ?>
+	<div style="clear: left;"></div>
+</div>

@@ -1,0 +1,22 @@
+<div id="buttons" style="width: 600px;">
+	<ul class="rs-menu">
+	<?
+		if( $this->nav ):
+			foreach( $this->nav->getItems() as $item ):
+			?><li><a href="<?= $item->getHref() ?>"><?
+				$image = $item->getImage();
+				if( !empty( $image ) ):
+					$imgActive = $item->getActiveImage();
+					if( $item->isActive() )
+						$image = $imgActive;
+				?><img active="<?= $item->isActive() ?>" title="<?= $item->getTitle() ?>" alt="<?= $item->getAlt() ?>" id="button_<?= $item->getId() ?>" border="0" src="<?= $image ?>" hover="<?= $item->getActiveImage() ?>" normal="<?= $item->getImage() ?>"/><?
+				endif;
+				?></a>
+				<?= $this->partial( 'subnavigation.phtml', array( 'item' => $item ) ) ?>
+				</li><?
+			endforeach;
+		endif;
+	?>
+	</ul>
+	<div style="clear: both;"></div>
+</div>

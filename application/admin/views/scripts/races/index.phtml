@@ -1,0 +1,89 @@
+<div style="margin-left: auto; margin-right: auto; width: 850px;">
+   
+    <table class="racenet" border="0">
+        <thead>
+            <td colspan="9">
+                <div style="float: left;">
+                    Races
+                </div>
+                <form action="/admin/races/index/" method="post" style="float: right; margin-bottom: 1px;">
+		            Player: <input name="playerfilter" class="search" type="text" value="<?= $this->playerFilter ? $this->playerFilter : '' ?>" />
+		            &nbsp;&nbsp;&nbsp;
+					Map: <input name="mapfilter" class="search" type="text" value="<?= $this->mapFilter ? $this->mapFilter : '' ?>" />
+		            <input title="show only players matching your search" type="submit" onclick="" value="search" />
+		            <input title="clear the current search" type="button" value="clear" <?= (!$this->mapFilter && !$this->playerFilter ? 'disabled="disabled"' : '') ?> onclick="window.location.href = '/admin/races/';" />
+		        </form>
+
+		        <div style="clear: both;"></div>
+            </td>
+        </thead>
+    
+    
+	    <? $counter = 0 ?>
+	    <? if( $this->paginator ): ?>
+		    <tr>
+		       <td colspan="9">
+		        <?  
+
+		            echo $this->paginatorCode = $this->paginationControl($this->paginator, 'Sliding', 'zend_paginator.phtml', array("highlight" => $this->highlight, "disabled" => !empty($this->search) ? false: false));
+		
+		        ?>
+		        </td>
+		    </tr>
+		    
+	        <tr class="racenet_semihead rankedmaps_click">
+	            <td style="width: 180px;">            
+	                Player
+	            </td>
+	            <td style="width: 180px;">            
+	                Map
+	            </td>
+				<td style="width: 180px;">            
+	                Time
+	            </td>
+				<td style="width: 180px;">            
+	                Date
+	            </td>
+	            <td style="width: 50px">            
+	                &nbsp;
+	            </td>
+	        </tr> 
+        <? if (count($this->paginator->getIterator())): ?>
+            <? foreach ($this->paginator->getIterator() as $race): ?>
+				<tr class="racenet_row rankedmaps_click">
+					<td style="width: 180px;">            
+						<?= new Racenet_IngameColors($race->Player->name) ?>
+					</td>
+					<td style="width: 180px;">            
+						<?= $race->Map->name ?>
+					</td>
+					<td style="width: 180px;">            
+						<?= $this->Racetime($race->time, Racenet_Filter_Racetime::FORMAT_INGAME, false) ?>
+					</td>
+					<td style="width: 180px;">            
+						<?= $race->created ?>
+					</td>
+					<td style="width: 50px">            
+						<a onclick="return confirm('really delete this race and recompute stats for the map?');" href="<?= $this->url(array('action' => 'delete', 'id' => $race->id, 'page' => $this->page, 'mapfilter' => $this->mapFilter, 'playerfilter' => $this->playerFilter)) ?>">delete</a>
+					</td>
+				</tr> 
+			<? endforeach; ?>
+        <? else: ?>
+            <tr style="color: #f00; margin: 10px;">
+                <td colspan=9">
+                    No map matched your search
+                </td>
+            </tr>
+        <? endif; ?>
+        <tr>
+            <td colspan="9">
+                <?= $this->paginatorCode ?>
+            </td>
+        </tr>
+    <? else: ?>
+    <tr>
+        <td colspan="9">No maps are available</td>
+    </tr>      
+    <? endif; ?>
+    </table>
+</div>

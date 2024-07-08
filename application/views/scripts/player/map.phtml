@@ -1,0 +1,31 @@
+<tr class="racenet_row rankedmaps_click" <?= $this->match ? 'style="background-color: #302843;"' : '' ?>>
+    <td style="text-align: left;">
+        <b><?= $this->points ?></b>
+    </td>
+	<td>			
+        <? $hasItems = isset($this->items) && $this->items->count() ?>
+		<a class="wmtt" <?= $hasItems ? 'addition="'. $this->id .'"' : '' ?> rel="<?= $this->image ?>" href="<?= $this->url(array('controller' => 'maps', 'action' => 'details', 'id' => $this->id), null, true) ?>"><?= str_replace('+', 'plus', $this->name) ?></a>
+        <? if($hasItems): ?>
+	        <div rel="<?= $this->id ?>" class="wmtt_addition" style="display: none;">
+            <? foreach($this->items as $item): ?>
+                <img width="16" src="/gfx/icons/<?= $item->item ?>_small.gif" alt="" />  
+            <? endforeach; ?>
+	        </div>
+        <? endif; ?>
+	</td>
+    <td style="text-align: left;">
+        <?= $this->time ? $this->Racetime($this->time, Racenet_Filter_Racetime::FORMAT_INGAME, false) : '<span class="info">none</span>' ?>
+    </td>
+    <td style="text-align: left;">
+        <b><?= $this->races ? $this->NumberFormat($this->races) : '<span class="info">none</span>' ?></b>
+    </td>
+    <td style="text-align: left;">
+        <b><?= $this->tries ? $this->NumberFormat($this->tries) : '<span class="info">none</span>' ?></b>
+    </td>
+	<td style="text-align: left;">
+		<?= $this->playtime ? $this->Racetime($this->playtime) : '<span class="info">none</span>' ?>
+	</td>
+	<td style="text-align: left; width: 160px; font-size: 10px;">
+		<?= $this->created ?>
+	</td>
+</tr>

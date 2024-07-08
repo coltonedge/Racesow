@@ -1,0 +1,653 @@
+##############################################################
+## MOD Title: Add Topic Types
+## MOD Author: Florian_DVP < florian@developpez.biz > ( Florian ) http://florian.developpez.com
+## MOD Description: Add new types of topics, which can be mixed together
+## MOD Version: 1.0.1
+##
+## Installation Level: Intermediate
+## Installation Time: 10 Minutes
+## Files To Edit:
+##		modcp.php
+##		search.php 
+##		viewforum.php
+##		viewtopic.php
+##		language/lang_english/lang_main.php
+##		templates/subSilver/modcp_body.tpl
+## Included Files:
+##		alter_tables.php
+##		ext_status.php
+##############################################################
+## For Security Purposes, Please Check: http://www.phpbb.com/mods/ for the
+## latest version of this MOD. Downloading this MOD from other sites could cause malicious code
+## to enter into your phpBB Forum. As such, phpBB will not offer support for MOD's not offered
+## in our MOD-Database, located at: http://www.phpbb.com/mods/
+##############################################################
+## Author Notes:
+##
+## This mod add three new types of topics, looking like the
+## Sticky/Announcement/Poll types.
+## It will had three fields to your topics table in your database.
+##
+## Two of them can be used either by the subject author or by
+## moderators, the third only by moderators.
+##
+## The two author-usable types have fixed values ('Solved','To Trash').
+## They are made to highlight that the subject has found a solution,
+## and/or to report that the subject is useless and can be trashed.
+## The goal is to ease the work of moderators, and also to ease forum
+## use for those who whish to help.
+##
+## The third type is chosen from a list, and is made to ease the
+## use of the forum, by clearly "tagging" subjects, whith things like
+## [FAQ],[To Do],[Repost],etc.
+## For the "types list", order of elements addition doesn't matter.
+## However, once you have used these types don't change their ID.
+##
+## An exemple to change existing topics, supposing you have mysql
+## and standard tables names:
+## update phpbb_topics set topic_title=right(topic_title,char_length(topic_title)-8),
+## topic_solved="Y"  where topic_title like '[solved]%'
+##
+## This will remove the [solved] mention from title and will set then 'solved' status.
+##
+## You can see a demo of this mod here:
+##
+## http://florian.developpez.comt/mods/topictypes/english.php
+##
+## Don't forget to run the file alter_tables.php
+## to complete the MOD installation
+##############################################################
+## MOD History:
+##
+##   2003-10-22 - Version 1.0.3
+##	- Fixed a bug wich allowed anonymous users to change status of topics posted
+##	by guests or deleted users
+##	- Change behaviour to prevent status change when topic is locked
+##
+##   2003-08-11 - Version 1.0.2
+##	- Fixed a bug which caused first poster of the page to have links,
+##	even if he was not author
+##	ayant posté le premier sujet de la page
+##
+##   2003-08-05 - Version 1.0.1
+##	- Fixed a wich caused wrong type to be selected in the dropdown list
+##
+##   2003-07-31 - Version 1.0.0
+##	- Initial release
+##
+##############################################################
+## Before Adding This MOD To Your Forum, You Should Back Up All Files Related To This MOD
+##############################################################
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+modcp.php
+
+# 
+#-----[ FIND ]------------------------------------------
+# 
+// session id check
+if (!empty($HTTP_POST_VARS['sid']) || !empty($HTTP_GET_VARS['sid']))
+{
+	$sid = (!empty($HTTP_POST_VARS['sid'])) ? $HTTP_POST_VARS['sid'] : $HTTP_GET_VARS['sid'];
+}
+else
+{
+	$sid = '';
+}
+
+# 
+#-----[ BEFORE, ADD ]-----------------------------------
+# 
+// Begin Add Topic Types
+$solved = ( isset($HTTP_POST_VARS['solved']) ) ?  TRUE : FALSE;
+$unsolved = ( isset($HTTP_POST_VARS['unsolved']) ) ?  TRUE : FALSE;
+$trash = ( isset($HTTP_POST_VARS['trash']) ) ?  TRUE : FALSE;
+$untrash = ( isset($HTTP_POST_VARS['untrash']) ) ?  TRUE : FALSE;
+$extended_status = ( isset($HTTP_POST_VARS['extended_status']) && isset($HTTP_POST_VARS['ext_status_value'])) ?  TRUE : FALSE;
+if ( $solved || $unsolved || $trash || $untrash || $extended_status)
+{
+	$mode = "status";
+}
+// End Add Topic Types
+
+# 
+#-----[ FIND ]------------------------------------------
+#
+case 'lock':
+	if ( empty($HTTP_POST_VARS['topic_id_list']) && empty($topic_id) )
+	{
+		message_die(GENERAL_MESSAGE, $lang['None_selected']);
+	}
+
+# 
+#-----[ BEFORE, ADD ]-----------------------------------
+#
+// Begin Add Topic Types
+case 'status':
+	if ( empty($HTTP_POST_VARS['topic_id_list']) && empty($topic_id) )
+	{
+		message_die(GENERAL_MESSAGE, $lang['None_selected']);
+	}
+	$topics = ( isset($HTTP_POST_VARS['topic_id_list']) ) ?  $HTTP_POST_VARS['topic_id_list'] : array($topic_id);
+
+	$topic_id_sql = '';
+	for($i = 0; $i < count($topics); $i++)
+	{
+		$topic_id_sql .= ( ( $topic_id_sql != '' ) ? ', ' : '' ) . $topics[$i];
+	}
+
+	$sql = "UPDATE " . TOPICS_TABLE . " SET ";
+	if($solved)
+	{
+		$sql .= " topic_solved='Y' ";
+		$completion = $lang['Marked_Solved'];
+	}
+	if($unsolved)
+	{
+		$sql .= " topic_solved='N' ";
+		$completion = $lang['UnMarked_Solved'];
+	}
+	if($trash)
+	{
+		$sql .= " topic_totrash='Y' ";
+		$completion = $lang['Marked_ToTrash'];
+	}
+	if($untrash)
+	{
+		$sql .= " topic_totrash='N' ";
+		$completion = $lang['UnMarked_ToTrash'];
+	}
+	if($extended_status)
+	{
+		$sql .= " topic_ext_status=" . $HTTP_POST_VARS['ext_status_value'] ;
+		$completion = $lang['Ext_Status_Changed'];
+	}
+
+	$sql .= " WHERE topic_id IN ($topic_id_sql) 
+			AND topic_moved_id = 0";
+	if ( !($result = $db->sql_query($sql)) )
+	{
+		message_die(GENERAL_ERROR, 'Could not update topics table', '', __LINE__, __FILE__, $sql);
+	}
+
+	if ( !empty($topic_id) )
+	{
+		$redirect_page = "viewtopic.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;sid=" . $userdata['session_id'];
+		$message = sprintf($lang['Click_return_topic'], '<a href="' . $redirect_page . '">', '</a>');
+	}
+	else
+	{
+		$redirect_page = "modcp.$phpEx?" . POST_FORUM_URL . "=$forum_id&amp;sid=" . $userdata['session_id'];
+		$message = sprintf($lang['Click_return_modcp'], '<a href="' . $redirect_page . '">', '</a>');
+	}
+
+	$message = $message . '<br \><br \>' . sprintf($lang['Click_return_forum'], '<a href="' . "viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id&amp;sid=" . $userdata['session_id'] . '">', '</a>');
+
+	$template->assign_vars(array(
+		'META' => '<meta http-equiv="refresh" content="3;url=' . $redirect_page . '">')
+	);
+
+	message_die(GENERAL_MESSAGE, $completion . '<br /><br />' . $message);
+
+	break;
+// End Add Topic Types
+# 
+#-----[ FIND ]------------------------------------------
+#
+default:
+	$page_title = $lang['Mod_CP'];
+	include($phpbb_root_path . 'includes/page_header.'.$phpEx);
+
+	$template->assign_vars(array(
+		'FORUM_NAME' => $forum_name,
+
+		'L_MOD_CP' => $lang['Mod_CP'],
+		'L_MOD_CP_EXPLAIN' => $lang['Mod_CP_explain'],
+		'L_SELECT' => $lang['Select'],
+		'L_DELETE' => $lang['Delete'],
+		'L_MOVE' => $lang['Move'],
+		'L_LOCK' => $lang['Lock'],
+		'L_UNLOCK' => $lang['Unlock'],
+		'L_TOPICS' => $lang['Topics'], 
+		'L_REPLIES' => $lang['Replies'], 
+		'L_LASTPOST' => $lang['Last_Post'], 
+		'L_SELECT' => $lang['Select'], 
+
+		'U_VIEW_FORUM' => append_sid("viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id"), 
+		'S_HIDDEN_FIELDS' => '<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" /><input type="hidden" name="' . POST_FORUM_URL . '" value="' . $forum_id . '" />',
+		'S_MODCP_ACTION' => append_sid("modcp.$phpEx"))
+	);
+
+# 
+#-----[ REPLACE WITH ]----------------------------------
+#
+default:
+	$page_title = $lang['Mod_CP'];
+	include($phpbb_root_path . 'includes/page_header.'.$phpEx);
+
+	$ext_status_select ='';
+	for ($ext_nb=0; $ext_nb<count($ext_status); $ext_nb++)
+	{
+		$ext_status_select .="<option value='" . $ext_status[$ext_nb][0] . "'" . ">" . $ext_status[$ext_nb][2] . "</option>";
+	}
+
+	$template->assign_vars(array(
+		'FORUM_NAME' => $forum_name,
+
+		'L_MOD_CP' => $lang['Mod_CP'],
+		'L_MOD_CP_EXPLAIN' => $lang['Mod_CP_explain'],
+		'L_SELECT' => $lang['Select'],
+		'L_DELETE' => $lang['Delete'],
+		'L_MOVE' => $lang['Move'],
+		'L_LOCK' => $lang['Lock'],
+		'L_UNLOCK' => $lang['Unlock'],
+		'L_TOPICS' => $lang['Topics'], 
+		'L_REPLIES' => $lang['Replies'], 
+		'L_LASTPOST' => $lang['Last_Post'], 
+		'L_SELECT' => $lang['Select'],
+		// Begin Add Topic Types
+		'L_SOLVED' => $lang['Solved_Mark_Yes'],
+		'L_UNSOLVED' => $lang['Solved_Mark_No'],
+		'L_TRASH' => $lang['ToTrash_Mark_Yes'],
+		'L_UNTRASH' => $lang['ToTrash_Mark_No'],
+		'L_EXT_STATUS' => $lang['Extended_Status'],
+		'L_EXT_STAT_VALUE' => $ext_status_select,
+		// End Add Topic Types
+		'U_VIEW_FORUM' => append_sid("viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id"), 
+		'S_HIDDEN_FIELDS' => '<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" /><input type="hidden" name="' . POST_FORUM_URL . '" value="' . $forum_id . '" />',
+		'S_MODCP_ACTION' => append_sid("modcp.$phpEx"))
+	);
+
+# 
+#-----[ FIND ]------------------------------------------
+#
+			if ( $row['topic_vote'] )
+			{
+				$topic_type .= $lang['Topic_Poll'] . ' ';
+			}
+	
+			$topic_title = $row['topic_title'];
+			if ( count($orig_word) )
+			{
+				$topic_title = preg_replace($orig_word, $replacement_word, $topic_title);
+			}
+
+			$u_view_topic = "modcp.$phpEx?mode=split&amp;" . POST_TOPIC_URL . "=$topic_id&amp;sid=" . $userdata['session_id'];
+			$topic_replies = $row['topic_replies'];
+
+			$last_post_time = create_date($board_config['default_dateformat'], $row['post_time'], $board_config['board_timezone']);
+
+			$template->assign_block_vars('topicrow', array(
+				'U_VIEW_TOPIC' => $u_view_topic,
+
+				'TOPIC_FOLDER_IMG' => $folder_img, 
+				'TOPIC_TYPE' => $topic_type, 
+				'TOPIC_TITLE' => $topic_title,
+				'REPLIES' => $topic_replies,
+				'LAST_POST_TIME' => $last_post_time,
+				'TOPIC_ID' => $topic_id,
+					
+				'L_TOPIC_FOLDER_ALT' => $folder_alt)
+			);
+		}
+
+		$template->assign_vars(array(
+			'PAGINATION' => generate_pagination("modcp.$phpEx?" . POST_FORUM_URL . "=$forum_id&amp;sid=" . $userdata['session_id'], $forum_topics, $board_config['topics_per_page'], $start),
+			'PAGE_NUMBER' => sprintf($lang['Page_of'], ( floor( $start / $board_config['topics_per_page'] ) + 1 ), ceil( $forum_topics / $board_config['topics_per_page'] )), 
+			'L_GOTO_PAGE' => $lang['Goto_page'])
+		);
+
+		$template->pparse('body');
+
+		break;
+}
+
+include($phpbb_root_path . 'includes/page_tail.'.$phpEx);
+
+?>
+
+# 
+#-----[ BEFORE, ADD ]------------------------------------
+#
+// Begin Add Topic Types
+if ($row['topic_ext_status'] != 0 )
+{
+	for ($ext_nb=0; $ext_nb<count($ext_status); $ext_nb++)
+	{
+		if ( $ext_status[$ext_nb][0] == $row['topic_ext_status'] )
+		{
+			$topic_type .= $ext_status[$ext_nb][2];
+		}
+	}
+}
+if ($row['topic_solved'] == 'Y')
+{
+	$topic_type .= $lang['Topic_Solved'];
+}
+if ($row['topic_totrash'] == 'Y')
+{
+	$topic_type .= $lang['Topic_ToTrash'];
+}
+// End Add Topic Types
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+search.php
+
+# 
+#-----[ FIND ]------------------------------------------
+# 
+for($i = 0; $i < count($searchset); $i++)
+{
+	$forum_url = append_sid("viewforum.$phpEx?" . POST_FORUM_URL . '=' . $searchset[$i]['forum_id']);
+	$topic_url = append_sid("viewtopic.$phpEx?" . POST_TOPIC_URL . '=' . $searchset[$i]['topic_id'] . "&amp;highlight=$highlight_active");
+	$post_url = append_sid("viewtopic.$phpEx?" . POST_POST_URL . '=' . $searchset[$i]['post_id'] . "&amp;highlight=$highlight_active") . '#' . $searchset[$i]['post_id'];
+
+	$post_date = create_date($board_config['default_dateformat'], $searchset[$i]['post_time'], $board_config['board_timezone']);
+
+	$message = $searchset[$i]['post_text'];
+	$topic_title = $searchset[$i]['topic_title'];
+
+# 
+#-----[ AFTER, ADD ]------------------------------------
+#
+// Begin Add Topic Types
+if ($searchset[$i]['topic_totrash'] == "Y" )
+{
+	$topic_title = $lang['Topic_ToTrash'] . $topic_title;
+}
+if ($searchset[$i]['topic_solved'] == "Y" )
+{
+	$topic_title = $lang['Topic_Solved'] . $topic_title;
+}
+if ($searchset[$i]['topic_ext_status'] != 0 )
+{
+	for ($ext_nb=0; $ext_nb<count($ext_status); $ext_nb++)
+	{
+		if ( $ext_status[$ext_nb][0] == $searchset[$i]['topic_ext_status'] )
+		{
+			$topic_title = $ext_status[$ext_nb][2] . $topic_title;
+		}
+	}
+}
+// End Add Topic Types
+#
+#-----[ OPEN ]------------------------------------------
+#
+viewforum.php
+
+# 
+#-----[ FIND ]------------------------------------------
+#
+$view_topic_url = append_sid("viewtopic.$phpEx?" . POST_TOPIC_URL . "=$topic_id");
+
+$topic_author = ( $topic_rowset[$i]['user_id'] != ANONYMOUS ) ? '<a href="' . append_sid("profile.$phpEx?mode=viewprofile&amp;" . POST_USERS_URL . '=' . $topic_rowset[$i]['user_id']) . '">' : '';
+$topic_author .= ( $topic_rowset[$i]['user_id'] != ANONYMOUS ) ? $topic_rowset[$i]['username'] : ( ( $topic_rowset[$i]['post_username'] != '' ) ? $topic_rowset[$i]['post_username'] : $lang['Guest'] );
+
+# 
+#-----[ BEFORE, ADD ]------------------------------------
+#
+// Begin Add Topic Types
+if ($topic_rowset[$i]['topic_ext_status'] != 0 )
+{
+	for ($ext_nb=0; $ext_nb<count($ext_status); $ext_nb++)
+	{
+		if ( $ext_status[$ext_nb][0] == $topic_rowset[$i]['topic_ext_status'] )
+		{
+			$topic_type .= $ext_status[$ext_nb][2];
+		}
+	}
+}
+if ($topic_rowset[$i]['topic_solved'] == "Y" )
+{
+	$topic_type .= $lang['Topic_Solved'];
+}
+if ($topic_rowset[$i]['topic_totrash'] == "Y" )
+{
+	$topic_type .= $lang['Topic_ToTrash'];
+}
+// End Add Topic Types
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+viewtopic.php
+
+# 
+#-----[ FIND ]------------------------------------------
+#
+$sql = "SELECT t.topic_id, t.topic_title, t.topic_status, t.topic_replies, t.topic_time, t.topic_type, t.topic_vote, t.topic_last_post_id, f.forum_name, f.forum_status, f.forum_id, f.auth_view, f.auth_read, f.auth_post, f.auth_reply, f.auth_edit, f.auth_delete, f.auth_sticky, f.auth_announce, f.auth_pollcreate, f.auth_vote, f.auth_attachments" . $count_sql . "
+
+# 
+#-----[ REPLACE WITH ]----------------------------------
+#
+$sql = "SELECT t.topic_id, t.topic_title, t.topic_status, t.topic_replies, t.topic_time, t.topic_type, t.topic_vote, t.topic_last_post_id, t.topic_solved, t.topic_totrash, t.topic_ext_status, t.topic_poster, f.forum_name, f.forum_status, f.forum_id, f.auth_view, f.auth_read, f.auth_post, f.auth_reply, f.auth_edit, f.auth_delete, f.auth_sticky, f.auth_announce, f.auth_pollcreate, f.auth_vote, f.auth_attachments" . $count_sql . "
+
+# 
+#-----[ FIND ]------------------------------------------
+#
+//
+// Output page header
+//
+
+# 
+#-----[ AFTER, ADD ]------------------------------------
+#
+// Begin Add Topic Types
+if ($forum_topic_data['topic_totrash'] == "Y" )
+{
+	$topic_title = $lang['Title_ToTrash'] . $topic_title;
+}
+if ($forum_topic_data['topic_solved'] == "Y" )
+{
+	$topic_title = $lang['Title_Solved'] . $topic_title;
+}
+if ($forum_topic_data['topic_ext_status'] != 0 )
+{
+	for ($ext_nb=0; $ext_nb<count($ext_status); $ext_nb++)
+	{
+		if ( $ext_status[$ext_nb][0] == $forum_topic_data['topic_ext_status'] )
+		{
+			$topic_title = $ext_status[$ext_nb][2] . $topic_title;
+		}
+	}
+}
+// End Add Topic Types
+
+# 
+#-----[ FIND ]------------------------------------------
+#
+if ( $is_auth['auth_mod'] )
+{
+	$s_auth_can .= sprintf($lang['Rules_moderate'], "<a href=\"modcp.$phpEx?" . POST_FORUM_URL . "=$forum_id&amp;sid=" . $userdata['session_id'] . '">', '</a>');
+
+	$topic_mod .= "<a href=\"modcp.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;mode=delete&amp;sid=" . $userdata['session_id'] . '"><img src="' . $images['topic_mod_delete'] . '" alt="' . $lang['Delete_topic'] . '" title="' . $lang['Delete_topic'] . '" border="0" /></a>&nbsp;';
+
+	$topic_mod .= "<a href=\"modcp.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;mode=move&amp;sid=" . $userdata['session_id'] . '"><img src="' . $images['topic_mod_move'] . '" alt="' . $lang['Move_topic'] . '" title="' . $lang['Move_topic'] . '" border="0" /></a>&nbsp;';
+
+	$topic_mod .= ( $forum_topic_data['topic_status'] == TOPIC_UNLOCKED ) ? "<a href=\"modcp.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;mode=lock&amp;sid=" . $userdata['session_id'] . '"><img src="' . $images['topic_mod_lock'] . '" alt="' . $lang['Lock_topic'] . '" title="' . $lang['Lock_topic'] . '" border="0" /></a>&nbsp;' : "<a href=\"modcp.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;mode=unlock&amp;sid=" . $userdata['session_id'] . '"><img src="' . $images['topic_mod_unlock'] . '" alt="' . $lang['Unlock_topic'] . '" title="' . $lang['Unlock_topic'] . '" border="0" /></a>&nbsp;';
+
+	$topic_mod .= "<a href=\"modcp.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;mode=split&amp;sid=" . $userdata['session_id'] . '"><img src="' . $images['topic_mod_split'] . '" alt="' . $lang['Split_topic'] . '" title="' . $lang['Split_topic'] . '" border="0" /></a>&nbsp;';
+}
+
+# 
+#-----[ REPLACE WITH ]----------------------------------
+#
+if ( $is_auth['auth_mod'] )
+{
+	$s_auth_can .= sprintf($lang['Rules_moderate'], "<a href=\"modcp.$phpEx?" . POST_FORUM_URL . "=$forum_id&amp;sid=" . $userdata['session_id'] . '">', '</a>');
+
+	$topic_mod .= "<a href=\"modcp.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;mode=delete&amp;sid=" . $userdata['session_id'] . '"><img src="' . $images['topic_mod_delete'] . '" alt="' . $lang['Delete_topic'] . '" title="' . $lang['Delete_topic'] . '" border="0" /></a>&nbsp;';
+
+	$topic_mod .= "<a href=\"modcp.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;mode=move&amp;sid=" . $userdata['session_id'] . '"><img src="' . $images['topic_mod_move'] . '" alt="' . $lang['Move_topic'] . '" title="' . $lang['Move_topic'] . '" border="0" /></a>&nbsp;';
+
+	$topic_mod .= ( $forum_topic_data['topic_status'] == TOPIC_UNLOCKED ) ? "<a href=\"modcp.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;mode=lock&amp;sid=" . $userdata['session_id'] . '"><img src="' . $images['topic_mod_lock'] . '" alt="' . $lang['Lock_topic'] . '" title="' . $lang['Lock_topic'] . '" border="0" /></a>&nbsp;' : "<a href=\"modcp.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;mode=unlock&amp;sid=" . $userdata['session_id'] . '"><img src="' . $images['topic_mod_unlock'] . '" alt="' . $lang['Unlock_topic'] . '" title="' . $lang['Unlock_topic'] . '" border="0" /></a>&nbsp;';
+
+	$topic_mod .= "<a href=\"modcp.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;mode=split&amp;sid=" . $userdata['session_id'] . '"><img src="' . $images['topic_mod_split'] . '" alt="' . $lang['Split_topic'] . '" title="' . $lang['Split_topic'] . '" border="0" /></a>&nbsp;';
+	// Begin Add Topic Types
+	$solved = ( $forum_topic_data['topic_solved'] == "Y" ? $lang['Solved_Mark_No'] : $lang['Solved_Mark_Yes'] );
+	$solved_act = ( $forum_topic_data['topic_solved'] == "Y" ? "unsolved" : "solved" );
+	$totrash = ( $forum_topic_data['topic_totrash'] == "Y" ? $lang['ToTrash_Mark_No'] : $lang['ToTrash_Mark_Yes'] );
+	$totrash_act = ( $forum_topic_data['topic_totrash'] == "Y" ? "untrash" : "trash" );
+
+	for ($ext_nb=0; $ext_nb<count($ext_status); $ext_nb++)
+	{
+		$ext_status_select .="<option value='" . $ext_status[$ext_nb][0] . "'";
+		if ( $forum_topic_data['topic_ext_status'] == $ext_status[$ext_nb][0] )
+		{
+			$ext_status_select .= ' selected ';
+		}
+		$ext_status_select .= ">" . $ext_status[$ext_nb][2] . "</option>";
+	}
+	$topic_mod .="<form action='modcp.$phpEx' method='post'><input type='submit' class='liteoption' name='" . $solved_act . "' value='" . $solved . "'><input type='submit' class='liteoption' name='" . $totrash_act . "' value='" . $totrash . "'><input type='hidden' name='sid' value='" . $userdata['session_id'] . "'><input type='hidden' name='mode' value='status'><input type=hidden name='" . POST_FORUM_URL . "' value=". $forum_topic_data['forum_id'] . "><input type=hidden name='" . POST_TOPIC_URL . "' value=". $forum_topic_data['topic_id'] . "><input type='submit' class='liteoption' name='extended_status' value='" . $lang['Extended_Status'] . "'><select class='liteoption' name='ext_status_value'>" . $ext_status_select . "</select></form>";
+	// End Add Topic Types
+}
+
+# 
+#-----[ FIND ]------------------------------------------
+#
+//
+// Topic watch information
+//
+$s_watching_topic = '';
+if ( $can_watch_topic )
+{
+	if ( $is_watching_topic )
+	{
+		$s_watching_topic = "<a href=\"viewtopic.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;unwatch=topic&amp;start=$start&amp;sid=" . $userdata['session_id'] . '">' . $lang['Stop_watching_topic'] . '</a>';
+		$s_watching_topic_img = ( isset($images['topic_un_watch']) ) ? "<a href=\"viewtopic.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;unwatch=topic&amp;start=$start&amp;sid=" . $userdata['session_id'] . '"><img src="' . $images['topic_un_watch'] . '" alt="' . $lang['Stop_watching_topic'] . '" title="' . $lang['Stop_watching_topic'] . '" border="0"></a>' : '';
+	}
+	else
+	{
+		$s_watching_topic = "<a href=\"viewtopic.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;watch=topic&amp;start=$start&amp;sid=" . $userdata['session_id'] . '">' . $lang['Start_watching_topic'] . '</a>';
+		$s_watching_topic_img = ( isset($images['Topic_watch']) ) ? "<a href=\"viewtopic.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;watch=topic&amp;start=$start&amp;sid=" . $userdata['session_id'] . '"><img src="' . $images['Topic_watch'] . '" alt="' . $lang['Start_watching_topic'] . '" title="' . $lang['Start_watching_topic'] . '" border="0"></a>' : '';
+	}
+}
+
+# 
+#-----[ AFTER, ADD ]------------------------------------
+#
+// Begin Add Topic Types
+if ( ($userdata['user_id'] != ANONYMOUS ) && ($userdata['user_id'] == $forum_topic_data['topic_poster']) && !$is_auth['auth_mod'] && ($forum_topic_data['topic_status'] != TOPIC_LOCKED) )
+{ 
+	$solved = ( $forum_topic_data['topic_solved'] == "Y" ? $lang['Solved_Mark_No'] : $lang['Solved_Mark_Yes'] );
+	$solved_act = ( $forum_topic_data['topic_solved'] == "Y" ? "unsolved" : "solved" );
+	$totrash = ( $forum_topic_data['topic_totrash'] == "Y" ? $lang['ToTrash_Mark_No'] : $lang['ToTrash_Mark_Yes'] );
+	$totrash_act = ( $forum_topic_data['topic_totrash'] == "Y" ? "untrash" : "trash" );
+	$s_watching_topic .= "<br /><a href=\"ext_status.$phpEx?sid=". $userdata['session_id'] . "&" . POST_TOPIC_URL . "=" . $topic_id . "&" . POST_FORUM_URL . "=" . $forum_topic_data['forum_id'] . "&" . $solved_act . "=true\">" . $solved . "</a>";
+	$s_watching_topic .= "<br /><a href=\"ext_status.$phpEx?sid=". $userdata['session_id'] . "&" . POST_TOPIC_URL . "=" . $topic_id . "&" . POST_FORUM_URL . "=" . $forum_topic_data['forum_id'] . "&" . $totrash_act . "=true\">" . $totrash . "</a>";
+} 
+// End Add Topic Types
+#
+#-----[ OPEN ]------------------------------------------
+#
+language/lang_english/lang_main.php
+
+# 
+#-----[ FIND ]------------------------------------------
+# 
+//
+// That's all, Folks!
+// -------------------------------------------------
+
+# 
+#-----[ BEFORE, ADD ]-----------------------------------
+#
+// Begin Add Topic Types
+$lang['Solved_Mark_Yes'] = 'Add [Solved]';
+$lang['Solved_Mark_No'] = 'Remove [Solved]';
+$lang['Marked_Solved'] = 'Topic(s) has been tagged [Solved]';
+$lang['UnMarked_Solved'] = 'Topic(s) is(are) no longer been tagged [Solved]';
+
+$lang['ToTrash_Mark_Yes'] = 'Add [To Trash]';
+$lang['ToTrash_Mark_No'] = 'Remove [To Trash]';
+$lang['Marked_ToTrash'] = 'Topic(s) has been tagged [To Trash]';
+$lang['UnMarked_ToTrash'] = 'Topic(s) is(are) no longer been tagged [To Trash]';
+
+$lang['Ext_Status_Changed'] = 'Topic(s) type has changed';
+
+$lang['Topic_Solved'] = ' <b>[Solved]</b> ';
+$lang['Topic_ToTrash'] = ' <b>[To Trash]</b> ';
+$lang['Title_Solved'] = ' [Solved] ';
+$lang['Title_ToTrash'] = ' [To Trash] ';
+$lang['Extended_Status'] = 'Topic Type';
+
+// First element : type ID (never changed once type has been used)
+// Second element : type wich is displayed in forum and topic
+// Third element : type added to the page title and shown in list
+global $ext_status;
+$ext_status = array();
+$ext_status[] = array(0,'','Nothing');
+$ext_status[] = array(1,' <b>[FAQ]</b> ',' [FAQ] ');
+$ext_status[] = array(2,' <b>[To Do]</b> ',' [To Do] ');
+$ext_status[] = array(0,'','----');
+$ext_status[] = array(3,' <b>[Repost]</b> ',' [Repost] ');
+// End Add Topic Types
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+templates/subSilver/modcp_body.tpl
+
+# 
+#-----[ FIND ]------------------------------------------
+# 
+<tr align="right"> 
+  <td class="catBottom" colspan="5" height="29"> {S_HIDDEN_FIELDS} 
+	<input type="submit" name="delete" class="liteoption" value="{L_DELETE}" />
+	&nbsp; 
+	<input type="submit" name="move" class="liteoption" value="{L_MOVE}" />
+	&nbsp; 
+	<input type="submit" name="lock" class="liteoption" value="{L_LOCK}" />
+	&nbsp; 
+	<input type="submit" name="unlock" class="liteoption" value="{L_UNLOCK}" />
+  </td>
+</tr>
+
+# 
+#-----[ REPLACE WITH ]----------------------------------
+#
+<tr align="right"> 
+  <td class="catBottom" colspan="5" height="29"> {S_HIDDEN_FIELDS} 
+	<input type="submit" name="delete" class="liteoption" value="{L_DELETE}" />
+	&nbsp; 
+	<input type="submit" name="move" class="liteoption" value="{L_MOVE}" />
+	&nbsp; 
+	<input type="submit" name="lock" class="liteoption" value="{L_LOCK}" />
+	&nbsp; 
+	<input type="submit" name="unlock" class="liteoption" value="{L_UNLOCK}" />
+	<!-- Begin Add Topic Types -->
+	&nbsp; 
+	<input type="submit" name="solved" class="liteoption" value="{L_SOLVED}" />
+	&nbsp; 
+	<input type="submit" name="unsolved" class="liteoption" value="{L_UNSOLVED}" />
+	&nbsp; 
+	<input type="submit" name="trash" class="liteoption" value="{L_TRASH}" />
+	&nbsp; 
+	<input type="submit" name="untrash" class="liteoption" value="{L_UNTRASH}" />
+	&nbsp; 
+	<input type="submit" name="extended_status" class="liteoption" value="{L_EXT_STATUS}" />
+	&nbsp; 
+	<select name="ext_status_value" class="liteoption">{L_EXT_STAT_VALUE}</select>
+	<!-- End Add Topic Types -->
+  </td>
+</tr>
+
+# 
+#-----[ COPY ]------------------------------------------
+#
+copy ext_status.php to ext_status.php
+
+# 
+#-----[ COPY ]------------------------------------------
+#
+# You have to upload this file, logon to your forum, execute the file and delete it !
+copy alter_tables.php to alter_tables.php
+
+# 
+#-----[ SAVE/CLOSE ALL FILES ]-------------------------- 
+# 
+# EoM 

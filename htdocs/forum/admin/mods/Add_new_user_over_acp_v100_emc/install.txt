@@ -1,0 +1,112 @@
+## EasyMod 0.0.7 compliant
+##############################################################
+##
+## MOD Title: Add New User over ACP - MOD
+## MOD Author: AWSW <> http://www.awsw.de
+##
+## MOD Description:
+## Fügt im Adminbereich Deines phpBB2 die Möglichkeit hinzu, neue User über das Adminpannel anzulegen und auch danach zu aktivieren, falls Du die Accountaktivierung in Deinem Forum eingestellt hast. Getestet mit phpBB 2.0.6.
+## With this MOD you are able to add new users over your Administration Panel. You can also activate the new accounts after that, if you use the account activation in your phpbb2. Testet with phpBB: 2.0.6.
+## MOD Version: 1.00
+##
+## Installation Level: easy
+## Installation Time: 3 Minutes
+##
+## Generator: phpBB2 Mod Maker 0.1.67
+##############################################################
+## This MOD is released under the GPL License. Intellectual Property is retained by the MOD Author(s) listed above. http://www.gnu.org
+##############################################################
+## For Security Purposes, Please Check: http://www.awsw.de/ for the latest version of this MOD. Downloading this MOD from other sites could cause malicious code to enter into your phpBB Forum. You´ll find support to this MOD at http://www.phpbb.de/
+##############################################################
+## Before Adding This MOD To Your Forum, You Should Back Up Your Complete Database And All Files Related To This MOD !
+##############################################################
+#
+# Hinweis: Dieser MOD verwendet Teile des "Account Activation MOD". Der Autor ist mir leider nicht bekannt.
+# Note: This MOD uses parts of the "Account Activation MOD". Sadely i do not know the original author of this MOD.
+#
+##############################################################
+#
+# Installation:
+#
+##############################################################
+#
+#-----[ COPY TO FOLDER ]------------------------------------------
+#
+# german: Dateien in vorgesehene Verzeichnisse kopieren
+#
+
+COPY phpBB2-Root/admin/admin_add_user_activate.php TO admin/admin_add_user_activate.php
+COPY phpBB2-Root/admin/admin_add_user_info.php TO admin/admin_add_user_info.php
+COPY phpBB2-Root/admin/admin_add_user_user.php TO admin/admin_add_user_user.php
+COPY phpBB2-Root/templates/subSilver/admin/admin_add_user_activate.tpl TO templates/subSilver/admin/admin_add_user_activate.tpl
+COPY phpBB2-Root/language/lang_english/lang_admin_add_user.php TO language/lang_english/lang_admin_add_user.php
+COPY phpBB2-Root/language/lang_german/lang_admin_add_user.php TO language/lang_german/lang_admin_add_user.php
+
+##############################################################
+#
+#-----[ OPEN ]------------------------------------------
+#
+# german: Öffne
+#
+
+language/lang_english/lang_admin.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+# german: Finde
+#
+
+?>
+
+#
+#-----[ BEFORE, ADD ]------------------------------------------
+#
+# german: Davor einfügen
+#
+
+// AWSW "Add_new_user_over_acp_v100" MOD
+$lang['User_Add_New_Users'] = 'Add User';
+$lang['User_Add_New_Users_1'] = '1. Information';
+$lang['User_Add_New_Users_2'] = '2. Add User';
+$lang['User_Add_New_Users_3'] = '3. Activate User';
+
+##############################################################
+#
+#-----[ OPEN ]------------------------------------------
+#
+# german: Öffne
+#
+
+language/lang_german/lang_admin.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+# german: Finde
+#
+
+?>
+
+#
+#-----[ BEFORE, ADD ]------------------------------------------
+#
+# german: Davor einfügen
+#
+
+// AWSW "Add_new_user_over_acp_v100" MOD
+$lang['User_Add_New_Users'] = 'User anlegen';
+$lang['User_Add_New_Users_1'] = '1. Information';
+$lang['User_Add_New_Users_2'] = '2. User anlegen';
+$lang['User_Add_New_Users_3'] = '3. User aktivieren';
+
+##############################################################
+#
+#-----[ SAVE/CLOSE ALL FILES ]------------------------------------------
+#
+# german: Speichere/Schließe alle Dateien
+#
+# HTH AWSW
+# http://www.awsw.de
+#
+# EoM

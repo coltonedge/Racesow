@@ -1,0 +1,76 @@
+##############################################################
+## MOD Title: Admin Private Messages Manager
+## MOD Author: nivisec < N/A > (Billy Sauls) http://www.nivisec.com
+## MOD Description: An Admin panel plug-in that allows
+##                  the management of Private Messages
+##                  on the board.  You may sort by
+##                  a variety of options, delete any
+##                  PMs you choose, or optionally archive
+##                  them for later use.
+## MOD Version: 1.6.0
+##
+## Installation Level: (Easy)
+## Installation Time: 3 Minutes
+## Files To Edit: N/A
+## Included Files: N/A
+## License: http://opensource.org/licenses/gpl-license.php GNU Public License v2
+##############################################################
+## For security purposes, please check: http://www.phpbb.com/mods/
+## for the latest version of this MOD. Although MODs are checked
+## before being allowed in the MODs Database there is no guarantee
+## that there are no security problems within the MOD. No support
+## will be given for MODs not found within the MODs Database which
+## can be found at http://www.phpbb.com/mods/
+############################################################## ## Author Notes:
+##     Once installed, you will have a new admin panel
+##     option under the "User Admin" area called Private
+##     Messages.
+##
+##     The MOD's options are readily available to change
+##     from the bottom of the admin panel page.
+##
+##     You should add a clause to your user registration area
+##     saying you are using this hack, as well as alert current
+##     users you have installed it.  Otherwise, this may be
+##     illegal according to the current ToS the user signed up
+##     for and your country of hosting.
+##
+##     YOU MAY THINK YOU ARE SEEING MULTIPLE MESSAGES WHEN ALL
+##     FILTER IS BEING USED.  This is not the case, phpBB creates
+##     two messages for each PM once it has been read.  One for the
+##     reader and one for the sender.
+##############################################################
+## MOD History:
+##
+##   2005-07-21 - Version 1.6.0
+##			- Optimized queries, reducing on average the number by 50% during most operations.
+##			- Preferences are now settable inside the mod, instead of editing the php file.
+##			- Objectized the code some, but it is minimal until phpBB supports php5, as it
+##			  would be a waste of time rewriting it all until then.
+##			- No hassle install.  Just upload 4 files, done.  Options and the archive table
+##			  will be created as needed.
+##			- Fixed a problem with no addslashes() in an archiving query.
+##			- Removed my version checker code to make things as speedy as possible.
+##			- Now takes up only one menu item.  Archive mode/Normal mode is a toggle inside
+##			  the main page.
+##			- Added page navigation above and below the PM list.
+##
+##    Please see contrib/version_history.txt for the complete list.
+##
+##############################################################
+## Before Adding This MOD To Your Forum, You Should Back Up All Files Related To This MOD
+##############################################################
+
+#
+#-----[ COPY ]------------------------------------------ 
+#
+# All files are located in the ROOT subdirectory.
+#
+copy admin/admin_priv_msgs.php to admin/
+copy templates/subSilver/admin/*.* to templates/subSilver/admin/
+copy language/lang_english/lang_admin_priv_msgs.php to language/lang_english/
+
+#
+#-----[ SAVE/CLOSE ALL FILES ]------------------------------------------
+#
+# EoM

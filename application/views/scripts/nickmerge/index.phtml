@@ -1,0 +1,18 @@
+<div style="width: 810px; margin-left: auto; margin-right: auto;">
+    <div class="racenet_headrow">
+        Nickname merge-request
+    </div>
+    
+    <? if ($this->messages): ?>
+    <ul style="list-style: none; color: #0f0; font-weight: bold;">
+    <? foreach ($this->messages as $message): ?>
+        <li><?= $message ?></li>       
+    <? endforeach ?>
+    </ul>
+    <? endif; ?>
+    
+    <div class="racenet_row">
+        Please fill in the following form to request a nickname merge. An Admin will check your request and decide whether to accept or decline your request.
+        <?= $this->form ?>  
+    </div>
+</div>

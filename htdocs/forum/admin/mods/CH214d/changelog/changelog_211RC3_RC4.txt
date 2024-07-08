@@ -1,0 +1,1891 @@
+
+________________________________________________________________________________
+
+Prior to upgrade :
+=================
+If you have used the "installed" pack to upgrade, some modifications were missing in modcp.php & viewtopic.php,
+so do this first :
+
+#
+#-----[ OPEN ]------------------------------------------------
+#
+modcp.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+//
+// End session management
+//
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+$template->assign_vars(array(
+	'U_MOD_CP' => $config->url('modcp', array(POST_FORUM_URL => $forum_id, 'sid' => $user->data['session_id'])),
+	'L_MOD_CP' => $user->lang('Mod_CP'),
+));
+$user->get_cache(array(POST_FORUM_URL, POST_FORUM_URL . 'jbox'));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+viewtopic.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+$view_forum_url = append_sid("viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id");
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+// $view_forum_url = append_sid("viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id");
+//-- add
+$view_forum_url = $config->url('index', array(POST_FORUM_URL => $forum_id), true);
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ SAVE/CLOSE ALL FILES ]--------------------------------
+#
+# EoM
+________________________________________________________________________________
+
+________________________________________________________________________________
+
+#=============================================================
+#	Changes between 2.1.1 RC 3 & 2.1.1 RC 4
+#=============================================================
+Since 2005/04/16 :
+
+
+- fix a preview bug with the sub-title,
+- fix a bug with attachmod preview/review (attached files not showed),
+- fix a bug with attachmod icon, and priorise the topics attributes choice,
+- enhance the pics & classes handling in templates,
+- add the navigation box in returned messages,
+- add the pagination to topic review area,
+- add a templates/your_template/your_template.ini read to handle commands specific to a template (ie tpl var assignation),
+- fix a bug on install with postgresql prior to v8,
+- review the mssql schema for install
+
+
+#
+#-----[ OPEN ]------------------------------------------------
+#
+faq.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+				'U_FAQ_ID' => $faq_block[$i][$j]['id'])
+			);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+			$template->set_switch('faq_block.faq_row.light', !($j % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+				'U_FAQ_LINK' => '#' . $faq_block[$i][$j]['id'])
+			);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+			$template->set_switch('faq_block_link.faq_row_link.light', !($j % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+groupcp.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+			if ( $is_moderator )
+			{
+				$template->assign_block_vars('member_row.switch_mod_option', array());
+			}
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+			$template->set_switch('member_row.light', !($i % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+					'U_VIEWPROFILE' => append_sid("profile.$phpEx?mode=viewprofile&amp;" . POST_USERS_URL . "=$user_id"))
+				);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+				$template->set_switch('pending_members_row.light', !($i % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+# Note : you can simply copy the file from the pack root/ directory
+#
+index.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.4 - 09/04/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.5 - 24/04/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+	'FORUM_LOCKED_IMG' => $user->img('forum_locked'),
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+	'FORUM_LINK_IMG' => $user->img('link'),
+
+#
+#-----[ FIND ]------------------------------------------------
+#
+	'FOLDER_ANNOUNCE_IMG' => $user->img('folder_announce'),
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+	'FOLDER_CALENDAR_IMG' => $user->img('folder_calendar'),
+	'FOLDER_MOVED_IMG' => $user->img('folder_moved'),
+#
+#-----[ FIND ]------------------------------------------------
+#
+	'L_FORUM_LOCKED' => $user->lang('Forum_is_locked'),
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+	'L_FORUM_LINK' => $user->lang('Link'),
+
+	'L_TOPIC_MOVED' => $user->lang('Topic_Moved'),
+#
+#-----[ OPEN ]------------------------------------------------
+#
+memberlist.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+			'U_VIEWPROFILE' => append_sid("profile.$phpEx?mode=viewprofile&amp;" . POST_USERS_URL . "=$user_id"))
+		);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+		$template->set_switch('memberrow.light', !($i % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+modcp.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+	'L_MOD_CP' => $user->lang('Mod_CP'),
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+	'I_POST' => $user->img('icon_minipost'),
+#
+#-----[ FIND ]------------------------------------------------
+#
+						'S_SPLIT_CHECKBOX' => $checkbox)
+					);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+					$template->set_switch('postrow.light', !($i % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+					'U_LOOKUP_IP' => "modcp.$phpEx?mode=ip&amp;" . POST_POST_URL . "=$post_id&amp;" . POST_TOPIC_URL . "=$topic_id&amp;rdns=" . $row['poster_ip'] . "&amp;sid=" . $userdata['session_id'])
+				);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+				$template->set_switch('iprow.light', !($i % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+					'U_SEARCHPOSTS' => append_sid("search.$phpEx?search_author=" . urlencode($username) . "&amp;showresults=topics"))
+				);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+				$template->set_switch('userrow.light', !($i % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+posting.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+$forums->read();
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+// pic buttons
+$_params = array('post', 'preview', 'confirm', 'cancel', 'delete', 'poll_delete', 'add_poll_option');
+$count__params = count($_params);
+for ( $i = 0; $i < $count__params; $i++ )
+{
+	_button($_params[$i]);
+}
+#
+#-----[ FIND ]------------------------------------------------
+#
+			'post_sub_title' => $sub_title,
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+			'topic_sub_title' => ($post_data['first_post'] || ($mode == 'newtopic')) ? $sub_title : $post_info['topic_sub_title'],
+#
+#-----[ FIND ]------------------------------------------------
+#
+			$template->assign_var_from_handle('ERROR_BOX', 'reg_header');
+		}
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+		$template->assign_vars(array(
+			'I_POST' => $user->img('icon_minipost'),
+		));
+#
+#-----[ FIND ]------------------------------------------------
+#
+	'TITLE' => ($mode == 'newtopic') ? $forum_name : _censor($post_info['topic_title']),
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+	'I_SUBMIT' => $user->img('cmd_submit'),
+	'I_PREVIEW' => $user->img('cmd_preview'),
+	'I_CANCEL' => $user->img('cmd_cancel'),
+#
+#-----[ OPEN ]------------------------------------------------
+#
+privmsg.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+//
+// Parameters
+//
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+// pic buttons
+$_params = array('post', 'preview', 'confirm', 'cancel', 'delete', 'usersubmit', 'submit_msgdays', 'deleteall', 'save');
+$count__params = count($_params);
+for ( $i = 0; $i < $count__params; $i++ )
+{
+	_button($_params[$i]);
+}
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+	'SUBJECT_LENGTH' => intval($config->data['topic_title_length']),
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+	'I_SUBMIT' => $user->img('cmd_submit'),
+	'I_PREVIEW' => $user->img('cmd_preview'),
+	'I_CANCEL' => $user->img('cmd_cancel'),
+#
+#-----[ FIND ]------------------------------------------------
+#
+			'U_FROM_USER_PROFILE' => $u_from_user_profile)
+		);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+		$template->set_switch('listrow.light', !($i % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+search.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$pagination->display('pagination', $total_match_count, $per_page, $start, true, 'Posts_count');
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+		$template->assign_vars(array(
+			'I_TOPIC' => $user->img('folder'),
+		));
+#
+#-----[ FIND ]------------------------------------------------
+#
+	'S_NO_SUBS' => _button('no_subs') ? 'checked="checked"' : '',
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+	'I_SEARCH_BUTTON' => $user->img('cmd_search'),
+#
+#-----[ OPEN ]------------------------------------------------
+#
+# *************************************************
+# you may prefer simply copy this one from the pack
+# *************************************************
+#
+usercp.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.5 - 02/04/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.6 - 30/04/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+	'S_ACTION' => $config->url($cp_requester, '', true),
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+	'I_SPACER' => $user->img('spacer'),
+#
+#-----[ OPEN ]------------------------------------------------
+#
+viewonline.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+			'U_FORUM_LOCATION' => append_sid($location_url))
+		);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+		$template->set_switch($which_row . '.light', !($$which_counter % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+viewtopic.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+				$vote_graphic_img = $images['voting_graphic'][$vote_graphic];
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+				$vote_graphic_img_left = $images['voting_left'][$vote_graphic];
+				$vote_graphic_img_right = $images['voting_right'][$vote_graphic];
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+					'POLL_OPTION_IMG' => $vote_graphic_img,
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+					'POLL_OPTION_IMG_LEFT' => $vote_graphic_img_left,
+					'POLL_OPTION_IMG_RIGHT' => $vote_graphic_img_right,
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$l_edited_by = '<br /><br />' . sprintf($l_edit_time_total, $poster, create_date($board_config['default_dateformat'], $postrow[$i]['post_edit_time'], $board_config['board_timezone']), $postrow[$i]['post_edit_count']);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+# here we remove one <br />
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+//		$l_edited_by = '<br /><br />' . sprintf($l_edit_time_total, $poster, create_date($board_config['default_dateformat'], $postrow[$i]['post_edit_time'], $board_config['board_timezone']), $postrow[$i]['post_edit_count']);
+//-- add
+		$l_edited_by = '<br />' . sprintf($l_edit_time_total, $poster, create_date($board_config['default_dateformat'], $postrow[$i]['post_edit_time'], $board_config['board_timezone']), $postrow[$i]['post_edit_count']);
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+	// enhance the topic title
+	$front_title->set('postrow', array_merge($forum_topic_data, $postrow[$i]), $forum_topic_data['topic_first_post_id'] == $postrow[$i]['post_id'], $highlight_match);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+	// post buttons switches
+	$post_buttons = array('profile', 'pm', 'email', 'www', 'icq', 'aim', 'msn', 'yim', 'quote', 'search', 'edit', 'ip', 'delpost');
+	$count_post_buttons = count($post_buttons);
+	for ( $j = 0; $j < $count_post_buttons; $j++ )
+	{
+		$button = $post_buttons[$j] . '_img';
+		$template->set_switch('postrow.' . $button, !empty($$button));
+	}
+#
+#-----[ FIND ]------------------------------------------------
+#
+	'I_VIEW_NEXT_TOPIC' => $user->img('topic_next'),
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+	'I_BACK_TO_TOP' => $user->img('icon_go_top'),
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/admin_ranks.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+				"SPECIAL_RANK" => ( $special_rank == 1 ) ? $lang['Yes'] : $lang['No'],
+
+				"U_RANK_EDIT" => append_sid("admin_ranks.$phpEx?mode=edit&amp;id=$rank_id"),
+				"U_RANK_DELETE" => append_sid("admin_ranks.$phpEx?mode=delete&amp;id=$rank_id"))
+			);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+			$template->set_switch('ranks.light', !($i % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+			"RANK_MIN" => $rank_min,
+
+			"U_RANK_EDIT" => append_sid("admin_ranks.$phpEx?mode=edit&amp;id=$rank_id"),
+			"U_RANK_DELETE" => append_sid("admin_ranks.$phpEx?mode=delete&amp;id=$rank_id"))
+		);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+		$template->set_switch('ranks.light', !($i % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+# *************************************************
+# you may prefer simply copy this one from the pack
+# *************************************************
+#
+admin/admin_settings.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.5 - 02/04/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.6 - 30/04/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+	'S_ACTION' => $config->url($cp_requester, '', true),
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+	'I_SPACER' => $user->img('spacer'),
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/admin_smilies.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+			"U_SMILEY_DELETE" => append_sid("admin_smilies.$phpEx?mode=delete&amp;id=" . $smilies[$i]['smilies_id']))
+		);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+		$template->set_switch('smiles.light', !($i % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/admin_styles.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+						"U_STYLES_INSTALL" => append_sid("admin_styles.$phpEx?mode=addnew&amp;style=" . urlencode($installable_themes[$i]['style_name']) . "&amp;install_to=" . urlencode($installable_themes[$i]['template_name'])))
+					);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+					$template->set_switch('styles.light', !($i % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+				"U_STYLES_DELETE" => append_sid("admin_styles.$phpEx?mode=delete&amp;style_id=" . $style_rowset[$i]['themes_id']))
+			);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+			$template->set_switch('styles.light', !($i % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/admin_words.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+			"U_WORD_DELETE" => append_sid("admin_words.$phpEx?mode=delete&amp;id=$word_id"))
+		);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+		$template->set_switch('words.light', !($i % 2));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/index.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+					"U_USER_PROFILE" => append_sid("admin_users.$phpEx?mode=edit&amp;" . POST_USERS_URL . "=" . $onlinerow_reg[$i]['user_id']),
+					"U_FORUM_LOCATION" => append_sid($location_url))
+				);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+				$template->set_switch('reg_user_row.light', $registered_users % 2);
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+				"U_WHOIS_IP" => "http://network-tools.com/default.asp?host=$guest_ip", 
+				"U_FORUM_LOCATION" => append_sid($location_url))
+			);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+			$template->set_switch('guest_user_row.light', $guest_users % 2);
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/page_header_admin.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+	'I_SPACER' => $user->img('spacer'),
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+	'I_LOGO_SMALL' => $user->img('logo_small'),
+#
+#-----[ OPEN ]------------------------------------------------
+#
+# *************************************************
+# you may prefer simply copy this one from the pack
+# *************************************************
+#
+includes/class_config.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.18 - 10/04/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.19 - 24/04/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+# here we replace the both methods : check_system_groups() & get_last_group_id() by a new method : check_system_groups()
+#
+	function check_system_groups()
+	{
+		global $db;
+
+		// all is right, end there
+		if ( !empty($this->data['group_founder']) && !empty($this->data['group_admin']) && !empty($this->data['group_registered']) && !empty($this->data['group_anonymous']) )
+		{
+			return;
+		}
+
+		// groups
+		$group_founder = $this->data['group_founder'];
+		$group_admin = $this->data['group_admin'];
+		$group_registered = $this->data['group_registered'];
+		$group_anonymous = $this->data['group_anonymous'];
+
+		// search for board founder (here the older active admin)
+		$sql = 'SELECT user_id
+					FROM ' . USERS_TABLE . '
+					WHERE user_level = ' . ADMIN . '
+						AND user_active = ' . true . '
+					ORDER BY user_id
+					LIMIT 1';
+		$result = $db->sql_query($sql, false, __LINE__, __FILE__);
+		if ( !($row = $db->sql_fetchrow($result)) || !($user_founder = intval($row['user_id'])) )
+		{
+			message_die(GENERAL_ERROR, 'Could not find the main administrator', '', __LINE__, __FILE__);
+		}
+		$db->sql_freeresult($result);
+
+		// prepare update
+		$last_group_id = 0;
+		$updated = false;
+		$db->sql_stack_reset();
+
+		// read closed system groups (if a previous attempt failed)
+		$sql = 'SELECT group_id, group_name, group_description, group_moderator
+					FROM ' . GROUPS_TABLE . '
+					WHERE group_status = ' . GROUP_SYSTEM . '
+						AND group_type = ' . GROUP_CLOSED;
+		$result = $db->sql_query($sql, false, __LINE__, __FILE__);
+		while ( $row = $db->sql_fetchrow($result) )
+		{
+			if ( empty($group_founder) && ($row['group_name'] == 'Board_founder') && ($row['group_description'] == 'Board_founder_desc') && ($row['group_moderator'] == $user_founder) )
+			{
+				$group_founder = intval($row['group_id']);
+				$updated = true;
+			}
+			if ( empty($group_admin) && ($row['group_name'] == 'Group_admin') && ($row['group_description'] == 'Group_admin_desc') && ($row['group_moderator'] == $user_founder) )
+			{
+				$group_admin = intval($row['group_id']);
+				$updated = true;
+			}
+			if ( empty($group_registered) && ($row['group_name'] == 'Group_registered') && ($row['group_description'] == 'Group_registered_desc') && ($row['group_moderator'] == $user_founder) )
+			{
+				$group_registered = intval($row['group_id']);
+				$updated = true;
+			}
+			if ( empty($group_anonymous) && ($row['group_name'] == 'Group_anonymous') && ($row['group_description'] == 'Group_anonymous_desc') )
+			{
+				$group_anonymous = intval($row['group_id']);
+				$updated = true;
+			}
+		}
+
+		// founder group
+		if ( empty($group_founder) )
+		{
+			if ( empty($last_group_id) )
+			{
+				$last_group_id = $this->get_last_group_id();
+			}
+			$last_group_id++;
+			$group_founder = $last_group_id;
+
+			// create the founder group
+			$fields = array(
+				'group_id' => $last_group_id,
+				'group_status' => GROUP_SYSTEM,
+				'group_type' => GROUP_CLOSED,
+				'group_name' => 'Board_founder',
+				'group_description' => 'Board_founder_desc',
+				'group_moderator' => $user_founder,
+				'group_single_user' => false,
+				'group_user_id' => 0,
+				'group_user_list' => '',
+			);
+			$db->sql_stack_statement($fields, 'groups');
+
+			// register user to it
+			$fields = array(
+				'user_id' => $user_founder,
+				'group_id' => $last_group_id,
+				'user_pending' => false,
+			);
+			$db->sql_stack_statement($fields, 'user_group');
+			$updated = true;
+		}
+
+		// admin group
+		if ( empty($group_admin) )
+		{
+			if ( empty($last_group_id) )
+			{
+				$last_group_id = $this->get_last_group_id();
+			}
+			$last_group_id++;
+			$group_admin = $last_group_id;
+
+			// search for all admins
+			$sql = 'SELECT user_id
+						FROM ' . USERS_TABLE . '
+						WHERE user_level = ' . ADMIN . '
+							AND user_active = ' . true . '
+							AND user_id NOT IN(0, ' . ANONYMOUS . ')
+						ORDER BY user_id';
+			$result = $db->sql_query($sql, false, __LINE__, __FILE__);
+			$user_ids = array();
+			while ( $row = $db->sql_fetchrow($result) )
+			{
+				$user_ids[] = intval($row['user_id']);
+			}
+			$db->sql_freeresult($result);
+			if ( empty($user_ids) )
+			{
+				message_die(GENERAL_ERROR, 'Could not find any active administrator', '', __LINE__, __FILE__);
+			}
+			else
+			{
+				// create the admins group
+				$fields = array(
+					'group_id' => $last_group_id,
+					'group_status' => GROUP_SYSTEM,
+					'group_type' => GROUP_CLOSED,
+					'group_name' => 'Group_admin',
+					'group_description' => 'Group_admin_desc',
+					'group_moderator' => $user_founder,
+					'group_single_user' => false,
+					'group_user_id' => 0,
+					'group_user_list' => '',
+				);
+				$db->sql_stack_statement($fields, 'groups');
+
+				// register users to it
+				$count_user_ids = count($user_ids);
+				for ( $i = 0; $i < $count_user_ids; $i++ )
+				{
+					$fields = array(
+						'user_id' => intval($user_ids[$i]),
+						'group_id' => $last_group_id,
+						'user_pending' => false,
+					);
+					$db->sql_stack_statement($fields, 'user_group');
+				}
+			}
+			$updated = true;
+		}
+
+		// registered group : we don't create the links for this one
+		if ( empty($group_registered) )
+		{
+			if ( empty($last_group_id) )
+			{
+				$last_group_id = $this->get_last_group_id();
+			}
+			$last_group_id++;
+			$group_registered = $last_group_id;
+
+			// create the registered group
+			$fields = array(
+				'group_id' => $last_group_id,
+				'group_status' => GROUP_SYSTEM,
+				'group_type' => GROUP_CLOSED,
+				'group_name' => 'Group_registered',
+				'group_description' => 'Group_registered_desc',
+				'group_moderator' => $user_founder,
+				'group_single_user' => false,
+				'group_user_id' => 0,
+				'group_user_list' => '',
+			);
+			$db->sql_stack_statement($fields, 'groups');
+			$updated = true;
+		}
+
+		// anonymous group : this one exists
+		if ( empty($group_anonymous) )
+		{
+			// read anonymous group
+			$sql = 'SELECT ug.group_id
+						FROM ' . USER_GROUP_TABLE . ' ug, ' . GROUPS_TABLE . ' g
+						WHERE ug.user_id = ' . ANONYMOUS . '
+							AND g.group_id = ug.group_id
+							AND g.group_single_user = ' . true;
+			$result = $db->sql_query($sql, false, __LINE__, __FILE__);
+			$row = $db->sql_fetchrow($result);
+			$group_id = intval($row['group_id']);
+			$db->sql_freeresult($result);
+			if ( empty($group_id) )
+			{
+				message_die(GENERAL_ERROR, 'Could not find individual group for ANONYMOUS user', '', __LINE__, __FILE__);
+			}
+			$group_anonymous = $group_id;
+			$fields = array(
+				'group_name' => 'Group_anonymous',
+				'group_description' => 'Group_anonymous_desc',
+				'group_status' => GROUP_SYSTEM,
+				'group_user_id' => ANONYMOUS,
+				'group_user_list' => ',' . $group_anonymous . ',',
+			);
+			$db->sql_statement($fields);
+			$sql = 'UPDATE ' . GROUPS_TABLE . '
+						SET ' . $db->sql_update . '
+						WHERE group_id = ' . intval($group_anonymous);
+			$db->sql_query($sql, false, __LINE__, __FILE__);
+			$updated = true;
+		}
+
+		// udapte database
+		$db->sql_stack_insert(GROUPS_TABLE, false, __LINE__, __FILE__, true, 'groups');
+		$db->sql_stack_insert(USER_GROUP_TABLE, false, __LINE__, __FILE__, true, 'user_group');
+		if ( $updated )
+		{
+			// update eventual remaining auths
+			$sql = 'UPDATE ' . AUTHS_TABLE . '
+						SET group_id = ' . intval($group_admin) . '
+						WHERE group_id = -2';
+			$db->sql_query($sql, false, __LINE__, __FILE__);
+			$sql = 'UPDATE ' . AUTHS_TABLE . '
+						SET group_id = ' . intval($group_anonymous) . '
+						WHERE group_id = -1';
+			$db->sql_query($sql, false, __LINE__, __FILE__);
+			$sql = 'UPDATE ' . AUTHS_TABLE . '
+						SET group_id = ' . intval($group_registered) . '
+						WHERE group_id = 0';
+			$db->sql_query($sql, false, __LINE__, __FILE__);
+
+			// groups vs group auths
+			$sql = 'UPDATE ' . AUTHS_TABLE . '
+						SET obj_id = ' . intval($group_admin) . '
+						WHERE obj_id = -2
+							AND obj_type = \'' . POST_GROUPS_URL . '\'';
+			$db->sql_query($sql, false, __LINE__, __FILE__);
+			$sql = 'UPDATE ' . AUTHS_TABLE . '
+						SET obj_id = ' . intval($group_anonymous) . '
+						WHERE obj_id = -1
+							AND obj_type = \'' . POST_GROUPS_URL . '\'';
+			$db->sql_query($sql, false, __LINE__, __FILE__);
+			$sql = 'UPDATE ' . AUTHS_TABLE . '
+						SET obj_id = ' . intval($group_registered) . '
+						WHERE obj_id = 0
+							AND obj_type = \'' . POST_GROUPS_URL . '\'';
+			$db->sql_query($sql, false, __LINE__, __FILE__);
+
+			// clear users cache
+			$sql = 'DELETE FROM ' . USERS_CACHE_TABLE;
+
+			// update users groups list
+			$sys_groups = array(
+				'GROUP_FOUNDER' => $group_founder,
+				'GROUP_ADMIN' => $group_admin,
+				'GROUP_REGISTERED' => $group_registered,
+				'GROUP_ANONYMOUS' => $group_anonymous,
+			);
+			$groups = new groups();
+			$groups->resync_users_list($sys_groups);
+			unset($groups);
+
+			// update config table
+			$this->begin_transaction();
+			$this->set('group_founder', $group_founder, true);
+			$this->set('group_admin', $group_admin, true);
+			$this->set('group_registered', $group_registered, true);
+			$this->set('group_anonymous', $group_anonymous, true);
+			$this->end_transaction();
+		}
+	}
+
+	function get_last_group_id()
+	{
+		global $db;
+
+		$sql = 'SELECT group_id
+					FROM ' . GROUPS_TABLE . '
+					ORDER BY group_id DESC
+					LIMIT 1';
+		$result = $db->sql_query($sql, false, __LINE__, __FILE__);
+		$row = $db->sql_fetchrow($result);
+		$db->sql_freeresult($result);
+		return intval($row['group_id']);
+	}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	function check_system_groups()
+	{
+		global $db;
+
+		// all is right, end there
+		if ( !empty($this->data['group_founder']) && !empty($this->data['group_admin']) && !empty($this->data['group_registered']) && !empty($this->data['group_anonymous']) )
+		{
+			return;
+		}
+
+		// groups
+		$group_founder = $this->data['group_founder'];
+		$group_admin = $this->data['group_admin'];
+		$group_registered = $this->data['group_registered'];
+		$group_anonymous = $this->data['group_anonymous'];
+
+		// search for board founder (here the older active admin)
+		$sql = 'SELECT user_id
+					FROM ' . USERS_TABLE . '
+					WHERE user_level = ' . ADMIN . '
+						AND user_active = ' . true . '
+					ORDER BY user_id
+					LIMIT 1';
+		$result = $db->sql_query($sql, false, __LINE__, __FILE__);
+		if ( !($row = $db->sql_fetchrow($result)) || !($user_founder = intval($row['user_id'])) )
+		{
+			message_die(GENERAL_ERROR, 'Could not find the main administrator', '', __LINE__, __FILE__);
+		}
+		$db->sql_freeresult($result);
+
+		// prepare update
+		$updated = false;
+		$db->sql_stack_reset();
+
+		// read closed system groups (if a previous attempt failed)
+		$sql = 'SELECT group_id, group_name, group_description, group_moderator
+					FROM ' . GROUPS_TABLE . '
+					WHERE group_status = ' . GROUP_SYSTEM . '
+						AND group_type = ' . GROUP_CLOSED;
+		$result = $db->sql_query($sql, false, __LINE__, __FILE__);
+		while ( $row = $db->sql_fetchrow($result) )
+		{
+			if ( empty($group_founder) && ($row['group_name'] == 'Board_founder') && ($row['group_description'] == 'Board_founder_desc') && ($row['group_moderator'] == $user_founder) )
+			{
+				$group_founder = intval($row['group_id']);
+				$updated = true;
+			}
+			if ( empty($group_admin) && ($row['group_name'] == 'Group_admin') && ($row['group_description'] == 'Group_admin_desc') && ($row['group_moderator'] == $user_founder) )
+			{
+				$group_admin = intval($row['group_id']);
+				$updated = true;
+			}
+			if ( empty($group_registered) && ($row['group_name'] == 'Group_registered') && ($row['group_description'] == 'Group_registered_desc') && ($row['group_moderator'] == $user_founder) )
+			{
+				$group_registered = intval($row['group_id']);
+				$updated = true;
+			}
+			if ( empty($group_anonymous) && ($row['group_name'] == 'Group_anonymous') && ($row['group_description'] == 'Group_anonymous_desc') )
+			{
+				$group_anonymous = intval($row['group_id']);
+				$updated = true;
+			}
+		}
+
+		// founder group
+		if ( empty($group_founder) )
+		{
+			// create the founder group
+			$fields = array(
+				'group_status' => GROUP_SYSTEM,
+				'group_type' => GROUP_CLOSED,
+				'group_name' => 'Board_founder',
+				'group_description' => 'Board_founder_desc',
+				'group_moderator' => $user_founder,
+				'group_single_user' => false,
+				'group_user_id' => 0,
+				'group_user_list' => '',
+			);
+			$db->sql_statement($fields);
+			$sql = 'INSERT INTO ' . GROUPS_TABLE . '
+						(' . $db->sql_fields . ') VALUES (' . $db->sql_values . ')';
+			$db->sql_query($sql, false, __LINE__, __FILE__);
+			$last_group_id = $db->sql_nextid();
+
+			// register user to it
+			$fields = array(
+				'user_id' => $user_founder,
+				'group_id' => $last_group_id,
+				'user_pending' => false,
+			);
+			$db->sql_stack_statement($fields, 'user_group');
+			$updated = true;
+		}
+
+		// admin group
+		if ( empty($group_admin) )
+		{
+			// search for all admins
+			$sql = 'SELECT user_id
+						FROM ' . USERS_TABLE . '
+						WHERE user_level = ' . ADMIN . '
+							AND user_active = ' . true . '
+							AND user_id NOT IN(0, ' . ANONYMOUS . ')
+						ORDER BY user_id';
+			$result = $db->sql_query($sql, false, __LINE__, __FILE__);
+			$user_ids = array();
+			while ( $row = $db->sql_fetchrow($result) )
+			{
+				$user_ids[] = intval($row['user_id']);
+			}
+			$db->sql_freeresult($result);
+			if ( empty($user_ids) )
+			{
+				message_die(GENERAL_ERROR, 'Could not find any active administrator', '', __LINE__, __FILE__);
+			}
+			else
+			{
+				// create the admins group
+				$fields = array(
+					'group_status' => GROUP_SYSTEM,
+					'group_type' => GROUP_CLOSED,
+					'group_name' => 'Group_admin',
+					'group_description' => 'Group_admin_desc',
+					'group_moderator' => $user_founder,
+					'group_single_user' => false,
+					'group_user_id' => 0,
+					'group_user_list' => '',
+				);
+				$db->sql_statement($fields);
+				$sql = 'INSERT INTO ' . GROUPS_TABLE . '
+							(' . $db->sql_fields . ') VALUES (' . $db->sql_values . ')';
+				$db->sql_query($sql, false, __LINE__, __FILE__);
+				$last_group_id = $db->sql_nextid();
+
+				// register users to it
+				$count_user_ids = count($user_ids);
+				for ( $i = 0; $i < $count_user_ids; $i++ )
+				{
+					$fields = array(
+						'user_id' => intval($user_ids[$i]),
+						'group_id' => $last_group_id,
+						'user_pending' => false,
+					);
+					$db->sql_stack_statement($fields, 'user_group');
+				}
+			}
+			$updated = true;
+		}
+
+		// registered group : we don't create the links for this one
+		if ( empty($group_registered) )
+		{
+			// create the registered group
+			$fields = array(
+				'group_status' => GROUP_SYSTEM,
+				'group_type' => GROUP_CLOSED,
+				'group_name' => 'Group_registered',
+				'group_description' => 'Group_registered_desc',
+				'group_moderator' => $user_founder,
+				'group_single_user' => false,
+				'group_user_id' => 0,
+				'group_user_list' => '',
+			);
+			$db->sql_statement($fields);
+			$sql = 'INSERT INTO ' . GROUPS_TABLE . '
+						(' . $db->sql_fields . ') VALUES (' . $db->sql_values . ')';
+			$db->sql_query($sql, false, __LINE__, __FILE__);
+			$last_group_id = $db->sql_nextid();
+
+			$updated = true;
+		}
+
+		// anonymous group : this one exists
+		if ( empty($group_anonymous) )
+		{
+			// read anonymous group
+			$sql = 'SELECT ug.group_id
+						FROM ' . USER_GROUP_TABLE . ' ug, ' . GROUPS_TABLE . ' g
+						WHERE ug.user_id = ' . ANONYMOUS . '
+							AND g.group_id = ug.group_id
+							AND g.group_single_user = ' . true;
+			$result = $db->sql_query($sql, false, __LINE__, __FILE__);
+			$row = $db->sql_fetchrow($result);
+			$group_id = intval($row['group_id']);
+			$db->sql_freeresult($result);
+			if ( empty($group_id) )
+			{
+				message_die(GENERAL_ERROR, 'Could not find individual group for ANONYMOUS user', '', __LINE__, __FILE__);
+			}
+			$group_anonymous = $group_id;
+			$fields = array(
+				'group_name' => 'Group_anonymous',
+				'group_description' => 'Group_anonymous_desc',
+				'group_status' => GROUP_SYSTEM,
+				'group_user_id' => ANONYMOUS,
+				'group_user_list' => ',' . $group_anonymous . ',',
+			);
+			$db->sql_statement($fields);
+			$sql = 'UPDATE ' . GROUPS_TABLE . '
+						SET ' . $db->sql_update . '
+						WHERE group_id = ' . intval($group_anonymous);
+			$db->sql_query($sql, false, __LINE__, __FILE__);
+			$updated = true;
+		}
+
+		// udapte database
+		$db->sql_stack_insert(USER_GROUP_TABLE, false, __LINE__, __FILE__, true, 'user_group');
+		if ( $updated )
+		{
+			// update eventual remaining auths
+			$sql = 'UPDATE ' . AUTHS_TABLE . '
+						SET group_id = ' . intval($group_admin) . '
+						WHERE group_id = -2';
+			$db->sql_query($sql, false, __LINE__, __FILE__);
+			$sql = 'UPDATE ' . AUTHS_TABLE . '
+						SET group_id = ' . intval($group_anonymous) . '
+						WHERE group_id = -1';
+			$db->sql_query($sql, false, __LINE__, __FILE__);
+			$sql = 'UPDATE ' . AUTHS_TABLE . '
+						SET group_id = ' . intval($group_registered) . '
+						WHERE group_id = 0';
+			$db->sql_query($sql, false, __LINE__, __FILE__);
+
+			// groups vs group auths
+			$sql = 'UPDATE ' . AUTHS_TABLE . '
+						SET obj_id = ' . intval($group_admin) . '
+						WHERE obj_id = -2
+							AND obj_type = \'' . POST_GROUPS_URL . '\'';
+			$db->sql_query($sql, false, __LINE__, __FILE__);
+			$sql = 'UPDATE ' . AUTHS_TABLE . '
+						SET obj_id = ' . intval($group_anonymous) . '
+						WHERE obj_id = -1
+							AND obj_type = \'' . POST_GROUPS_URL . '\'';
+			$db->sql_query($sql, false, __LINE__, __FILE__);
+			$sql = 'UPDATE ' . AUTHS_TABLE . '
+						SET obj_id = ' . intval($group_registered) . '
+						WHERE obj_id = 0
+							AND obj_type = \'' . POST_GROUPS_URL . '\'';
+			$db->sql_query($sql, false, __LINE__, __FILE__);
+
+			// clear users cache
+			$sql = 'DELETE FROM ' . USERS_CACHE_TABLE;
+
+			// update users groups list
+			$sys_groups = array(
+				'GROUP_FOUNDER' => $group_founder,
+				'GROUP_ADMIN' => $group_admin,
+				'GROUP_REGISTERED' => $group_registered,
+				'GROUP_ANONYMOUS' => $group_anonymous,
+			);
+			$groups = new groups();
+			$groups->resync_users_list($sys_groups);
+			unset($groups);
+
+			// update config table
+			$this->begin_transaction();
+			$this->set('group_founder', $group_founder, true);
+			$this->set('group_admin', $group_admin, true);
+			$this->set('group_registered', $group_registered, true);
+			$this->set('group_anonymous', $group_anonymous, true);
+			$this->end_transaction();
+		}
+	}
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this one has been already published as a temp fix on CH 2.1.1 RC3 the 24 april 2005
+#
+					if ( intval($attach_config['disable_mod']) || $user->auth(POST_FORUM_URL, 'auth_download', $row['forum_id']) )
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+					if ( intval($attach_config['disable_mod']) || !$user->auth(POST_FORUM_URL, 'auth_download', $row['forum_id']) )
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this one has been already published as a temp fix on CH 2.1.1 RC3 the 24 april 2005
+#
+						$images[ $this->data[$attr_id]['attr_timg'] ] = $attach_config['topic_icon'];
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+						if ( empty($images[ $this->data[$attr_id]['attr_timg'] ]) )
+						{
+							$images[ $this->data[$attr_id]['attr_timg'] ] = $attach_config['topic_icon'];
+						}
+#
+#-----[ FIND ]------------------------------------------------
+#
+	var $root_count;
+	var $requester;
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+	var $displayed;
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$this->root_count = count($this->data);
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+		$this->displayed = false;
+#
+#-----[ FIND ]------------------------------------------------
+#
+			$template->assign_var_from_handle('NAVIGATION_ONLY_BOX', 'navigation_only_box');
+		}
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+		$this->displayed = true;
+#
+#-----[ OPEN ]------------------------------------------------
+#
+# *************************************************
+# you may prefer simply copy this one from the pack
+# *************************************************
+#
+includes/class_stats.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.7 - 02/04/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.8 - 24/04/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+			'I_VIEWONLINE' => $user->img('whosonline'),
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+			'I_SPACER' => $user->img('spacer'),
+#
+#-----[ OPEN ]------------------------------------------------
+#
+# *************************************************
+# you may prefer simply copy this one from the pack
+# *************************************************
+#
+includes/class_topics.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.11 - 09/04/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.12 - 24/04/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+			'L_GO' => $user->lang('Go'),
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+			'I_GO' => $user->img('cmd_mini_submit'),
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$template->set_switch('topicrow.topic.moved', !empty($row['topic_moved_id']));
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+		$template->set_switch('topicrow.topic.last_post_link', empty($row['topic_moved_id']) && !$this->with_select);
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/functions.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- add
+	global $config, $forums;
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- add
+	global $config, $forums, $user;
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$boxstring .= '</select><input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />';
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+	$template->assign_vars(array(
+		'I_GO' => $user->img('cmd_mini_submit'),
+	));
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- add
+	global $config, $themes;
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- add
+	global $config, $user, $themes;
+#
+#-----[ FIND ]------------------------------------------------
+#
+				$images += $sav_images;
+			}
+		}
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+		// .ini file
+		@include($phpbb_root_path . $template_path . $template_name . '/' . $template_name . '.ini');
+#
+#-----[ FIND ]------------------------------------------------
+#
+					$msg_text .= '<br /><b>' . $lang['dbg_requester'] . ':</b> ' . basename($dbg[$i]['file']) . '[ ' . $dbg[$i]['line'] . ' ].' . $dbg[$i]['function'] . '(' . (empty($dbg[$i]['args']) ? '' : stripslashes(_format($dbg[$i]['args']))) . ')';
+				}
+			}
+		}
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+		if ( !defined('IN_ADMIN') && !empty($config->data) )
+		{
+			global $navigation;
+
+			if ( !isset($navigation) || !is_object($navigation) )
+			{
+				$navigation = new navigation();
+			}
+			if ( !$navigation->displayed )
+			{
+				$navigation->display();
+			}
+		}
+		else
+		{
+			$template->assign_vars(array(
+				'NAVIGATION_BOX' => '<a href="' . append_sid('index.' . $phpEx) . '" class="nav">' . sprintf($lang['Forum_Index'], $board_config['sitename']) . '</a>',
+			));
+		}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/page_header.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+$template->assign_vars(array(
+	'L_PREFERENCES' => $lang['Preferences'],
+	'U_PREFERENCES' => $config->url('usercp', '', true),
+	'I_SPACER' => $user->img('spacer'),
+));
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+$is_admin = $user->data['session_logged_in'] && ($user->data['user_level'] == ADMIN);
+$template->assign_vars(array(
+	// preferences
+	'L_PREFERENCES' => $user->lang('Preferences'),
+	'U_PREFERENCES' => $config->url('usercp', '', true),
+
+	// logos
+	'I_SPACER' => $user->img('spacer'),
+	'I_LOGO' => $user->img('logo'),
+	'I_LOGO_SMALL' => $user->img('logo_small'),
+
+	// admin
+	'U_ADMIN_LINK' => $is_admin ? $config->url('admin/index', array('sid' => $user->data['session_id']), true) : '',
+	'L_ADMIN_LINK' => $is_admin ? $user->lang('Admin_panel') : '',
+	'I_ADMIN_LINK' => $is_admin ? $user->img('menu_admin') : '',
+
+	// pics for other options
+	'I_ACP' => $user->img('menu_acp'),
+	'I_FAQ' => $user->img('menu_faq'),
+	'I_SEARCH' => $user->img('menu_search'),
+	'I_MEMBERLIST' => $user->img('menu_memberlist'),
+	'I_GROUP_CP' => $user->img('menu_usergroup'),
+	'I_REGISTER' => $user->img('menu_register'),
+	'I_PROFILE' => $user->img('menu_profile'),
+	'I_PREFERENCES' => $user->img('menu_preferences'),
+	'I_LOGIN' => $user->img('menu_login'),
+	'I_LOGOUT' => $user->img('menu_logout'),
+));
+$template->set_switch('user_is_admin', $is_admin);
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/topic_review.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$added_fields = 't.topic_type, t.topic_sub_type, t.topic_first_post_id, t.topic_time, t.topic_duration, t.topic_sub_title, ';
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		$added_fields = 't.topic_replies, t.topic_type, t.topic_sub_type, t.topic_first_post_id, t.topic_time, t.topic_duration, t.topic_sub_title, ';
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this one has been already published as a temp fix on CH 2.1.1 RC3 the 24 april 2005
+#
+			'auth_read' => $user->auth(POST_FORUM_URL, 'auth_read', $forum_id),
+			'auth_read_type' => $user->lang('Auth_Users_granted_access'),
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+			'auth_view' => $user->auth(POST_FORUM_URL, 'auth_view', $forum_id),
+			'auth_download' => $user->auth(POST_FORUM_URL, 'auth_download', $forum_id),
+#
+#-----[ FIND ]------------------------------------------------
+#
+	// Go ahead and pull all data for this topic
+	//
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+	$sql = str_replace('SELECT ', 'SELECT pt.post_sub_title, ', $sql);
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+*/
+//-- add
+	// generate pagination
+	$ppage = _read('ppage', TYPE_INT);
+	if ( $ppage < 5 )
+	{
+		$ppage = $config->data['posts_per_page'];
+	}
+	$start = _read('start', TYPE_INT);
+	if ( $start < 0 )
+	{
+		$start = 0;
+	}
+	$total_posts = $forum_row['topic_replies'] + 1;
+	$parms = array(
+		'mode' => 'topicreview',
+		POST_TOPIC_URL => $topic_id,
+	);
+	if ( $ppage != $config->data['posts_per_page'] )
+	{
+		$parms += array(
+			'ppage' => $ppage,
+		);
+	}
+	$pagination = new pagination('posting', $parms);
+	$pagination->display('pagination', $total_posts, $config->data['posts_per_page'], $start, true, 'Posts_count');
+
+	// read posts
+	$sql = 'SELECT p.*, pt.post_text, pt.post_subject, pt.bbcode_uid, pt.post_sub_title, u.user_id, u.username
+				FROM ' . POSTS_TABLE . ' p, ' . POSTS_TEXT_TABLE . ' pt, ' . USERS_TABLE . ' u
+				WHERE p.topic_id = ' . intval($topic_id) . '
+					AND p.poster_id = u.user_id
+					AND pt.post_id = p.post_id
+				ORDER BY p.post_time DESC
+				LIMIT ' . $start . ', ' . $ppage;
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+				$front_title->set('postrow', array_merge($forum_row, $row), $forum_row['topic_first_post_id'] == $row['post_id']);
+			}
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+			$template->set_switch('postrow.light', !($i % 2));
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/admin/index_navigate.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<td align="center" ><a href="{U_FORUM_INDEX}" target="_parent"><img src="../templates/subSilver/images/logo_phpBB_med.gif" border="0" /></a></td>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	<td align="center" ><a href="{U_FORUM_INDEX}" target="_parent"><img src="{I_LOGO_SMALL}" border="0" /></a></td>
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/agreement.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+<table width="100%" cellspacing="2" cellpadding="2" border="0" align="center">
+	<tr>
+		<td align="left"><span class="nav"><a class="nav" href="{U_INDEX}">{L_INDEX}</a></span></td>
+	</tr>
+</table>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+{NAVIGATION_BOX}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+# *************************************************
+# you may prefer simply copy this one from the pack
+# *************************************************
+#
+templates/subSilver/index_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<td><span class="gensmall">{L_FORUM_LOCKED}</span></td>
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+	<td>&nbsp;&nbsp;</td>
+	<td width="20" align="center"><img src="{FORUM_LINK_IMG}" alt="{L_FORUM_LINK}" /></td>
+	<td><span class="gensmall">{L_FORUM_LINK}</span></td>
+#
+#-----[ OPEN ]------------------------------------------------
+#
+# *************************************************
+# you may prefer simply copy this one from the pack
+# *************************************************
+#
+templates/subSilver/index_stats_box.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<!-- BEGIN extended -->
+	<td class="row1" width="50" align="center" valign="middle" rowspan="4"><img src="{I_VIEWONLINE}" alt="{L_WHO_IS_ONLINE}" /></td>
+	<!-- END extended -->
+	<!-- BEGIN extended_ELSE -->
+	<td class="row1" width="50" align="center" valign="middle" rowspan="3"><img src="{I_VIEWONLINE}" alt="{L_WHO_IS_ONLINE}" /></td>
+	<!-- END extended_ELSE -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+# here we get out from the switches the <img> statement, and change its alt="" value
+#
+	<!-- BEGIN extended -->
+	<td class="row1" width="50" align="center" valign="middle" rowspan="4">
+	<!-- END extended -->
+	<!-- BEGIN extended_ELSE -->
+	<td class="row1" width="50" align="center" valign="middle" rowspan="3">
+	<!-- END extended_ELSE -->
+		<img src="{I_VIEWONLINE}" alt="{L_VIEWONLINE}" border="0" />
+	</td>
+#
+#-----[ FIND ]------------------------------------------------
+#
+	<!-- BEGIN root_ELSE -->
+	<td class="row1" width="50" align="center" valign="middle" rowspan="2"><img src="{I_VIEWONLINE}" alt="{L_WHO_IS_ONLINE}" /></td>
+	<!-- END root_ELSE -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+# here we change the alt="" value
+#
+	<!-- BEGIN root_ELSE -->
+	<td class="row1" width="50" align="center" valign="middle" rowspan="2"><img src="{I_VIEWONLINE}" alt="{L_VIEWONLINE}" border="0" /></td>
+	<!-- END root_ELSE -->
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/message_body.tpl
+#
+#-----[ FIND ]------------------------------------------------
+# 
+<table width="100%" cellspacing="2" cellpadding="2" border="0" align="center">
+	<tr>
+		<td align="left" class="nav"><a href="{U_INDEX}" class="nav">{L_INDEX}</a></td>
+	</tr>
+</table>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+{NAVIGATION_BOX}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/modcp_split.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this is a partial search : the full line is longer
+#
+templates/subSilver/images/icon_minipost.gif
+#
+#-----[ IN-LINE FIND ]----------------------------------------
+#
+templates/subSilver/images/icon_minipost.gif
+#
+#-----[ IN-LINE REPLACE WITH ]--------------------------------
+#
+{I_POST}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/overall_header.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this is a partial search : the full line is longer
+#
+templates/subSilver/images/logo_phpBB.gif
+#
+#-----[ IN-LINE FIND ]----------------------------------------
+#
+templates/subSilver/images/logo_phpBB.gif
+#
+#-----[ IN-LINE REPLACE WITH ]--------------------------------
+#
+{I_LOGO}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/posting_preview.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this is a partial search : the full line is longer
+#
+templates/subSilver/images/icon_minipost.gif
+#
+#-----[ IN-LINE FIND ]----------------------------------------
+#
+templates/subSilver/images/icon_minipost.gif
+#
+#-----[ IN-LINE REPLACE WITH ]--------------------------------
+#
+{I_POST}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+# *************************************************
+# you may prefer simply copy this one from the pack
+# *************************************************
+#
+templates/subSilver/posting_topic_review.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+# here we add the pagination above and after the postrow table
+#
+		<td class="row1"><iframe width="100%" height="300" src="{U_REVIEW_TOPIC}" >
+<!-- END switch_inline_mode -->
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+<table width="100%" cellspacing="2" cellpadding="2" border="0">
+<tr>
+	<td width="100%" align="left"><span class="gensmall">
+		<!-- BEGIN pagination -->
+		<b>{pagination.L_PAGE_OF}</b>&nbsp;{pagination.L_COUNT}
+		<!-- END pagination -->
+	</span></td>
+	<td align="right" nowrap="nowrap"><span class="gensmall"><b>
+		<!-- BEGIN pagination -->
+		<!-- BEGIN unique_ELSE -->
+		{pagination.L_GOTO}:&nbsp;
+		<!-- END unique_ELSE -->
+		<!-- BEGIN previous -->
+		<a href="{pagination.U_PREVIOUS}" class="gensmall">{pagination.L_PREVIOUS}</a>&nbsp;
+		<!-- END previous -->
+
+		<!-- BEGIN page_number -->
+		<!-- BEGIN number -->
+		<!-- BEGIN current -->
+		{pagination.page_number.PAGE}{pagination.page_number.L_SEP}
+		<!-- END current -->
+		<!-- BEGIN current_ELSE -->
+		<a href="{pagination.page_number.U_PAGE}" class="gensmall">{pagination.page_number.PAGE}</a>{pagination.page_number.L_SEP}
+		<!-- END current_ELSE -->
+		<!-- END number -->
+		<!-- BEGIN number_ELSE -->
+		...,
+		<!-- END number_ELSE -->
+		<!-- END page_number -->
+
+		<!-- BEGIN next -->
+		<a href="{pagination.U_NEXT}" class="gensmall">{pagination.L_NEXT}</a>
+		<!-- END next -->
+		<!-- END pagination -->
+	</b></span></td>
+</tr>
+</table>
+
+#
+#-----[ FIND ]------------------------------------------------
+#
+	 <!-- END postrow -->
+</table>
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+<table width="100%" cellspacing="2" cellpadding="2" border="0">
+<tr>
+	<td width="100%" align="left"><span class="gensmall">
+		<!-- BEGIN pagination -->
+		<b>{pagination.L_PAGE_OF}</b>&nbsp;{pagination.L_COUNT}
+		<!-- END pagination -->
+	</span></td>
+	<td align="right" nowrap="nowrap"><span class="gensmall"><b>
+		<!-- BEGIN pagination -->
+		<!-- BEGIN unique_ELSE -->
+		{pagination.L_GOTO}:&nbsp;
+		<!-- END unique_ELSE -->
+		<!-- BEGIN previous -->
+		<a href="{pagination.U_PREVIOUS}" class="gensmall">{pagination.L_PREVIOUS}</a>&nbsp;
+		<!-- END previous -->
+
+		<!-- BEGIN page_number -->
+		<!-- BEGIN number -->
+		<!-- BEGIN current -->
+		{pagination.page_number.PAGE}{pagination.page_number.L_SEP}
+		<!-- END current -->
+		<!-- BEGIN current_ELSE -->
+		<a href="{pagination.page_number.U_PAGE}" class="gensmall">{pagination.page_number.PAGE}</a>{pagination.page_number.L_SEP}
+		<!-- END current_ELSE -->
+		<!-- END number -->
+		<!-- BEGIN number_ELSE -->
+		...,
+		<!-- END number_ELSE -->
+		<!-- END page_number -->
+
+		<!-- BEGIN next -->
+		<a href="{pagination.U_NEXT}" class="gensmall">{pagination.L_NEXT}</a>
+		<!-- END next -->
+		<!-- END pagination -->
+	</b></span></td>
+</tr>
+</table>
+
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/search_results_posts.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+# this is a partial search : the full line is longer
+#
+templates/subSilver/images/folder.gif
+#
+#-----[ IN-LINE FIND ]----------------------------------------
+#
+templates/subSilver/images/folder.gif
+#
+#-----[ IN-LINE REPLACE WITH ]--------------------------------
+#
+{I_TOPIC}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/subSilver.cfg
+#
+#-----[ FIND ]------------------------------------------------
+#
+// images addition
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+// vote bars sides
+$images['voting_left'][0] = "$current_template_images/vote_lcap.gif";
+$images['voting_left'][1] = "$current_template_images/vote_lcap.gif";
+$images['voting_left'][2] = "$current_template_images/vote_lcap.gif";
+$images['voting_left'][3] = "$current_template_images/vote_lcap.gif";
+$images['voting_left'][4] = "$current_template_images/vote_lcap.gif";
+$images['voting_right'][0] = "$current_template_images/vote_rcap.gif";
+$images['voting_right'][1] = "$current_template_images/vote_rcap.gif";
+$images['voting_right'][2] = "$current_template_images/vote_rcap.gif";
+$images['voting_right'][3] = "$current_template_images/vote_rcap.gif";
+$images['voting_right'][4] = "$current_template_images/vote_rcap.gif";
+
+// page header
+$images['logo'] = "$current_template_images/logo_phpBB.gif";
+$images['logo_small'] = "$current_template_images/logo_phpBB_med.gif";
+
+// menu
+$images['menu_admin'] = "";
+$images['menu_faq'] = "";
+$images['menu_search'] = "";
+$images['menu_memberlist'] = "";
+$images['menu_usergroup'] = "";
+$images['menu_register'] = "";
+$images['menu_profile'] = "";
+$images['menu_preferences'] = "";
+$images['pm_new_msg'] =  "";
+$images['pm_no_new_msg'] =  "";
+$images['menu_login'] =  "";
+$images['menu_logout'] =  "";
+
+// various pics
+$images['forum_mark_read'] = "";
+$images['topic_mark_read'] = "";
+$images['topic_unmark_read'] = "";
+$images['topic_previous'] = "";
+$images['topic_next'] = "";
+$images['icon_go_top'] = "";
+
+// index page
+#
+#-----[ OPEN ]------------------------------------------------
+#
+# you may prefer copy this one from the pack
+#
+templates/subSilver/topics_row_box.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+		<!-- BEGIN moved_ELSE -->
+		<a href="{topicrow.U_LAST_POST}" title="{L_LAST_POST}"><img src="{I_LAST_POST}" alt="{L_LAST_POST}" border="0" /></a>
+		<!-- END moved_ELSE -->
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		<!-- BEGIN last_post_link -->
+		<a href="{topicrow.U_LAST_POST}" title="{L_LAST_POST}"><img src="{I_LAST_POST}" alt="{L_LAST_POST}" border="0" /></a>
+		<!-- END last_post_link -->
+#
+#-----[ OPEN ]------------------------------------------------
+#
+templates/subSilver/viewtopic_poll_result.tpl
+#
+#-----[ FIND ]------------------------------------------------
+#
+templates/subSilver/images/vote_lcap.gif
+#
+#-----[ IN-LINE FIND ]----------------------------------------
+#
+templates/subSilver/images/vote_lcap.gif
+#
+#-----[ IN-LINE REPLACE WITH ]--------------------------------
+#
+{poll_option.POLL_OPTION_IMG_LEFT}
+#
+#-----[ IN-LINE FIND ]----------------------------------------
+#
+templates/subSilver/images/vote_rcap.gif
+#
+#-----[ IN-LINE REPLACE WITH ]--------------------------------
+#
+{poll_option.POLL_OPTION_IMG_RIGHT}
+#
+#-----[ SAVE/CLOSE ALL FILES ]--------------------------------
+#
+# EoM
+
+________________________________________________________________________________

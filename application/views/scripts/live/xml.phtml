@@ -1,0 +1,20 @@
+<server>
+    <ip><?= $this->server->ip ?></ip>
+    <hostname><?= $this->server->hostname ?></hostname>
+    <port><?= $this->server->port ?></port>
+    <gametype><?= $this->server->gametype?></gametype>
+    <map><?= $this->server->map->name ?></map>
+    <matchtime><?= $this->server->matchtime ?></matchtime>
+    <levelshot>http://www.warsow-race.net<?= $this->server->levelshot ?></levelshot>
+    <players>
+        <? $players = $this->server->players; // surpress a notice caused by magic getter/setter
+        foreach ($players as $player): ?>
+    	<player>
+            <id><?= $player->id ?></id>
+            <name><?= $player->name ?></name>
+            <time><?= isset($player->time) ? $player->time : '' ?></time>
+        </player>
+        <? endforeach ?>
+    </players>
+    <info><?= $this->server->info ?></info>
+</server>

@@ -1,0 +1,58 @@
+<div style="margin-left: auto; margin-right: auto; width: 600px;">
+    <div class="racenet_headrow">
+        Ingame Nickname
+    </div>
+    
+    <? if ($this->messages): ?>
+    <ul style="list-style: none; color: #0f0; font-weight: bold;">
+    <? foreach ($this->messages as $message): ?>
+        <li><?= $message ?></li>       
+    <? endforeach ?>
+    </ul>
+    <? endif; ?>
+    <? if (count($errorMessages = $this->form->getErrorMessages())): ?>
+    <ul style="list-style: none; color: red; font-weight: bold;">
+        <? foreach ($errorMessages as $message): ?>
+        <li><?= $message ?></li>       
+    <? endforeach ?>
+    </ul>
+    <? endif; ?>
+    
+    <h2>General information</h2>
+    Using the Ingame Nickname Protection, you can connect an ingame Nickname with your racenetID. Your racenetID is the username for the warsow-race.net community.
+    Simply enter the ingame nickname you want to link to your racenetID into the following field. Dot not use the ingame color notation but only the human readable name. 
+    Your protected ingame nickname will also be shown at the warsow-race.net website. <br/>
+
+    <h2>Switch connected playerID</h2>
+    When you change your protected nickname using this interface your statistics will be left on the old nickname and your following stats will be recorded for your new nickname.<br/>
+
+    <h2>Change nickname</h2>
+    To keep your stats but change your ingame nickname simply join a racesow server, change your nickname to your new one and use the following console command:<br/>
+    <br/>
+    <b style="color: #fff">protectednick update</b><br/>
+
+    <h2>inGame Login</h2>
+    When you see a countdown after joining a racesow server and you get kicked after it has ended, it means that you are using a protected nickname but are not authenticated to use it.
+    You must login using your racenetID to be able to play using a protected nickname. To login simply use the following command: <br/>
+    <br/>
+    <b style="color: #fff">auth MyRacenetID MyRacenetPassword</b><br/>
+    <br/>
+    Alternatively you can set your authentication information in your autoexec.cfg so you won't need to enter them each time you join a racesow server.<br/>
+    <br/>
+    <b style="color: #fff">setu racenet_user "MyRacenetID"</b><br/>
+    <b style="color: #fff">setu racenet_pass "MyRacenetPassword"</b><br/>
+    <br/>
+    <i>
+    In a later stage you will be able to set an ecrypted token in autoexec.cfg so you don't nee to oppose your password in your config file.<br/>
+    <br/>
+    <b style="color: #fff">setu racenet_token "S0m3eNcrYpT3D70k3NtOb3Pr1N73dh2rE"</b><br/>
+    <br/></i>
+    
+    <h2>Choose the nickname to link with your racenetID</h2>
+    
+    <div class="racenet_row">
+        <?= $this->form ?>
+    </div> 
+    
+    <span style="font-style: italic; font-size: 10px;">* mandatory field</span>
+</div>

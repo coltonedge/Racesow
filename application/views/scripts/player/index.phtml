@@ -1,0 +1,135 @@
+<br/>
+
+<div style="width: 910px; margin-left: auto; margin-right: auto;">
+	
+	<div class="racenet_headrow">
+		|
+        <?= ( !empty( $this->player->IngameLinkage->User->user_firstname ) ? $this->player->IngameLinkage->User->user_firstname .' ' : '' ) ?>
+		<?= new Racenet_IngameColors($this->player->name) ?>
+		<?= ( !empty( $this->player->IngameLinkage->User->user_lastname ) ? ' '. $this->player->IngameLinkage->User->user_lastname : '' ) ?>
+        |
+        <a class="headrow_link" href="<?= $this->url(array('controller' => 'player', 'action' => 'index', 'id' => $this->player->id), null, true) ?>">profile</a>
+        |
+        <a class="headrow_link" href="<?= $this->url(array('controller' => 'player', 'action' => 'maps', 'id' => $this->player->id), null, true) ?>">played maps</a>
+	</div>
+	<div class="racenet_row" style="padding: 20px;">
+		
+		<div style="width: 380px; float: left;">
+			<div style="float: left;  margin-right: 10px;">
+            <? if ($this->player->IngameLinkage->User->user_avatar): ?>
+				<img src="/forum/images/avatars/<?= $this->player->IngameLinkage->User->user_avatar ?>" border="0" />
+            <? else: ?>
+                <img src="/gfx/layout/logo.png" border="0" />
+            <? endif; ?>
+			</div>
+			<div style="float: left;">
+				<span style="font-size: 20px; font-weight: bold;">
+					<? if( $this->player->points ): ?>
+						<span style="color: #fff;"><?= $this->NumberFormat($this->player->points) ?></span>
+						<span style="font-size: 14px;">points</span>
+					<? else: ?>
+						<span style="font-size: 14px;">not ranked / no points</span>
+					<? endif; ?>
+				</span>
+				<br/>
+				<? if ($this->player->diff_points > 0) :?>
+					<img align="absmiddle" src="/gfx/icons/rank_up.png" border="0"/> 	<span style="font-weight: normal; font-size: 10px;">+<?= $this->player->diff_points ?> since yesterday</span>
+				<? elseif ($this->player->diff_points < 0): ?>
+					<img align="absmiddle" src="/gfx/icons/rank_down.png" border="0"/> <span style="font-weight: normal; font-size: 10px;"><?= $this->player->diff_points ?> since yesterday</span>
+				<? else: ?>
+					<img align="absmiddle" src="/gfx/icons/rank_equal.png" border="0"/> <span style="font-weight: normal; font-size: 10px;">unchanged since yesterday</span>
+				<? endif; ?>
+			</div>
+			<div style="float: left; margin-top: 20px;">
+			    <!-- a href="/forum/profile.php?mode=viewprofile&amp;u=<?= $this->player->IngameLinkage->User->user_id ?>">
+                    <img border="0" title="View user's profile" alt="View user's profile" src="/forum/templates/andro/images/lang_english/icon_profile.gif"/>
+                </a-->
+				<? if ($this->player->IngameLinkage->User->user_id): ?>
+					<a href="/forum/privmsg.php?mode=post&amp;u=<?= $this->player->IngameLinkage->User->user_id ?>">
+						<img border="0" title="Send private message" alt="Send private message" src="/forum/templates/andro/images/lang_english/icon_pm.gif"/>
+					</a>
+					<a href="/forum/profile.php?mode=email&amp;u=<?= $this->player->IngameLinkage->User->user_id ?>">
+						<img border="0" title="Send e-mail" alt="Send e-mail" src="/forum/templates/andro/images/lang_english/icon_email.gif"/>
+					</a>
+				<? endif ?>
+                <? if ($this->player->IngameLinkage->User->user_icq): ?> 
+                <a target="_blank" href="http://wwp.icq.com/<?= $this->player->IngameLinkage->User->user_icq ?>">
+                    <img border="0" title="ICQ Number" alt="ICQ Number" src="/forum/templates/andro/images/lang_english/icon_icq_add.gif"/>
+                    <img style="position: relative; left: -58px; top: -1px;" width="18" height="18" border="0" src="http://status.icq.com/online.gif?icq=<?= $this->player->IngameLinkage->User->user_icq ?>&img=5"/>
+                </a>
+                <? endif; ?>
+                <br/>
+                <? if ($this->player->IngameLinkage->User && $this->player->IngameLinkage->User->username): ?>
+                    <a href="/forum/search.php?search_author=<?= $this->player->IngameLinkage->User->username ?>">View forum posts by <?= htmlspecialchars($this->player->simplified) ?></a>
+                <? endif; ?>
+            </div>
+			<div style="clear: left;"></div>
+		</div>
+		
+		<div style="width: 380px; float: left;">
+			<? if ($this->player->IngameLinkage->User): ?> 
+				<table border="0">
+					<tr>
+						<td class="profileTitle">Username:</b></td>
+						<td><?= $this->player->IngameLinkage->User->username ? $this->player->IngameLinkage->User->username : 'This player has no username linked' ?></td>
+					</tr>
+					<tr>
+						<td class="profileTitle">Nickname:</td>
+						<td><?= $this->player->simplified ?></td>
+					</tr>
+					<tr>
+						<td class="profileTitle">Realname:</td>
+						<td><?= $this->player->IngameLinkage->User->user_firstname ?> <?= $this->player->IngameLinkage->User->user_lastname ?></td>
+					</tr>
+				</table>
+			<? else: ?>
+				No contact information available.<br/>
+				<br/>
+				<span style="color: #fff; font-weight: bold;"><?= new Racenet_Ingamecolors($this->player->name) ?></span>
+				is not registered at The Warsow Racenet.
+			<? endif; ?>
+		</div>
+		
+		<div style="clear: left; height: 20px;"></div>
+    </div>
+
+    <div class="racenet_headrow">
+        Latest personal records
+    </div>
+    <div class="racenet_row" id="playedMaps">
+        <table width="100%">
+            <thead style="font-weight: bold;">
+                <td>Points</td>
+                <td>Map</td>
+                <td>Time</td>
+                <td>Tries</td>
+                <td>Duration</td>
+                <td>Date</td>
+                <td>Server</td>
+            </thead>
+	    <? foreach($this->player->getLatestPersonalHighscores(20) as $highscore): ?>
+            <tr>
+                <td><?= $highscore->points ?></td>
+                <td><a class="wmtt" rel="<?= $highscore->Map->getWmttImage() ?>" href="/maps/details/id/<?= $highscore->Map->id ?>"><?= $highscore->Map->name ?></a></td>
+                <td><?= $this->Racetime($highscore->time, Racenet_Filter_Racetime::FORMAT_INGAME, Racenet_Filter_Racetime::KEEP_LEADING_ZEROS) ?></td>
+                <td><?= $highscore->tries ?></td>
+                <td><?= $this->Racetime($highscore->duration) ?></td>
+                <td><span style="font-size: 10px;"><?= $highscore->created ?></span></td>
+                <td><a style="font-size: 10px;" href="/server/<?= $highscore->Server->ident ?>"><?= new Racenet_IngameColors(str_replace('warsow-race.net', '', $highscore->Server->servername)) ?></a></td>
+            </tr>
+        <? endforeach; ?>
+        </table>
+    </div>
+
+    <br/>
+    <br/>
+    <br/>
+
+	<div class="racenet_headrow">
+		Points history
+	</div>
+	<div class="racenet_row">
+		<img src="/tools/graph.php?type=playerPointsHistory&id=<?=  $this->player->id ?>" alt="Points history not available :(" border="0" />
+	</div>
+	
+</div>

@@ -1,0 +1,122 @@
+		v1.6.0
+		- Optimized queries, reducing on average the number by 50% during most operations.
+		- Preferences are now settable inside the mod, instead of editing the php file.
+		- Objectized the code some, but it is minimal until phpBB supports php5, as it
+		  would be a waste of time rewriting it all until then.
+		- No hassle install.  Just upload 4 files, done.  Options and the archive table
+		  will be created as needed.
+		- Fixed a problem with no addslashes() in an archiving query.
+		- Removed my version checker code to make things as speedy as possible.
+		- Now takes up only one menu item.  Archive mode/Normal mode is a toggle inside
+		  the main page.
+		- Added page navigation above and below the PM list.
+
+		v1.5.1
+		- Fixed a template display problem for the archive column.
+		- Fixed a problem with PM Pop-up style not working.
+		- Removed the old code for preference saving to speed things up.
+
+		v1.5.0
+		- A few quick fixes and upped the version number to what it should have been before.
+
+		v1.4.6
+		- Recoded some file parts that would try to call a missing language file.
+		- Fixed a few small bugs that weren't noticeable by most people.
+		- A few clean-ups and optimizations.
+		- New install file style.
+
+		v1.45
+		- Fixed the gz_handler() problem.
+		- Changed the sub-section back to Users instead of Nivisec.com, plans have
+			changed for me and ppl didn't like it anyway :)
+
+		v1.44
+		- Settings are now saved in cookies and no warnings appear if gzip isn't
+			enabled.
+		- PMs are now displayed in-line with the page.  If you don't like this new
+			method, you can revert back easily.  see goodies/using_pm_popup_again.txt
+		- The new section is Nivisec.com instead of Users.  This helps me manage my
+			hacks better and there is some future plans that would require this.
+		- A new template file!  admin_priv_msgs_view_inline_body.tpl is there now, so
+			don't forget to upload it with the rest.
+
+		v1.43
+		- Quick fix for a bunch of warning print outs if GZip compression wasn't
+			enabled.  Your settings may or may not be saved at this point, a fix
+			is coming.
+
+		v1.42
+		- Fixed javascript problems on the archive page or when archive is disabled.
+		- Fixed javascript problems in Mozilla/Netscape.
+		- Checked for 2.0.5 compatibility, it works except preferences can not
+			be saved due to odd change in template.php.  You should not
+			recieve any error messages about this when using 2.0.5 now.
+		- SID wasn't being appended to mass deletion utils correctly, this is
+			fixed now.
+
+		v1.41
+		- Fixed a copy and paste mistake with IPs
+
+		v1.40
+		- Fixed paganation bug with filters.
+		- Settings are now saved (including your current browsing page)! (needs cookies enabled)
+		- Check all on current page boxes for delete and archive
+		- Mass deletion options added (orphan PMs and Sent PMs)
+		- Templates edited to look a little better
+		- New filter by to and from specific usernames option
+
+		v1.33
+		- Added a re-sync function so users no longer think they have new
+		  	PMs you might have deleted.
+		- Fixed a problem with some SQL code that happened only to some users.
+		- Archive feature can now be disabled.  see goodies/disabling_archive.txt
+		- Uses Nivisec Vesion Checker.
+		- Auto-Inserts itself into the hacks list.
+
+		v1.32
+		- Fixed a line of code causing only 2 PMs per page to display.
+		- nivisec_install.php no longer uses lang_main.php
+		- To upgrade, just re-copy the files.
+
+		v1.31
+		- Acid found some errors I missed :)
+		- Fixed viewing archived PMs.
+		- Fixed "button" styles (submit, reset, sort)
+		- Fixed pagination problems
+		- To upgrade, just re-copy the files
+
+		v1.30
+		- Rewrite of almost ALL code for this hack.
+      - Added an archive section for those you wish to delete
+   		from users, but save for yourself.
+      - Viewing messages now acts normal (html, smilies, etc)
+      - All sort choices are now saved between transactions.
+      - Added the PM filter type of "All" messages, and made it
+     		the default.
+      - You can sort by many more options now instead of just date
+			and subject.
+
+ 		v1.2.1
+  	- Quick fix, had used OR instead of AND in a sql query.
+
+ 		v1.2.0
+  	- Updated code to follow the phpBB coding standards.
+  	- Updated mod to work with phpBB2 final release.
+  	- After many annoying e-mails added a delete function
+       	even though I said I would not.
+  	- Discontinued support for anything other than final phpBB2!
+ 
+ 		v1.1.0
+  	- Rewrote the whole thing due to people getting errors.
+  	- If you tried the mod before, make sure to do the upgrade note
+      	below or the mod may not work now!
+  	***IMPORTANT To Updgrade***
+  	- Delete admin_priv_msgs_view.php -- from admin directory (i.e. admin/)
+  	- Overwrite the rest of the files.
+ 
+ 		v1.0.1
+ 		- Ok, so forgot to add one thing in and everyone
+      	was getting multiple copies of all topics...
+
+ 		v1.0.0
+  	- Initial Release.

@@ -1,0 +1,53 @@
+<tr class="racenet_row rankedmaps_click" <?= $this->match ? 'style="background-color: #302843;"' : '' ?>>
+	<td style="font-size: 14px; text-align: right;">
+		<b><?= $this->position ? $this->position .'.' : '-' ?></b>&nbsp;&nbsp;
+	</td>
+	<td style="font-size: 14px;">           
+        <a href="<?= $this->url(array("controller" => "player", "id" => $this->id), null, true) ?>/"><?= new Racenet_IngameColors($this->name) ?></a>
+    </td>
+	<td style="font-size: 14px;">         
+        <?= $this->NumberFormat($this->races) ?>
+    </td>
+    <td style="font-size: 14px;">         
+        <?= $this->NumberFormat($this->maps) ?>
+		<span style="font-size: 10px;">(<?= $this->NumberFormat($this->pj) ?>)</span>
+    </td>
+    <td style="font-size: 10px;">         
+        <?= $this->playtime ? $this->Racetime($this->playtime) : "-" ?>
+    </td>
+	<td>
+	    <? if($this->awardval): ?>
+	        <div style="float: left; font-size: 10px; width: 60px; margin-top: 3px;"><?= $this->NumberFormat($this->awardval) ?></div>
+	    <? else: ?>
+	        -
+	    <? endif; ?>
+		<? if( $this->awards ): ?>
+            <? foreach( $this->awards as $award ): ?>
+                <img alt="<?= $award->type ?>" title="<?= $award->num ?> x <?= Award::getTitleByType($award->type) ?>" src="/gfx/icons/ico_<?= $award->type ?>_mini.jpg" style="width: 18px; height:18px; padding: 0px; margin: 0px; border: 0px;" align="absmiddle" /><div style="display:inline; position: relative; left: -<?= (4*strlen( $award->num )) ?> px; top: 5px; font-size: 9px; font-weight: bold; color: #ffffff;"><?= $award->num ?></div>
+		    <? endforeach; ?>
+	    <? endif; ?>
+	    <div style="clear: left;"></div>
+	</td>
+	<td style="font-size: 14px;">         
+        <b><?= round($this->skill,2) ?></b>
+    </td>
+	<td style="text-align: right; color: #fff; font-weight: bold;">
+		<div style="margin-right: 5px;"><?= $this->NumberFormat($this->points) ?></div>		
+	</td>
+	<td style="text-align: left;">
+		<? if( $this->diff_points > 0 ) :?>
+			<img src="/gfx/icons/rank_up.png" border="0"/> 	<span style="font-weight: normal; font-size: 10px;">(+<?= $this->NumberFormat($this->diff_points) ?>)</span>
+		<? elseif( $this->diff_points < 0 ): ?>
+			<img src="/gfx/icons/rank_down.png" border="0"/> <span style="font-weight: normal; font-size: 10px;">(<?= $this->NumberFormat($this->diff_points) ?>)</span>
+		<? else: ?>
+			<img src="/gfx/icons/rank_equal.png" border="0"/> <span style="font-weight: normal; font-size: 10px;">(+-0)</span>
+		<? endif; ?>
+	</td>
+	<td style="text-align: center;">
+		<a href="javascript:void(0);" class="shortinfo_toggle" rel="<?= $this->player_id ?>" title="">+</a>
+	</td>
+</tr>
+
+<!-- div id="shortinfo_<?= $this->player_id ?>" class="shortinfo_box">
+		<div class="inner"></div>
+</div-->

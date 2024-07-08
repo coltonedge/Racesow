@@ -1,0 +1,671 @@
+##############################################################
+##
+## Upgrade path from 2.1.2 to 2.1.4
+##
+##############################################################
+#
+#-----[ COPY ]------------------------------------------------
+#
+COPY root/includes/sessions.php TO includes/sessions.php
+#
+#-----[ COPY ]------------------------------------------------
+#
+COPY root/install_cat/*.* TO install_cat/*.*
+#
+#-----[ COPY ]------------------------------------------------
+#
+# these are the templates/ptifo/ tpls modified through the phpBB 2.0.17 to 2.0.18 upgrade
+# ... just in case you have forgot them ;)
+#
+COPY root/templates/ptifo/admin/board_config_body.tpl TO templates/ptifo/admin/board_config_body.tpl
+COPY root/templates/ptifo/admin/index_frameset.tpl TO templates/ptifo/admin/index_frameset.tpl
+COPY root/templates/ptifo/admin/page_header.tpl TO templates/ptifo/admin/page_header.tpl
+COPY root/templates/ptifo/admin/styles_addnew_body.tpl TO templates/ptifo/admin/styles_addnew_body.tpl
+COPY root/templates/ptifo/admin/styles_list_body.tpl TO templates/ptifo/admin/styles_list_body.tpl
+COPY root/templates/ptifo/admin/user_edit_body.tpl TO templates/ptifo/admin/user_edit_body.tpl
+COPY root/templates/ptifo/bbcode.tpl TO templates/ptifo/bbcode.tpl
+COPY root/templates/ptifo/index_body.tpl TO templates/ptifo/index_body.tpl
+COPY root/templates/ptifo/login_body.tpl TO templates/ptifo/login_body.tpl
+COPY root/templates/ptifo/search_body.tpl TO templates/ptifo/search_body.tpl
+#
+#-----[ OPEN ]------------------------------------------------
+#
+# Modifying ptifo.cfg was not the thing to do : fixing viewtopic.php was, so revert back on one upgrade
+#
+templates/ptifo/ptifo.cfg
+#
+#-----[ FIND ]------------------------------------------------
+#
+$images['Topic_watch'] = $current_template_images . '/common/ft_watch.gif';
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+$images['topic_watch'] = $current_template_images . '/common/ft_watch.gif';
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/admin_styles.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+				'CUSTOM_TPLS' => $selected['custom_tpls'],
+				'L_STYLESHEET_EXPLAIN' => $lang['Stylesheet_explain'],
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+				'CUSTOM_TPLS' => $selected['custom_tpls'],
+#
+#-----[ OPEN ]------------------------------------------------
+#
+admin/index.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+			if ( $fsock = @fsockopen($provided['server'], 80, $mod_installed[$provider]['errno'], $mod_installed[$provider]['errstr']) )
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			if ( $fsock = @fsockopen($provided['server'], 80, $mod_installed[$provider]['errno'], $mod_installed[$provider]['errstr'], 10) )
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/bbcode.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+			$orig[] = "/(?<=.\W|\W.|^\W)" . phpbb_preg_quote($data[$i]['code'], "/") . "(?=.\W|\W.|\W$)/";
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			$orig[] = "/(?<=.\W|\W.|^\W)" . preg_quote($data[$i]['code'], "/") . "(?=.\W|\W.|\W$)/";
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_config.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.22 - 19/10/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.24 - 06/11/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+define('CH_CURRENT_VERSION', '2.1.2');
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+define('CH_CURRENT_VERSION', '2.1.4');
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$row_id = '#\b(' . str_replace('\*', '\w*?', phpbb_preg_quote($row['word'], '#')) . ')\b#i';
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		$row_id = '#\b(' . str_replace('\*', '\w*?', preg_quote($row['word'], '#')) . ')\b#i';
+#
+#-----[ FIND ]------------------------------------------------
+#
+				$sub_title = str_replace('\"', '"', substr(preg_replace('#(\>(((?>([^><]+|(?R)))*)\<))#se', "preg_replace('#\b(" . $highlight_match . ")\b#i', '<span style=\"color:#" . $theme['fontcolor3'] . "\"><b>\\\\1</b></span>', '\\0')", '>' . $sub_title . '<'), 1, -1));
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+				$sub_title = str_replace('\"', '"', substr(@preg_replace('#(\>(((?>([^><]+|(?R)))*)\<))#se', "@preg_replace('#\b(" . str_replace('\\', '\\\\', addslashes($highlight_match)) . ")\b#i', '<span style=\"color:#" . $theme['fontcolor3'] . "\"><b>\\\\1</b></span>', '\\0')", '>' . $sub_title . '<'), 1, -1));
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_forums.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.12 - 19/10/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.13 - 31/10/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+		switch ( intval($this->data[$forum_id]['forum_index_pack']) )
+		{
+			case DENY:
+				$pack_index = false;
+				break;
+			case TRUE:
+				$pack_index = true;
+				break;
+		}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		if ( !empty($forum_id) )
+		{
+			switch ( intval($this->data[$forum_id]['forum_index_pack']) )
+			{
+				case DENY:
+					$pack_index = false;
+					break;
+				case TRUE:
+					$pack_index = true;
+					break;
+			}
+		}
+#
+#-----[ FIND ]------------------------------------------------
+#
+		switch ( intval($this->data[$forum_id]['forum_index_split']) )
+		{
+			case DENY:
+				$split_index = false;
+				break;
+			case TRUE:
+				$split_index = true;
+				break;
+		}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		if ( !empty($forum_id) )
+		{
+			switch ( intval($this->data[$forum_id]['forum_index_split']) )
+			{
+				case DENY:
+					$split_index = false;
+					break;
+				case TRUE:
+					$split_index = true;
+					break;
+			}
+		}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_install.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.1 - 06/08/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.2 - 31/10/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+	var $title;
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+	var $sub_title;
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$this->title = empty($title) ? 'Script_title' : $title;
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+		$this->sub_title = '';
+#
+#-----[ FIND ]------------------------------------------------
+#
+<div align="center" class="background"><br /><br /><h1><u><b><?php echo $this->lang($this->title); ?></b></u></h1><br /><br /></div>
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+<div align="center" class="background"><br /><br /><h1><u><b><?php echo $this->lang($this->title); ?></b></u></h1><?php if ( !empty($this->sub_title) ) {echo $this->lang($this->sub_title);} ?><br /><br /></div>
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_stats.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.10 - 19/10/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.11 - 31/10/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+			'u.user_allow_viewonline',
+			'u.user_level',
+			'u.user_session_time',
+			'u.user_session_logged',
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			'user_allow_viewonline',
+			'user_level',
+			'user_session_time',
+			'user_session_logged',
+#
+#-----[ FIND ]------------------------------------------------
+#
+		// build the main request to read registered users
+		$sql_where = empty($forum_id) ? 'u.user_session_time >= ' . ($now - $selected_timerange) : 'u.user_session_time >= ' . ($now - $online_timerange) . ' AND u.user_session_page = ' . intval($forum_id);
+		$sql = 'SELECT u.user_id, ' . implode(', ', $user_fields) . '
+					FROM ' . USERS_TABLE . ' u
+					WHERE u.user_id <> ' . ANONYMOUS . '
+						AND ' . $sql_where . '
+					ORDER BY username';
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		// build the main request to read registered users
+		$sql_where = empty($forum_id) ? 'user_session_time >= ' . ($now - $selected_timerange) : 'user_session_time >= ' . ($now - $online_timerange) . ' AND user_session_page = ' . intval($forum_id);
+		$sql = 'SELECT user_id, ' . implode(', ', $user_fields) . '
+					FROM ' . USERS_TABLE . '
+					WHERE user_id <> ' . ANONYMOUS . '
+						AND ' . $sql_where . '
+					ORDER BY username';
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_topics.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.14 - 19/10/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.15 - 31/10/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+				$sql_fields .= ', ' . implode(', ', $this->user_fields);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+				$sql_fields .= ', u.' . implode(', u.', $this->user_fields);
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/class_user.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.15 - 19/10/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.16 - 31/10/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+		return array(
+			'u.username',
+		);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		return array(
+			'username',
+		);
+#
+#-----[ FIND ]------------------------------------------------
+#
+			$sql = 'SELECT u.user_id, ' . implode(', ', $this->get_pool_fields()) . '
+						FROM ' . USERS_TABLE . ' u
+						WHERE u.user_id IN(' . implode(', ', array_keys($user_ids)) . ')';
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+			$sql = 'SELECT user_id, ' . implode(', ', $this->get_pool_fields()) . '
+						FROM ' . USERS_TABLE . '
+						WHERE user_id IN(' . implode(', ', array_keys($user_ids)) . ')';
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$unreads = array();
+		$last_extraction = $this->data['session_logged_in'] ? $this->data['user_lastvisit'] : time()-300;
+		if ( $keep_unreads )
+		{
+			// get unreaded topic_ids and the extraction date
+			if ( $keep_unreads_db )
+			{
+				$unreads = empty($this->data['user_unread_topics']) ? array() : unserialize($this->data['user_unread_topics']);
+				if ( !empty($this->data['user_unread_date']) )
+				{
+					$last_extraction = $this->data['user_unread_date'];
+				}
+			}
+			else
+			{
+				$unreads = isset($HTTP_COOKIE_VARS[$base_name . '_t_u']) ? unserialize($HTTP_COOKIE_VARS[$base_name . '_t_u']) : array();
+				$date = intval($HTTP_COOKIE_VARS[$base_name . '_t_ud']);
+				if ( !empty($date) )
+				{
+					$last_extraction = $date;
+				}
+			}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		$unreads = array();
+		$last_extraction = $this->data['session_logged_in'] ? $this->data['user_lastvisit'] : time()-300;
+
+		// 60 days limit
+		if ( $reset = ($last_extraction < (time() - 5184000)) && $this->data['session_logged_in'] )
+		{
+			$last_extraction = time() - 5184000;
+		}
+
+		if ( $keep_unreads )
+		{
+			// get unreaded topic_ids and the extraction date
+			if ( $keep_unreads_db )
+			{
+				$unreads = empty($this->data['user_unread_topics']) || $reset ? array() : unserialize($this->data['user_unread_topics']);
+				if ( !empty($this->data['user_unread_date']) && !$reset )
+				{
+					$last_extraction = $this->data['user_unread_date'];
+				}
+			}
+			else
+			{
+				$unreads = !$reset && isset($HTTP_COOKIE_VARS[$base_name . '_t_u']) ? unserialize($HTTP_COOKIE_VARS[$base_name . '_t_u']) : array();
+				$date = intval($HTTP_COOKIE_VARS[$base_name . '_t_ud']);
+				if ( !empty($date) && !$reset )
+				{
+					$last_extraction = $date;
+				}
+			}
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/db.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+unset($dbhost);
+unset($dbuser);
+unset($dbpasswd);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+unset($dbhost);
+unset($dbuser);
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/functions_admin.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+					// remove shadow topics
+					$sql = 'DELETE FROM ' . TOPICS_TABLE . '
+								WHERE topic_id = ' . intval($id);
+					$db->sql_query($sql, false, __LINE__, __FILE__);
+					return;
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+					// remove shadow topics
+					$sql = 'DELETE FROM ' . TOPICS_TABLE . '
+								WHERE topic_id = ' . intval($id) . '
+									AND topic_moved_id <> 0';
+					$db->sql_query($sql, false, __LINE__, __FILE__);
+					return;
+#
+#-----[ FIND ]------------------------------------------------
+#
+							'topic_last_time' => $row['post_time'],
+							)
+						);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+							'topic_last_time' => $row['post_time'],
+						));
+#
+#-----[ FIND ]------------------------------------------------
+#
+							'topic_time' => $row['post_time'],
+							)
+						);
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+							'topic_time' => $row['post_time'],
+						));
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/functions_post.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+	// fix this missing var
+	$topic_title = '';
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	// get forum id
+#
+#-----[ OPEN ]------------------------------------------------
+#
+includes/functions_search.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+function split_words(&$entry, $mode = 'post')
+*/
+//-- add
+function split_words($entry, $mode = 'post')
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+function split_words($entry, $mode = 'post')
+#
+#-----[ OPEN ]------------------------------------------------
+#
+index.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+ *	Version		: 0.0.6 - 21/08/2005
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+ *	Version		: 0.0.7 - 31/10/2005
+#
+#-----[ FIND ]------------------------------------------------
+#
+	if ( !empty($forum_id) );
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	if ( !empty($forum_id) )
+#
+#-----[ OPEN ]------------------------------------------------
+#
+posting.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+$topic_type = ( !empty($HTTP_POST_VARS['topictype']) ) ? intval($HTTP_POST_VARS['topictype']) : POST_NORMAL;
+$topic_type = ( in_array($topic_type, array(POST_NORMAL, POST_STICKY, POST_ANNOUNCE)) ) ? $topic_type : POST_NORMAL;
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+*/
+//-- add
+$topic_type = _read('topictype', TYPE_INT, POST_NORMAL, array_flip(array(POST_NORMAL, POST_STICKY, POST_ANNOUNCE, POST_GLOBAL_ANNOUNCE)));
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ FIND ]------------------------------------------------
+#
+// topic types allowing topic duration (won't work with POST_NORMAL in it)
+$types_with_duration = array(POST_ANNOUNCE, POST_GLOBAL_ANNOUNCE);
+
+// get auths
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+// get auths
+#
+#-----[ FIND ]------------------------------------------------
+#
+	// get the topic type
+	$topic_type = _read('topictype', TYPE_INT, $post_info['topic_type']);
+	$sav_topic_type = _read('sav_topic_type', TYPE_INT, $topic_type);
+
+	// if not on an announcement, set topic_duration to "never"
+	$topic_duration = -1;
+
+	// add the fields to the form
+	if ( $auth_announces )
+	{
+		// new topic : use time() as topic_time
+		if ( ($mode == 'newtopic') || !in_array($sav_topic_type, $types_with_duration) )
+		{
+			$topic_duration = $user->cvt_sys_to_user_date(time() + intval($config->data['default_duration']) * 86400);
+		}
+		// topic sat to "never"
+		else if ( !empty($post_info['topic_duration']) && ($post_info['topic_time'] >= $post_info['topic_duration']) )
+		{
+			$topic_duration = -1;
+		}
+		// topic sat to "forever" or with an end date
+		else
+		{
+			$topic_duration = $user->cvt_sys_to_user_date(intval($post_info['topic_duration']));
+		}
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	// set topic_duration to "never"
+	$topic_duration = -1;
+
+	// add the fields to the form
+	if ( $auth_announces )
+	{
+		$post_info['topic_duration'] = intval($post_info['topic_duration']);
+		if ( !empty($post_info['topic_duration']) )
+		{
+			if ( $post_info['topic_time'] >= $post_info['topic_duration'] )
+			{
+				$topic_duration = -1;
+			}
+			else
+			{
+				$topic_duration = $user->cvt_sys_to_user_date($post_info['topic_duration']);
+			}
+		}
+		else
+		{
+			if ( $mode == 'newtopic' )
+			{
+				$topic_duration = $user->cvt_sys_to_user_date(time() + intval($config->data['default_duration']) * 86400);
+			}
+			else
+			{
+				$topic_duration = 0;
+			}
+		}
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$posting_form = new form($fields, false);
+
+	//
+	// pre process announces part
+	//
+	// force duration when the previous type wasn't an announcement
+	if ( $auth_announces && isset($posting_form->fields['topic_duration']) && ((in_array($topic_type, $types_with_duration) && !in_array($sav_topic_type, $types_with_duration)) || (!in_array($topic_type, $types_with_duration) && in_array($sav_topic_type, $types_with_duration))) )
+	{
+		$posting_form->fields['topic_duration']->force_value($posting_form->fields['topic_duration']->data['value']);
+	}
+
+	//
+	// process the form
+	//
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	$posting_form = new form($fields, false);
+#
+#-----[ FIND ]------------------------------------------------
+#
+		// get topic duration
+		$topic_duration = $posting_form->fields['topic_duration']->value;
+		if ( ($topic_duration < 0) || !in_array($topic_type, $types_with_duration) )
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+		// get topic duration
+		$topic_duration = $posting_form->fields['topic_duration']->value;
+		if ( ($topic_duration < 0) || !in_array($topic_type, array(POST_ANNOUNCE, POST_GLOBAL_ANNOUNCE)) )
+#
+#-----[ FIND ]------------------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- add
+	// get the topic type from form when previewing (fix a phpBB bug)
+	$sav_post_data = isset($post_data['topic_type']) ? $post_data['topic_type'] : POST_NORMAL;
+	$post_data['topic_type'] = POST_NORMAL;
+	$topic_type = _read('topictype', TYPE_INT, $topic_type);
+//-- fin mod : categories hierarchy --------------------------------------------
+
+	if( $is_auth['auth_sticky'] )
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+	if( $is_auth['auth_sticky'] )
+#
+#-----[ FIND ]------------------------------------------------
+#
+	$sav_topic_type = empty($post_data['topic_type']) ? $topic_type : $post_data['topic_type'];
+	$topic_type_toggle .= '<input type="hidden" name="sav_topic_type" value="' . intval($sav_topic_type) . '" />';
+
+	// restore post_data topic type (fix a phpBB bug)
+	$post_data['topic_type'] = $sav_post_data;
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ REPLACE WITH ]----------------------------------------
+#
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ OPEN ]------------------------------------------------
+#
+viewtopic.php
+#
+#-----[ FIND ]------------------------------------------------
+#
+		$s_watching_topic_img = ( isset($images['Topic_watch']) ) ? "<a href=\"viewtopic.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;watch=topic&amp;start=$start&amp;sid=" . $userdata['session_id'] . '"><img src="' . $images['Topic_watch'] . '" alt="' . $lang['Start_watching_topic'] . '" title="' . $lang['Start_watching_topic'] . '" border="0"></a>' : '';
+#
+#-----[ BEFORE, ADD ]-----------------------------------------
+#
+//-- mod : categories hierarchy ------------------------------------------------
+//-- delete
+/*
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+*/
+//-- add
+		if ( isset($images['Topic_watch']) && !isset($images['topic_watch']) )
+		{
+			$images['topic_watch'] = $images['Topic_watch'];
+		}
+		$s_watching_topic_img = ( isset($images['topic_watch']) ) ? "<a href=\"viewtopic.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;watch=topic&amp;start=$start&amp;sid=" . $userdata['session_id'] . '"><img src="' . $images['topic_watch'] . '" alt="' . $lang['Start_watching_topic'] . '" title="' . $lang['Start_watching_topic'] . '" border="0"></a>' : '';
+//-- fin mod : categories hierarchy --------------------------------------------
+#
+#-----[ SAVE/CLOSE ALL FILES ]--------------------------------
+#
+# EoM

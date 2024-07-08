@@ -1,0 +1,13 @@
+<div style="margin: 10px 20px;">
+Top map positions:<br/>
+
+<? foreach( $this->info->top as $i => $top ): ?>
+	<? if( !$top ) continue ?>
+	
+	<div style="float: left; width: 30px;"><?= $top ?></div>
+	<div style="float: left; width: 20px;">x</div>
+	<div style="float: left; width: 30px;"><span class="top_rank"><?= $i ?>.</span></div>
+	<div style="clear: left;"></div>
+<? endforeach; ?>
+
+</div>

@@ -1,0 +1,51 @@
+<div class="racenet_pager">
+    <? if( !$this->disabled ): ?>
+		<? if ($this->pageCount): ?>
+			<? if (isset($this->previous)): ?>
+	            <a onclick="return Racenet.Request.load(this);"href="<?= $this->url(array('page' => $this->first)); ?>">&lt;&lt;</a>
+			<? else: ?>
+			    <span class="disabled">&lt;&lt;</span>
+			<? endif; ?>
+			
+			<? if (isset($this->previous)): ?>
+			    <a onclick="return Racenet.Request.load(this);"href="<?= $this->url(array('page' => $this->previous) ); ?>">&lt;</a>
+			<? else: ?>
+			    <span class="disabled">&lt;</span>
+			<? endif; ?>
+			
+			<? foreach ($this->pagesInRange as $page): ?> 
+			    <? if ($page != $this->current): ?>
+			        <a onclick="return Racenet.Request.load(this);"href="<?= $this->url(array('page' => $page) ); ?>"><?= $page; ?></a>
+			    <? else: ?>
+	  		        <?= $page; ?>
+			    <? endif; ?>
+			<? endforeach; ?>
+			
+			<? if (isset($this->next)): ?>
+			    <a onclick="return Racenet.Request.load(this);"href="<?= $this->url(array('page' => $this->next)); ?>">&gt;</a>
+			<? else: ?>
+			    <span class="disabled">&gt;</span>
+			<? endif; ?>
+			
+			<? if (isset($this->next)): ?>
+			    <a onclick="return Racenet.Request.load(this);"href="<?= $this->url(array('page' => $this->last, 'search' => null)); ?>">&gt;&gt;</a>
+			<? else: ?>
+			    <span class="disabled">&gt;</span>
+			<? endif; ?>
+		<? endif; ?>
+	<? else: ?>
+	    <? if ($this->pageCount): ?>
+            <span class="disabled">&lt;&lt;</span>
+            <span class="disabled">&lt;</span>
+            <? foreach ($this->pagesInRange as $page): ?> 
+                <? if ($page != $this->current): ?>
+                    <span class="disabled"><?= $page; ?></span>
+                <? else: ?>
+                    <span style="font-weight: bold;"><?= $page; ?></span>
+                <? endif; ?>
+            <? endforeach; ?>
+            <span class="disabled">&gt;</span>
+            <span class="disabled">&gt;</span>
+        <? endif; ?>
+    <? endif; ?>
+</div>

@@ -1,0 +1,242 @@
+###############################################
+##	Hack Title:		Buddylist
+##	Hack Version:	1.1.1 (upgrade from 1.1.0)
+##	Author:			Freakin' Booty ;-P
+##	Description:	Add and remove buddies from a list. PM or email someone right from the
+##					list, instead of searching for them through the memberlist first.
+##					See a buddy's online/offline status.
+##					This version allows you to have the buddylist on any page you want; all you need to do, is
+##					add a few lines in the page. Read "Buddylist 1.1.1 Installation Instructions (1).html" for more info.
+##
+##	Compatibility:	2.0.4 - 2.0.5
+##
+##	Installation Level: Easy
+##	Installation Time: 5 - 8 minutes
+##	Files To Edit: 2
+##		includes/functions_buddylist.php
+##		language/lang_english/lang_main.php
+##
+##	Included Files: 0
+##		None
+##
+##	History:
+##		See "Buddylist 1.1.1 - version history.txt".
+##
+##	Author Notes:
+##		None
+##
+##	Support:		http://www.phpbbhacks.com/forums
+##	Copyright:		©2003 Buddylist 1.1.1 (upgrade from 1.1.0) - Freakin' Booty ;-P
+##
+###############################################
+##   You downloaded this hack from phpBBHacks.com, the #1 source for phpBB related downloads.
+##   Please visit http://www.phpbbhacks.com/forums for support.
+###############################################
+##
+###############################################
+##	This hack is released under the GPL License.
+##	This hack can be freely used, but not distributed, without permission.
+##	Intellectual Property is retained by the hack author(s) listed above.
+###############################################
+
+#
+#-----[ OPEN ]--------------------------------------------
+#
+includes/functions_buddylist.php
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+function add_buddy($user_id, $buddy_id)
+{
+	global $db, $lang, $template, $theme, $phpEx, $phpbb_root_path, $userdata;
+
+#
+#-----[ REPLACE WITH ]------------------------------------
+#
+function add_buddy(&$user_id, &$buddy_id)
+{
+	global $db, $lang, $template, $theme, $phpEx;
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+function remove_buddy($user_id, $buddy_id)
+{
+	global $db, $lang, $template, $theme, $phpEx, $phpbb_root_path, $userdata;
+
+#
+#-----[ REPLACE WITH ]------------------------------------
+#
+function remove_buddy(&$user_id, &$buddy_id)
+{
+	global $db, $lang, $template, $theme, $phpEx;
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+function get_buddies($data)
+{
+	global $db, $lang, $template, $theme, $images, $phpbb_root_path, $phpEx, $userdata;
+
+#
+#-----[ REPLACE WITH ]------------------------------------
+#
+function get_buddies(&$data)
+{
+	global $db, $lang, $template, $theme, $images, $phpEx;
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+		if( ($row['user_allow_viewonline'] || $userdata['user_level'] == ADMIN) && ($row['user_session_time'] >= $end_session) )
+
+#
+#-----[ REPLACE WITH ]------------------------------------
+#
+		if( ($row['user_allow_viewonline'] || $data['user_level'] == ADMIN) && ($row['user_session_time'] >= $end_session) )
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+			if( $buddies_online[$i]['user_viewemail'] || ($userdata['user_level'] == ADMIN) )
+
+#
+#-----[ REPLACE WITH ]------------------------------------
+#
+			if( $buddies_online[$i]['user_viewemail'] || ($data['user_level'] == ADMIN) )
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+			if( $buddies_offline[$i]['user_viewemail'] || ($userdata['user_level'] == ADMIN) )
+
+#
+#-----[ REPLACE WITH ]------------------------------------
+#
+			if( $buddies_offline[$i]['user_viewemail'] || ($data['user_level'] == ADMIN) )
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+function get_buddy_img($user_id, $buddy_id)
+{
+	global $db, $lang, $template, $theme, $images, $phpbb_root_path, $phpEx, $userdata;
+
+#
+#-----[ REPLACE WITH ]------------------------------------
+#
+function get_buddy_img(&$user_id, &$buddy_id)
+{
+	global $db, $lang, $template, $theme, $images, $phpEx;
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+?>
+
+#
+#-----[ BEFORE, ADD ]-------------------------------------
+#
+//
+// Obtain buddies in a string
+// Instead of having the normal buddylist, this function simply creates a string with all buddies in.
+// Online buddies are being listed bold
+//
+function get_buddies_list(&$data, $mode = '')
+{
+	global $db, $lang, $template, $theme, $images, $phpEx;
+
+	$current_time = time();
+	$session_time = 60;
+	$end_session = $current_time - $session_time;
+
+	$sql = "SELECT b.buddy_id, u.username AS buddy_name, u.user_allow_viewonline, u.user_session_time
+			FROM " . BUDDIES_TABLE . " b, " . USERS_TABLE . " u
+			WHERE b.user_id = " . $data['user_id'] . "
+				AND u.user_id = b.buddy_id
+			ORDER BY u.username ASC";
+	if( !$result = $db->sql_query($sql) )
+	{
+		message_die(GENERAL_ERROR, 'Could not query buddies information', '', __LINE__, __FILE__, $sql);
+	}
+
+	$buddies = array();
+	while( $row = $db->sql_fetchrow($result) )
+	{
+		$buddies[] = $row;
+	}
+	$db->sql_freeresult($result);
+
+	//
+	// Dump vars to template
+	//
+	$template->assign_vars(array(
+		'L_BUDDYLIST' => $lang['Buddylist']
+		)
+	);
+
+
+	//
+	// Okay, let's build the online buddies list
+	//
+	$s_buddies = '';
+	if( count($buddies) == 0 )
+	{
+		$s_buddies = $lang['No_buddies'];
+	}
+	else
+	{
+		for( $i = 0; $i < count($buddies); $i++ )
+		{
+			$buddy_id = $buddies[$i]['buddy_id'];
+
+			if( ($buddies[$i]['user_allow_viewonline'] || $data['user_level'] == ADMIN) && ($buddies[$i]['user_session_time'] >= $end_session) )
+			{
+				$buddy_name = '<b>' . $buddies[$i]['buddy_name'] . '</b>';
+			}
+			else
+			{
+				$buddy_name = $buddies[$i]['buddy_name'];
+			}
+
+			$temp_url = append_sid("profile.$phpEx?mode=viewprofile&amp;" . POST_USERS_URL . "=$buddy_id");
+			$buddy_profile = '<a href="' . $temp_url . '">' . $buddy_name . '</a>';
+
+			$temp_url = append_sid("privmsg.$phpEx?mode=post&amp;" . POST_USERS_URL . "=$buddy_id");
+			$buddy_pm = '<a href="' . $temp_url . '">' . $buddy_name . '</a>';
+
+			$s_buddies .= ( ( $s_buddies != '' ) ? ', ' : '' ) . ( ( $mode == 'pm' ) ? $buddy_pm : $buddy_profile );
+		}
+	}
+
+	$template->assign_vars(array(
+		'S_BUDDIES' => $s_buddies
+		)
+	);
+
+	return;
+}
+
+#
+#-----[ OPEN ]--------------------------------------------
+#
+# make sure to edit this file for every language installed
+#
+language/lang_english/lang_main.php
+
+#
+#-----[ FIND ]--------------------------------------------
+#
+$lang['No_buddies_online'] = 'You currently have no buddies online';
+
+#
+#-----[ BEFORE, ADD ]-------------------------------------
+#
+$lang['Buddies_online'] = 'Online buddies';
+$lang['Buddies_offline'] = 'Offline buddies';
+$lang['No_buddies'] = 'You currently have no buddies in your list';
+
+#
+#-----[ SAVE & CLOSE ALL FILES ]--------------------------
+#

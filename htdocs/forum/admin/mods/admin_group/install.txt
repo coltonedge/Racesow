@@ -1,0 +1,446 @@
+############################################################## 
+## MOD Title: Admin Group (Administratorgruppe) 
+## MOD Author: Leuchte < mail@leuchte.net > http://www.leuchte.net 
+## MOD Description: Mit diesem Mod kann eine Gruppe als Admingruppe deklariert werden. Alle User erhalten automatisch
+## Adminrechte und einen definierbaren Rang.
+##
+## MOD Version: 1.0.1
+## 
+## Installation Level: Normal 
+## Installation Time: 10 Minuten 
+## Files To Edit: 4
+##
+##			language/lang_german/lang_admin.php
+##			admin/admin_groups.php
+##			groupcp.php
+##			templates/subSilver/admin/group_edit_body.tpl
+##
+## Included Files: 0 
+############################################################## 
+## For Security Purposes, Please Check: http://www.leuchte.net/mods/ for the 
+## latest version of this MOD.
+## 
+##############################################################
+## Before Adding This MOD To Your Forum, You Should Back Up All Files Related To This MOD 
+##############################################################
+## MOD History:
+##
+##	2006-04-07 - Typo in SQL-Query
+##   	2004-10-09 - Initial Release
+##
+############################################################## 
+# 
+#-----[ SQL ]------------------------------------------ 
+# Führe die Querrie in deiner Datenbank aus (ersetze phpbb_ mit deinem Prefix), bevor du die Dateien veränderst!
+ALTER TABLE phpbb_groups ADD group_admin TINYINT(1) DEFAULT '0' NOT NULL;
+ALTER TABLE phpbb_groups ADD group_admin_rank SMALLINT(5) UNSIGNED DEFAULT '0' NOT NULL;
+
+# 
+#-----[ OPEN ]------------------------------------------ 
+# 
+language/lang_german/lang_admin.php 
+
+# 
+#-----[ FIND ]------------------------------------------ 
+# 
+$lang['group_delete'] = 'Gelöschte Gruppe';
+
+# 
+#-----[ BEFORE, ADD ]------------------------------------------ 
+# 
+$lang['admin_group'] = 'Admingruppe';
+$lang['admin_group_explain'] = 'Alle Mitglieder dieser Gruppe erhalten automatisch Admin-Rechte';
+$lang['admin_group_check'] = 'Diese Gruppe als Admingruppe festlegen';
+$lang['Admingroup_set_rank'] = 'Allen Mitgliedern einen Rang zuweisen';
+$lang['Admingroup_set_rank_explain'] = 'Wird diese Option nicht gew&auml;hlt, erhalten nur Mitglieder ohne einen Spezialrang den gew&auml;hlten Adminrang';
+
+# 
+#-----[ OPEN ]------------------------------------------ 
+# 
+groupcp.php 
+
+# 
+#-----[ FIND ]------------------------------------------ 
+# 
+		default:
+			$sql = "SELECT g.group_moderator, g.group_type, aa.auth_mod
+
+# 
+#-----[ REPLACE, WITH ]------------------------------------------ 
+# 
+		default:
+			$sql = "SELECT g.group_moderator, g.group_type, g.group_admin, aa.auth_mod
+# 
+#-----[ FIND ]------------------------------------------ 
+#
+	//
+	// Get the group name
+	// Email the user and tell them they're in the group
+
+# 
+#-----[ BEFORE, ADD ]------------------------------------------ 
+# 
+          // Admin Group
+          if ( $row['user_level'] != ADMIN && $group_info['group_admin'] )
+					{
+						$sql = "UPDATE " . USERS_TABLE . " 
+							SET user_level = " . ADMIN . " 
+							WHERE user_id = " . $row['user_id'];
+						if ( !$db->sql_query($sql) )
+						{
+							message_die(GENERAL_ERROR, 'Could not update user level', '', __LINE__, __FILE__, $sql);
+						}
+            
+            $sql = "SELECT group_admin_rank 
+              FROM " . GROUPS_TABLE . "
+          	  WHERE group_id = $group_id";
+          	if ( !($result = $db->sql_query($sql)) )
+          	{
+          		message_die(GENERAL_ERROR, 'Could not get rank', '', __LINE__, __FILE__, $sql);
+          	}
+            $group_rank = $db->sql_fetchrow($result);
+            
+            $sql = "UPDATE ". USERS_TABLE ." 
+							SET user_rank = '". $group_rank['group_admin_rank'] ."' 
+							WHERE user_id = " . $row['user_id'];
+						if ( !$db->sql_query($sql) )
+						{
+							message_die(GENERAL_ERROR, 'Could not update user rank', '', __LINE__, __FILE__, $sql);
+						}            
+					}
+          // Admin Group
+
+# 
+#-----[ FIND ]------------------------------------------ 
+#
+						$sql = "DELETE FROM " . USER_GROUP_TABLE . " 
+							WHERE user_id IN ($sql_in) 
+								AND group_id = $group_id";
+					}
+
+# 
+#-----[ BEFORE, ADD ]------------------------------------------ 
+# 
+            // Admin Group
+            if ( $group_info['group_admin'] )
+						{
+							$sql = "SELECT ug.user_id, ug.group_id 
+								FROM " . AUTH_ACCESS_TABLE . " aa, " . USER_GROUP_TABLE . " ug 
+								WHERE ug.user_id IN  ($sql_in) 
+									AND aa.group_id = ug.group_id 
+									AND aa.auth_mod = 1 
+								GROUP BY ug.user_id, ug.group_id 
+								ORDER BY ug.user_id, ug.group_id";
+							if ( !($result = $db->sql_query($sql)) )
+							{
+								message_die(GENERAL_ERROR, 'Could not obtain moderator status', '', __LINE__, __FILE__, $sql);
+							}
+
+							if ( $row = $db->sql_fetchrow($result) )
+							{
+								$admin_group_check = array();
+								$remove_admin_sql = '';
+
+								do
+								{
+									$admin_group_check[$row['user_id']][] = $row['group_id'];
+								}
+								while ( $row = $db->sql_fetchrow($result) );
+
+								while( list($user_id, $group_list) = @each($admin_group_check) )
+								{
+									if ( count($group_list) == 1 )
+									{
+										$remove_admin_sql .= ( ( $remove_admin_sql != '' ) ? ', ' : '' ) . $user_id;
+									}
+								}
+
+								if ( $remove_admin_sql != '' )
+								{
+									$sql = "UPDATE " . USERS_TABLE . " 
+										SET user_level = " . MOD . " 
+										WHERE user_id IN ($remove_admin_sql)";
+									if ( !$db->sql_query($sql) )
+									{
+										message_die(GENERAL_ERROR, 'Could not update user level', '', __LINE__, __FILE__, $sql);
+									}
+								}
+							}
+              else
+              {
+                $sql = "UPDATE " . USERS_TABLE . " 
+									SET user_level = " . USER . " 
+									WHERE user_id IN ($sql_in)";
+								if ( !$db->sql_query($sql) )
+								{
+									message_die(GENERAL_ERROR, 'Could not update user level', '', __LINE__, __FILE__, $sql);
+								}
+              }
+              
+              $sql = "UPDATE " . USERS_TABLE . " 
+								SET user_rank = '0' 
+								WHERE user_id IN ($sql_in)";
+							if ( !$db->sql_query($sql) )
+							{
+								message_die(GENERAL_ERROR, 'Could not update user rank', '', __LINE__, __FILE__, $sql);
+							}
+						}
+            // Admin Group
+
+# 
+#-----[ OPEN ]------------------------------------------ 
+# 
+admin/admin_groups.php 
+
+# 
+#-----[ FIND ]------------------------------------------ 
+#
+			$group_moderator = $row['username'];
+		}
+	}
+
+# 
+#-----[ AFTER, ADD ]------------------------------------------ 
+#
+  // Admin Group
+  $sql = "SELECT group_admin_rank 
+    FROM " . GROUPS_TABLE . "
+	  WHERE group_id = $group_id";
+	if ( !($result = $db->sql_query($sql)) )
+	{
+		message_die(GENERAL_ERROR, 'Could not get rank', '', __LINE__, __FILE__, $sql);
+	}
+  $group_rank = $db->sql_fetchrow($result);
+  
+  $sql = "SELECT * FROM " . RANKS_TABLE . "
+		WHERE rank_special = 1
+		ORDER BY rank_title";
+	if ( !($result = $db->sql_query($sql)) )
+	{
+		message_die(GENERAL_ERROR, 'Could not obtain ranks data', '', __LINE__, __FILE__, $sql);
+	}
+
+	$rank_select_box = '<option value="0">' . $lang['No_assigned_rank'] . '</option>';
+	while( $row = $db->sql_fetchrow($result) )
+	{
+		$rank = $row['rank_title'];
+  	$rank_id = $row['rank_id'];
+			
+	  $selected = ( $group_rank['group_admin_rank'] == $rank_id ) ? ' selected="selected"' : '';
+	  $rank_select_box .= '<option value="' . $rank_id . '"' . $selected . '>' . $rank . '</option>';
+	}
+  // Admin Group
+
+# 
+#-----[ FIND ]------------------------------------------ 
+#
+	$group_closed = ( $group_info['group_type'] == GROUP_CLOSED ) ? ' checked="checked"' : '';
+	$group_hidden = ( $group_info['group_type'] == GROUP_HIDDEN ) ? ' checked="checked"' : '';
+
+# 
+#-----[ AFTER, ADD ]------------------------------------------ 
+#
+  // Admin Group
+  $admin_group = ( $group_info['group_admin'] ) ? ' checked="checked"' : '';
+  // Admin Group
+
+# 
+#-----[ FIND ]------------------------------------------ 
+#
+		'GROUP_DESCRIPTION' => $group_info['group_description'], 
+		'GROUP_MODERATOR' => $group_moderator,
+
+# 
+#-----[ AFTER, ADD ]------------------------------------------ 
+#
+		// Admin Group
+		'RANK_SELECT_BOX' => $rank_select_box,
+		'L_ADMIN_GROUP' => $lang['admin_group'],
+		'L_ADMIN_GROUP_EXPLAIN' => $lang['admin_group_explain'],
+		'L_ADMIN_GROUP_CHECK' => $lang['admin_group_check'],
+		'L_SELECT_RANK' => $lang['Rank_title'],
+		'L_SELECT_RANK2' => $lang['Admingroup_set_rank'],
+		'L_SELECT_RANK2_EXPLAIN' => $lang['Admingroup_set_rank_explain'],
+		'S_ADMIN_GROUP_CHECKED' => $admin_group,
+		// Admin Group
+
+# 
+#-----[ FIND ]------------------------------------------ 
+#
+else if ( isset($HTTP_POST_VARS['group_update']) )
+{
+
+# 
+#-----[ AFTER, ADD ]------------------------------------------ 
+#
+  // Admin Group
+  if ( isset($_POST['admin_group']) )
+	{
+  
+    $sql = "UPDATE ". GROUPS_TABLE ."
+      SET group_admin = '1'
+      WHERE group_id = $group_id";
+    if ( !($result = $db->sql_query($sql)) )
+		{
+			message_die(GENERAL_ERROR, 'Could not groups table', '', __LINE__, __FILE__, $sql);
+		}
+
+    $sql = "SELECT user_id
+      FROM ". USER_GROUP_TABLE ."
+      WHERE group_id = $group_id";
+    if ( !($result = $db->sql_query($sql)) )
+		{
+			message_die(GENERAL_ERROR, 'Could not get user', '', __LINE__, __FILE__, $sql);
+		}
+    $users = array();
+    while ( $row = $db->sql_fetchrow($result) )
+    {
+      $users[] = $row;
+    }
+    
+    for($i = 0; $i < count($users); $i++)
+    {
+     $sql = "UPDATE ". USERS_TABLE ."
+       SET user_level = 1
+       WHERE user_id = ". $users[$i]['user_id'];
+     if ( !($result = $db->sql_query($sql)) )
+		 {
+			 message_die(GENERAL_ERROR, 'Could not update users', '', __LINE__, __FILE__, $sql);
+		 }
+     
+     $group_rank = ( !empty($_POST['group_rank']) ) ? intval( $_POST['group_rank'] ) : 0;
+     if ( isset($_POST['set_rank']) )
+	   {  
+       $sql = "UPDATE ". USERS_TABLE ."
+         SET user_rank = $group_rank
+         WHERE user_id = ". $users[$i]['user_id'];
+     }
+     else
+     {
+       $sql = "UPDATE ". USERS_TABLE ."
+         SET user_rank = $group_rank
+         WHERE user_id = ". $users[$i]['user_id'] ."
+         AND user_rank = 0";
+     }
+       if ( !$db->sql_query($sql) )
+			 {
+				message_die(GENERAL_ERROR, 'Could not update users', '', __LINE__, __FILE__, $sql);
+			 }
+     
+     $sql = "UPDATE ". GROUPS_TABLE ."
+       SET group_admin_rank = $group_rank
+       WHERE group_id = $group_id";
+     if ( !($result = $db->sql_query($sql)) )
+		 {
+			 message_die(GENERAL_ERROR, 'Could not update group', '', __LINE__, __FILE__, $sql);
+		 }     
+    }
+  }
+  else
+  {
+    $sql = "UPDATE ". GROUPS_TABLE ."
+      SET group_admin = '0'
+      WHERE group_id = $group_id";
+    if ( !($result = $db->sql_query($sql)) )
+		{
+			message_die(GENERAL_ERROR, 'Could not groups table', '', __LINE__, __FILE__, $sql);
+		}
+ 
+        $sql = "SELECT group_moderator
+      FROM ". GROUPS_TABLE ."
+      WHERE group_id = $group_id";
+    if ( !($result = $db->sql_query($sql)) )
+		{
+			message_die(GENERAL_ERROR, 'Could not get group moderator', '', __LINE__, __FILE__, $sql);
+		}
+    $group_mod = $db->sql_fetchrow($result);
+    
+    $sql = "SELECT user_id
+      FROM ". USER_GROUP_TABLE ." ug
+      WHERE group_id = $group_id";
+    if ( !($result = $db->sql_query($sql)) )
+		{
+			message_die(GENERAL_ERROR, 'Could not get user', '', __LINE__, __FILE__, $sql);
+		}
+    $users = array();
+    while ( $row = $db->sql_fetchrow($result) )
+    {
+     $users[] = $row;
+    }
+    
+    for($i = 0; $i < count($users); $i++)
+    {
+			$sql = "SELECT aa.auth_mod 
+				FROM " . AUTH_ACCESS_TABLE . " aa, " . USER_GROUP_TABLE . " ug 
+				WHERE ug.user_id = ". $users[$i]['user_id'] ."
+        AND ug.group_id = $group_id 
+				AND aa.group_id = ug.group_id";
+				if ( !($result = $db->sql_query($sql)) )
+				{
+					message_die(GENERAL_ERROR, 'Could not obtain moderator status', '', __LINE__, __FILE__, $sql);
+			  }
+        $mod = $db->sql_fetchrow($result);    
+
+        if ( $mod['auth_mod'] )
+        {        
+          $sql = "UPDATE " . USERS_TABLE . " 
+			    	SET user_level = " . MOD . " 
+						WHERE user_id = ". $users[$i]['user_id'] ."
+            AND user_id != ". $group_mod['group_moderator'];
+				}
+			  else
+        {
+          $sql = "UPDATE " . USERS_TABLE . " 
+			  		SET user_level = " . USER . " 
+						WHERE user_id = ". $users[$i]['user_id'] ."
+            AND user_id != ". $group_mod['group_moderator'];
+        }
+        	if ( !$db->sql_query($sql) )
+					{
+					 	message_die(GENERAL_ERROR, 'Could not update user level', '', __LINE__, __FILE__, $sql);
+					}      
+     }
+  }
+  // Admin Group
+
+# 
+#-----[ OPEN ]------------------------------------------ 
+# 
+templates/subSilver/admin/group_edit_body.tpl 
+
+# 
+#-----[ FIND ]------------------------------------------ 
+# 
+	<tr> 
+	  <td class="row1" width="38%"><span class="gen">{L_GROUP_DELETE}:</span></td>
+	  <td class="row2" width="62%"> 
+		<input type="checkbox" name="group_delete" value="1">
+		{L_GROUP_DELETE_CHECK}</td>
+	</tr>
+	<!-- END group_edit -->
+
+# 
+#-----[ BEFORE, ADD ]------------------------------------------ 
+# 
+	<tr> 
+	  <td class="row1" width="38%"><span class="gen">{L_ADMIN_GROUP}:</span>
+    <br />
+	  <span class="gensmall">{L_ADMIN_GROUP_EXPLAIN}</span></td>
+	  <td class="row2" width="62%"> 
+		<input onclick="group_rank.setAttribute('disabled', !getAttribute('checked')); set_rank.setAttribute('disabled', !getAttribute('checked'))" type="checkbox" name="admin_group" value="1" {S_ADMIN_GROUP_CHECKED} />
+		{L_ADMIN_GROUP_CHECK}</td>
+	</tr>
+  <tr>
+		<td class="row1" width="38%"><span class="gen">{L_SELECT_RANK}:</span></td>
+		<td class="row2" width="62%"><select name="group_rank">{RANK_SELECT_BOX}</select></td>
+	</tr>
+  <tr>
+		<td class="row1" width="38%"><span class="gen">{L_SELECT_RANK2}:</span></td>
+		<td class="row2" width="62%"><input type="checkbox" name="set_rank" value="1" />
+	  <span class="gensmall">{L_SELECT_RANK2_EXPLAIN}</span></td>
+	</tr>
+
+# 
+#-----[ SAVE/CLOSE ALL FILES ]------------------------------------------ 
+# 
+# EoM

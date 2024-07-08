@@ -1,0 +1,12 @@
+<maps>
+<? foreach ($this->ranking->paginator->getIterator() as $map): ?>
+    <map position="<?= $map->position ?>">
+        <id><?= $this->Cdata($map->id) ?></id>
+        <name><?= $this->Cdata($map->name) ?></name>
+        <rating><?= $this->Cdata($map->rating) ?></rating>
+        <races><?= $this->Cdata($map->races) ?></races>
+        <playtime><?= $this->Cdata($map->playtime) ?></playtime>
+        <downloads><?= $this->Cdata($map->playtime) ?></downloads>
+    </map>
+<? endforeach; ?>
+</maps>

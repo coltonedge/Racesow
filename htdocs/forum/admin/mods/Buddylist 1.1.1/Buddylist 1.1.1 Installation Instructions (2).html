@@ -1,0 +1,462 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	<title>Buddylist 1.1.1 &#124;&#124; Installation Instructions (2)</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body
+{
+}
+
+font, p, td
+{
+	font-family: Verdana;
+	font-size: 10px;
+}
+
+table
+{
+	background-color: #FF6600;
+}
+
+th
+{
+	font-weight: bold;
+	color: #FFFFFF;
+	background-color: #007700;
+	font-family: "Trebuchet MS";
+	font-size: 12px;
+	height: 25px;
+}
+
+td
+{
+	background-color: #FFFFFF;
+}
+
+.code
+{
+	font-family: Courier, "Courier New";
+	font-size: 11px;
+	background-color: #999999;
+	color: #FFFFFF;
+	padding: 5px;
+}
+
+.top, a.top
+{
+	font-size: 9px;
+	background-color: #007700;
+	color: #FFFFFF;
+	height: 15px;
+}
+
+h1
+{
+	font-family: "Trebuchet MS";
+	font-size: 24px;
+	font-weight: bold;
+}
+
+.markup
+{
+	color: #007700;
+}
+-->
+</style>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000" link="#007700" alink="#FF6600" vlink="#FF6600">
+<a name="top"></a>
+<table width="100%" cellspacing="0" cellpadding="10" border="0">
+	<tr>
+		<td align="center">
+			<h1>Buddylist 1.1.1</h1>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<table width="100%" cellspacing="1" cellpadding="2" border="0">
+				<tr>
+					<th>
+						Introduction
+					</th>
+				</tr>
+				<tr>
+					<td>
+						I trust that you have installed the rest of the Buddylist already. If not, do so now please, by reading <a href="Buddylist%201.1.1%20-%20Read%20Me%20First.txt">the text file</a>.
+						<br />
+						This Buddylist version has been designed so it can be visible on <i>any</i> page of your forum. But of course, without a guide you wouldn't know where. That's why I have made this guide. First of all, I will discuss a few specific pages with detailed instructions. After that, I will give comprehensive information on how to add it to other pages than the ones below. You are in no way obligated adding them to different pages; all I want to do, is give an example to answer two frequently asked questions regarding the Buddylist.<br />
+						<br />
+						This document describes the alternative way of listing the buddies, simply by comma-separating them and showing the online buddies in bold. Read <a href="Buddylist%201.1.1%20Installation%20Instructions%20(1).html">this file</a> if you want the original buddylist. You can also combine the two of course ;-).
+					</td>
+				</tr>
+				<tr>
+					<td>Note: you will see a part of code called <span class="markup">get_buddies_list($userdata);</span>. This part retrieves the Buddylist from database, and links them to their profile. However, I have added an option so it automatically links them to sending a new private message. For doing so, use <span class="markup">get_buddies_list($userdata, 'pm');</span> instead.</td>
+				</tr>
+				<tr>
+					<td>
+						You can use this guide to install the Buddylist in the following pages:
+						<br>
+						<ul type="circle">
+							<li>
+								<a href="#viewprofile">View profile</a>
+							</li>
+							<li>
+								<a href="#privmsg">Private messages section</a>
+							</li>
+							<li>
+								<a href="#other">Other...</a>
+							</li>
+						</ul>
+					</td>
+				</tr>
+				<tr>
+					<th>
+						<a name="viewprofile"></a>In view profile
+					</th>
+				</tr>
+				<tr>
+					<td>
+						The Buddylist will be spread over the whole width of the page, underneath the actual profile. The buddies that will be shown, are the buddies from the user you are watching the profile, not your own buddies!
+					</td>
+				</tr>
+				<tr>
+					<td class="code">
+						#
+						<br>
+						#-----[ OPEN ]--------------------------------------------
+						<br>
+						#
+						<br>
+						includes/usercp_viewprofile.php
+						<br>
+						<br>
+						#
+						<br>
+						#-----[ FIND ]--------------------------------------------
+						<br>
+						#
+						<br>
+						$template-&gt;pparse('body');
+						<br>
+						<br>
+						include($phpbb_root_path . 'includes/page_tail.'.$phpEx);
+						<br>
+						<br>
+						?&gt;
+						<br>
+						<br>
+						#
+						<br>
+						#-----[ BEFORE, ADD ]-------------------------------------
+						<br>
+						#
+						<br>
+						get_buddies_list($profiledata);
+						<br>
+						<br>
+						#
+						<br>
+						#-----[ OPEN ]--------------------------------------------
+						<br>
+						#
+						<br>
+						# make sure to edit this file for every template installed
+						<br>
+						#
+						<br>
+						templates/subSilver/profile_view_body.tpl
+						<br>
+						<br>
+						#
+						<br>
+						#-----[ FIND ]--------------------------------------------
+						<br>
+						#
+						<br>
+						&nbsp;&nbsp;&nbsp;&nbsp;&lt;/table&gt;&lt;/td&gt;
+						<br>
+						&nbsp;&nbsp;&lt;/tr&gt;
+						<br>
+						&lt;/table&gt;
+						<br>
+						<br>
+						#
+						<br>
+						#-----[ AFTER, ADD ]--------------------------------------
+						<br>
+						#
+						<br>
+						&lt;br /&gt;
+						<br>
+						<br>
+						&lt;table width=&quot;100%&quot; cellspacing=&quot;1&quot; cellpadding=&quot;3&quot; border=&quot;0&quot; class=&quot;forumline&quot;&gt;
+						<br>
+						&nbsp;&nbsp;&lt;tr&gt;
+						<br>
+						&nbsp;&nbsp;&nbsp;&nbsp;&lt;th class=&quot;thHead&quot;&gt;{L_BUDDYLIST}&lt;/th&gt;
+						<br>
+						&nbsp;&nbsp;&lt;/tr&gt;
+						<br>
+						&nbsp;&nbsp;&lt;tr&gt;
+						<br>
+						&nbsp;&nbsp;&nbsp;&nbsp;&lt;td class=&quot;row1&quot;&gt;&lt;span class=&quot;genmed&quot;&gt;{S_BUDDIES}&lt;/span&gt;&lt;/td&gt;
+						<br>
+						&nbsp;&nbsp;&lt;/tr&gt;
+						<br>
+						&nbsp;&nbsp;&lt;tr&gt;
+						<br>
+						&nbsp;&nbsp;&nbsp;&nbsp;&lt;td class=&quot;catBottom&quot;height=&quot;28&quot;&gt;&nbsp;&lt;/td&gt;
+						<br>
+						&nbsp;&nbsp;&lt;/tr&gt;
+						<br>
+						&lt;/table&gt;
+						<br>
+						<br>
+						#
+						<br>
+						#-----[ SAVE &amp; CLOSE ALL FILES ]--------------------------
+						<br>
+						#
+					</td>
+				</tr>
+				<tr>
+					<td class="top" align="right">
+						<a href="#top" class="top">back to top...</a>
+					</td>
+				</tr>
+				<tr>
+					<th>
+						<a name="privmsg"></a>In private messages section
+					</th>
+				</tr>
+				<tr>
+					<td>
+						This will put the Buddylist on the bottom of the private messages listing.
+					</td>
+				</tr>
+				<tr>
+					<td class="code">
+						#
+						<br>
+						#-----[ OPEN ]--------------------------------------------
+						<br>
+						#
+						<br>
+						privmsg.php
+						<br>
+						<br>
+						#
+						<br>
+						#-----[ FIND ]--------------------------------------------
+						<br>
+						#
+						<br>
+						$template-&gt;pparse('body');
+						<br>
+						<br>
+						include($phpbb_root_path . 'includes/page_tail.'.$phpEx);
+						<br>
+						<br>
+						?&gt;
+						<br>
+						<br>
+						#
+						<br>
+						#-----[ BEFORE, ADD ]-------------------------------------
+						<br>
+						#
+						<br>
+						get_buddies_list($userdata);
+						<br>
+						<br>
+						#
+						<br>
+						#-----[ OPEN ]--------------------------------------------
+						<br>
+						#
+						<br>
+						# make sure to edit this file for every template installed
+						<br>
+						#
+						<br>
+						templates/subSilver/privmsgs_body.tpl
+						<br>
+						<br>
+						#
+						<br>
+						#-----[ FIND ]--------------------------------------------
+						<br>
+						#
+						<br>
+						&nbsp;&nbsp;&lt;/table&gt;
+						<br>
+						&lt;/form&gt;
+						<br>
+						<br>
+						#
+						<br>
+						#-----[ AFTER, ADD ]--------------------------------------
+						<br>
+						#
+						<br>
+						&lt;br /&gt;
+						<br>
+						<br>
+						&lt;table width=&quot;100%&quot; cellspacing=&quot;1&quot; cellpadding=&quot;3&quot; border=&quot;0&quot; class=&quot;forumline&quot;&gt;
+						<br>
+						&nbsp;&nbsp;&lt;tr&gt;
+						<br>
+						&nbsp;&nbsp;&nbsp;&nbsp;&lt;th class=&quot;thHead&quot;&gt;{L_BUDDYLIST}&lt;/th&gt;
+						<br>
+						&nbsp;&nbsp;&lt;/tr&gt;
+						<br>
+						&nbsp;&nbsp;&lt;tr&gt;
+						<br>
+						&nbsp;&nbsp;&nbsp;&nbsp;&lt;td class=&quot;row1&quot;&gt;&lt;span class=&quot;genmed&quot;&gt;{S_BUDDIES}&lt;/span&gt;&lt;/td&gt;
+						<br>
+						&nbsp;&nbsp;&lt;/tr&gt;
+						<br>
+						&nbsp;&nbsp;&lt;tr&gt;
+						<br>
+						&nbsp;&nbsp;&nbsp;&nbsp;&lt;td class=&quot;catBottom&quot;height=&quot;28&quot;&gt;&nbsp;&lt;/td&gt;
+						<br>
+						&nbsp;&nbsp;&lt;/tr&gt;
+						<br>
+						&lt;/table&gt;
+						<br>
+						<br>
+						#
+						<br>
+						#-----[ SAVE &amp; CLOSE ALL FILES ]--------------------------
+						<br>
+						#
+					</td>
+				</tr>
+				<tr>
+					<td class="top" align="right">
+						<a href="#top" class="top">back to top...</a>
+					</td>
+				</tr>
+				<tr>
+					<th>
+						<a name="other"></a>Other...
+					</th>
+				</tr>
+				<tr>
+					<td>
+						There are a few basic lines of code that you need to have the Buddylist working. They are listed here.<br /><br />
+						For the template, you will have to search yourself where exactly you have/want to put the Buddylist code.
+						Note that you can also embed the code inside a table, alter the code and so on.
+					</td>
+				</tr>
+				<tr>
+					<td class="code">
+						#
+						<br>
+						#-----[ OPEN ]--------------------------------------------
+						<br>
+						#
+						<br>
+						*.php
+						<br>
+						<br>
+						#
+						<br>
+						#-----[ FIND ]--------------------------------------------
+						<br>
+						#
+						<br>
+						$template-&gt;pparse('body');
+						<br>
+						<br>
+						include($phpbb_root_path . 'includes/page_tail.'.$phpEx);
+						<br>
+						<br>
+						?&gt;
+						<br>
+						<br>
+						#
+						<br>
+						#-----[ BEFORE, ADD ]-------------------------------------
+						<br>
+						#
+						<br>
+						get_buddies_list($userdata);
+						<br>
+						<br>
+						#
+						<br>
+						#-----[ OPEN ]--------------------------------------------
+						<br>
+						#
+						<br>
+						# open the .tpl file that belongs to the PHP file you just edited
+						<br>
+						# make sure to edit this file for every template installed
+						<br>
+						#
+						<br>
+						templates/subSilver/*.tpl
+						<br>
+						<br>
+						#
+						<br>
+						#-----[ ADD ]---------------------------------------------
+						<br>
+						#
+						<br>
+						&lt;table width=&quot;100%&quot; cellspacing=&quot;1&quot; cellpadding=&quot;3&quot; border=&quot;0&quot; class=&quot;forumline&quot;&gt;
+						<br>
+						&nbsp;&nbsp;&lt;tr&gt;
+						<br>
+						&nbsp;&nbsp;&nbsp;&nbsp;&lt;th class=&quot;thHead&quot;&gt;{L_BUDDYLIST}&lt;/th&gt;
+						<br>
+						&nbsp;&nbsp;&lt;/tr&gt;
+						<br>
+						&nbsp;&nbsp;&lt;tr&gt;
+						<br>
+						&nbsp;&nbsp;&nbsp;&nbsp;&lt;td class=&quot;row1&quot;&gt;&lt;span class=&quot;genmed&quot;&gt;{S_BUDDIES}&lt;/span&gt;&lt;/td&gt;
+						<br>
+						&nbsp;&nbsp;&lt;/tr&gt;
+						<br>
+						&nbsp;&nbsp;&lt;tr&gt;
+						<br>
+						&nbsp;&nbsp;&nbsp;&nbsp;&lt;td class=&quot;catBottom&quot;height=&quot;28&quot;&gt;&nbsp;&lt;/td&gt;
+						<br>
+						&nbsp;&nbsp;&lt;/tr&gt;
+						<br>
+						&lt;/table&gt;
+						<br>
+						<br>
+						#
+						<br>
+						#-----[ SAVE &amp; CLOSE ALL FILES ]--------------------------
+						<br>
+						#
+					</td>
+				</tr>
+				<tr>
+					<td class="top" align="right">
+						<a href="#top" class="top">back to top...</a>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<table width="100%" cellspacing="1" cellpadding="2" border="0">
+				<tr>
+					<td align="right" class="top">&copy;2003 <a href="http://www.phpbbhacks.com/viewhack.php?id=909" target="_hacks" class="top">Buddylist 1.1.1</a> by <a href="http://www.freakingbooty.tk" target="_fb" class="top">Freakin' Booty ;-P</a><br />
+						Support: <a href="http://www.phpbbhacks.com/forums" target="_hacks" class="top">phpBBHacks.com forums</a>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</body>
+</html>

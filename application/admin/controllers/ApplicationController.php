@@ -1,0 +1,1 @@
+<?php/** * Controller for the Admin Homepage * * @uses       Racenet_Controller_Action  * @copyright   * @license     */class Admin_ApplicationController extends Racenet_Controller_Action{    /**     * indexAction     *     */    public function indexAction()    {    }}?>

@@ -1,0 +1,119 @@
+<div style="margin-left: auto; margin-right: auto; width: 900px;">
+    
+    <table class="racenet" border="0" width="100%">
+        <thead>
+          <td colspan="9">
+              <div style="float: left;">
+				<?= $this->clan->name ?>
+              </div>
+			  <div style="float: right">
+				<? if ($this->account->isLoggedIn()): ?>
+					<? if ($this->member): ?>
+						<? if ($this->account->User->user_id == $this->clan->owner_id): ?>
+							<a href="<?= $this->url(array('controller' => 'groups', 'action' => 'invite', 'id' => $this->clan->id), null, true) ?>" style="font-size: 14px;">invite player</a>
+							&nbsp;|&nbsp;
+							<a href="<?= $this->url(array('controller' => 'groups', 'action' => 'edit', 'id' => $this->clan->id), null, true) ?>" style="font-size: 14px;">edit group</a>
+						<? else: ?>
+							<a href="<?= $this->url(array('controller' => 'groups', 'action' => 'leave', 'id' => $this->clan->id), null, true) ?>" style="font-size: 14px;">leave group</a>
+						<? endif ?>
+					<? elseif ($this->clan->type == 'public'): ?>
+						<a href="<?= $this->url(array('controller' => 'groups', 'action' => 'join', 'id' => $this->clan->id), null, true) ?>" style="font-size: 14px;">join group</a>
+					<? endif ?>
+				<? endif ?>
+			  </div>
+              <div style="clear: both;"></div>
+          </td>
+        </thead>
+		<? if ($this->messages): ?>
+		<tr><td colspan="9">
+		<ul style="list-style: none; color: #0f0; font-weight: bold;">
+		<? foreach ($this->messages as $message): ?>
+			<li><?= $message ?></li>       
+		<? endforeach ?>
+		</ul></td></tr>
+		<? endif; ?>
+		<tr>
+		  <td colspan="9">
+			<?= $this->clan->description ?>
+		  </td>
+		</tr>
+		<? if ($this->clan->website): ?>
+		<tr>
+		  <td colspan="9">
+			<a target="_blank" href="<?= $this->clan->website ?>"><?= $this->clan->website ?></a>
+		  </td>
+		</tr>
+		<? endif ?>
+    
+        <? if ($this->paginator): ?>
+        
+        <tr>
+            <td colspan="9">
+                <?= $renderedPaginator = $this->paginationControl($this->paginator, 'Sliding', 'zend_paginator.phtml') ?>
+             </td>
+        </tr>
+    
+        <tr class="racenet_semihead rankedmaps_click">
+            <td style="width: 580px; text-align: left;">
+                Player
+            </td>
+			<td style="width: 120px; text-align: left;">
+                Points <span style="font-size: 10px;">(diff)</span>
+            </td>
+			<td style="width: 100px; text-align: left;">
+                Races
+            </td>
+			<td style="width: 100px; text-align: left;">
+                Maps
+            </td>
+            <td style="text-align: center;">
+                &nbsp;
+            </td>
+        </tr>
+
+        <? foreach($this->paginator->getIterator() as $member): ?>
+		<tr class="racenet_row">
+			<td style="font-size: 14px; text-align: left;">
+				<a href="<?= $this->url(array('controller' => 'player', 'action' => 'index', 'id' => $member->Player->id), null, true) ?>"><?= $this->Nickname($member->Player->name) ?></a>
+			</td>
+			<td style="font-size: 14px; text-align: left;">
+				<b><?= $member->Player->points ?></b> <span style="font-size: 10px;">(<?= $member->Player->diff_points > 0 ? '+' : '' ?><?= $member->Player->diff_points ?>)</span>
+			</td>
+			<td style="font-size: 14px; text-align: left;">
+				<?= $member->Player->races ?>
+			</td>
+			<td style="font-size: 14px; text-align: left;">
+				<?= $member->Player->maps ?>
+			</td>
+		</tr>
+		<? endforeach ?>
+		
+        <tr>
+           <td colspan="9">
+               <?= $renderedPaginator ?>
+           </td>
+        </tr>
+        
+    <? else: ?>
+    <tr><td>No players in this group        </td></tr>
+    <? endif; ?>
+    </table>
+	
+	<? if ($this->invitations->count()): ?>
+	<table class="racenet" border="0" width="100%">
+        <thead>
+          <td colspan="9">
+              <div style="float: left;">
+                  Open invitations
+              </div>
+              <div style="clear: both;"></div>
+          </td>
+        </thead>
+		<? foreach ($this->invitations as $invitation): ?>
+		<tr class="racenet_row">
+			<td colspan="9"><?= $this->Nickname($invitation->Player->name) ?></td>
+		</tr>
+		<? endforeach ?>
+	</table>
+	<? endif ?>
+</div>
